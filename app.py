@@ -2,74 +2,90 @@ from flask import Flask, request, jsonify, render_template
 import joblib
 import pandas as pd
 import numpy as np
-from supabase_client import save_prediction  # We'll create this next
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from collections import defaultdict
 
 app = Flask(__name__)
 
-# Load models
+# Load model artifacts
 try:
-    model = joblib.load('model_stage1.pkl')
-    le = joblib.load('label_encoder.pkl')
-    print("Models loaded successfully")
+    model = joblib.load('results/disease_predictor.joblib')
+    le = joblib.load('results/label_encoder.joblib')
+    feature_cols = joblib.load('results/feature_columns.joblib')
+    print("Successfully loaded all model artifacts")
 except Exception as e:
-    print(f"Error loading models: {str(e)}")
-    model = None
-    le = None
+    print(f"Error loading model artifacts: {str(e)}")
+    raise
 
-# Get symptom columns from dataset
-if os.path.exists('data/X_train.csv'):
-    sample_df = pd.read_csv('data/X_train.csv', nrows=1)
-    SYMPTOMS = sample_df.columns.tolist()
-else:
-    SYMPTOMS = []
+
+def organize_symptoms(features):
+    """Organize symptoms into logical groups."""
+    groups = {
+        'General': [],
+        'Respiratory': [],
+        'Gastrointestinal': [],
+        'Neurological': [],
+        'Dermatological': [],
+        'Other': []
+    }
+
+    # Categorize each symptom
+    for symptom in features:
+        symptom_lower = symptom.lower()
+        if 'fever' in symptom_lower or 'fatigue' in symptom_lower:
+            groups['General'].append(symptom)
+        elif 'cough' in symptom_lower or 'breath' in symptom_lower:
+            groups['Respiratory'].append(symptom)
+        elif 'vomit' in symptom_lower or 'diarrhoea' in symptom_lower or 'abdominal' in symptom_lower:
+            groups['Gastrointestinal'].append(symptom)
+        elif 'headache' in symptom_lower or 'dizziness' in symptom_lower or 'vertigo' in symptom_lower:
+            groups['Neurological'].append(symptom)
+        elif 'rash' in symptom_lower or 'itching' in symptom_lower or 'skin' in symptom_lower:
+            groups['Dermatological'].append(symptom)
+        else:
+            groups['Other'].append(symptom)
+
+    # Remove empty groups
+    return {k: v for k, v in groups.items() if v}
 
 
 @app.route('/')
 def home():
-    return render_template('index.html', symptoms=SYMPTOMS)
+    """Render the symptom checker interface."""
+    symptom_groups = organize_symptoms(feature_cols)
+    return render_template('index.html', symptom_groups=symptom_groups)
 
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if model is None or le is None:
-        return jsonify({"error": "Model not loaded"}), 500
-
+    """API endpoint for predictions."""
     try:
-        # Get symptoms from form
-        symptoms_data = request.json.get('symptoms', {})
+        symptoms = request.json.get('symptoms', {})
+        input_data = {col: 0 for col in feature_cols}
+        input_data.update({
+            k: 1 for k, v in symptoms.items()
+            if k in feature_cols and (v == True or v == 'true' or v == '1')
+        })
+        input_df = pd.DataFrame([input_data])[feature_cols]
 
-        # Create input vector
-        input_vector = np.zeros((1, len(SYMPTOMS)))
-        for i, symptom in enumerate(SYMPTOMS):
-            input_vector[0, i] = symptoms_data.get(symptom, 0)
+        probas = model.predict_proba(input_df)[0]
+        top3_idx = np.argsort(probas)[-3:][::-1]
 
-        # Predict
-        probas = model.predict_proba(input_vector)[0]
-        top3_idx = probas.argsort()[-3:][::-1]
-        top3_diseases = le.inverse_transform(top3_idx)
-        top3_conf = [round(float(conf), 4) for conf in probas[top3_idx]]
+        results = [{
+            'disease': le.inverse_transform([idx])[0],
+            'confidence': float(probas[idx]),
+            'probability': f"{probas[idx]:.1%}"
+        } for idx in top3_idx]
 
-        # Format predictions
-        predictions = [
-            {"disease": d, "confidence": c}
-            for d, c in zip(top3_diseases, top3_conf)
-        ]
-
-        # Save to Supabase if configured
-        if os.getenv('SUPABASE_URL'):
-            try:
-                save_prediction(symptoms_data, predictions)
-            except Exception as e:
-                print(f"Supabase save error: {str(e)}")
-
-        return jsonify({"predictions": predictions})
-
+        return jsonify({
+            'success': True,
+            'predictions': results,
+            'top_prediction': results[0]['disease']
+        })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
 
 
 if __name__ == '__main__':
