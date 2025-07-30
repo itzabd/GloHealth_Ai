@@ -16,11 +16,7 @@ warnings.filterwarnings('ignore')
 class GeoAnalyzer:
     def __init__(self):
         # Initialize Supabase client
-        self.supabase: Client = create_client(
-            supabase_url="https://qmktyfkebpjtihxmfbgp.supabase.co",
-            supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFta3R5ZmtlYnBqdGloeG1mYmdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NzA3NTYsImV4cCI6MjA2OTI0Njc1Nn0.cAqokDfgN3PgHTQzyW-bPELgJlm3--a-O_Q97SFeTEk"
-        )
-
+        
         # Load model artifacts
         self.model = joblib.load('results/production_model.joblib')
         self.le = joblib.load('results/label_encoder.joblib')
