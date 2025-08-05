@@ -16,7 +16,11 @@ warnings.filterwarnings('ignore')
 class GeoAnalyzer:
     def __init__(self):
         # Initialize Supabase client
-        
+        self.supabase: Client = create_client(
+            supabase_url="https://qmktyfkebpjtihxmfbgp.supabase.co",
+            supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFta3R5ZmtlYnBqdGloeG1mYmdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NzA3NTYsImV4cCI6MjA2OTI0Njc1Nn0.cAqokDfgN3PgHTQzyW-bPELgJlm3--a-O_Q97SFeTEk"
+        )
+
         # Load model artifacts
         self.model = joblib.load('results/production_model.joblib')
         self.le = joblib.load('results/label_encoder.joblib')
@@ -25,6 +29,71 @@ class GeoAnalyzer:
         # Geo configuration
         self.usa_center = [37.0902, -95.7129]
         self.zoom_level = 4
+
+    def load_geo_data(self):
+        """Load and process data with geo information."""
+        train_df = pd.read_csv("data/train.csv")
+        test_df = pd.read_csv("data/test.csv")
+        full_df = pd.concat([train_df, test_df])
+
+        # Generate mock coordinates if not available
+        if 'lat' not in full_df.columns:
+            full_df['lat'] = full_df['zip'].apply(lambda x: float(str(x)[:2]) + np.random.uniform(0, 1))
+            full_df['long'] = full_df['zip'].apply(lambda x: float(str(x)[2:]) - 100 + np.random.uniform(-1, 1))
+
+        return full_df
+
+    def predict_diseases(self, df):
+        """Add predicted diseases to dataframe."""
+        X = df[self.feature_cols].fillna(0)
+        df['predicted'] = self.le.inverse_transform(self.model.predict(X))
+        df['confidence'] = np.max(self.model.predict_proba(X), axis=1)
+        return df
+
+    def create_disease_map(self, df):
+        """Generate interactive disease cluster map."""
+        disease_map = folium.Map(location=self.usa_center, zoom_start=self.zoom_level)
+
+        # Add heatmap first (renders below markers)
+        HeatMap(df[['lat', 'long', 'confidence']].values.tolist(),
+                name="Case Density").add_to(disease_map)
+
+        # Add clustered markers
+        for disease in df['predicted'].unique():
+            cluster = MarkerCluster(name=disease)
+            subset = df[df['predicted'] == disease]
+
+            for _, row in subset.iterrows():
+                popup = f"""
+                <b>{row['predicted']}</b><br>
+                Confidence: {row['confidence']:.1%}<br>
+                ZIP: {row['zip']}<br>
+                Date: {row['timestamp']}
+                """
+                cluster.add_child(
+                    folium.Marker(
+                        location=[row['lat'], row['long']],
+                        popup=popup,
+                        icon=folium.Icon(color=self._get_disease_color(row['predicted']))
+                    )
+                )
+            disease_map.add_child(cluster)
+
+        folium.LayerControl().add_to(disease_map)
+        return disease_map
+
+    def plot_seasonal_trends(self, df):
+        """Generate monthly disease frequency plots."""
+        df['month'] = pd.to_datetime(df['timestamp']).dt.month_name()
+        monthly_counts = df.groupby(['predicted', 'month']).size().unstack().fillna(0)
+
+        plt.figure(figsize=(14, 8))
+        sns.heatmap(monthly_counts, cmap="YlOrRd", annot=True, fmt='g')
+        plt.title('Disease Cases by Month')
+        plt.ylabel('Disease')
+        plt.xlabel('Month')
+        plt.tight_layout()
+        return plt
 
     def _ensure_table_exists(self):
         """Ensure the table exists with correct structure."""
@@ -82,7 +151,40 @@ class GeoAnalyzer:
                 print("⚠️ First record example:", records[0])
             return False
 
-    # [Keep all other methods exactly the same]
+    def _get_disease_color(self, disease):
+        """Get consistent colors for diseases."""
+        color_map = {
+            'Diabetes': 'red',
+            'Hypertension': 'blue',
+            'Asthma': 'green',
+            'Flu': 'orange',
+            'COVID-19': 'purple'
+        }
+        return color_map.get(disease, 'gray')
+
+    def run_analysis(self):
+        """Execute full analysis pipeline."""
+        print("Starting geo-temporal analysis...")
+
+        try:
+            df = self.load_geo_data()
+            df = self.predict_diseases(df)
+
+            # Generate visualizations
+            self.create_disease_map(df).save('results/disease_clusters.html')
+            self.plot_seasonal_trends(df).savefig('results/seasonal_trends.png')
+            plt.close()
+
+            # Update Supabase
+            if self.update_supabase_insights(df):
+                print("✅ Successfully updated Supabase")
+            else:
+                print("⚠️ Supabase update had some issues")
+
+            print("Analysis completed successfully!")
+
+        except Exception as e:
+            print(f"❌ Analysis failed: {str(e)}")
 
 
 if __name__ == "__main__":

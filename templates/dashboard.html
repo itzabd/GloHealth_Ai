@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}ড্যাশবোর্ড{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white bangla">
+                <i class="bi bi-person"></i> ব্যবহারকারী তথ্য
+            </div>
+            <div class="card-body">
+                <h5 class="bangla">{{ current_user.name }}</h5>
+                <p class="bangla">
+                    <i class="bi bi-envelope"></i> {{ current_user.email }}<br>
+                    <i class="bi bi-geo-alt"></i> {{ current_user.address.city }}, {{ current_user.address.division }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white bangla">
+                <i class="bi bi-clock-history"></i> সাম্প্রতিক পরীক্ষা
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bangla">
+                                <th>তারিখ</th>
+                                <th>লক্ষণ</th>
+                                <th>রোগ</th>
+                                <th>নিশ্চিততা</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in predictions %}
+                            <tr>
+                                <td>{{ pred.formatted_time }}</td>
+                                <td>{{ pred.symptoms|join(', ') }}</td>
+                                <td class="bangla">{{ pred.top_prediction }}</td>
+                                <td>{{ (pred.confidence * 100)|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,34 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>GloHealth Symptom Checker</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GloHealth - বাংলাদেশের স্বাস্থ্য পরীক্ষক</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.alkalami.net/css?family=SolaimanLipi" rel="stylesheet">
     <style>
-        body { padding: 20px; }
+        :root {
+            --bd-primary: #0d6efd;
+            --bd-success: #198754;
+        }
+        body {
+            padding: 20px;
+            font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif;
+        }
+        .bangla { font-family: 'SolaimanLipi', sans-serif; }
         .symptom-group { margin-bottom: 20px; }
         #symptom-container { max-height: 60vh; overflow-y: auto; }
         .progress { height: 24px; }
+        #location-section { margin-bottom: 20px; }
+        #geo-loading { display: none; }
+        .card-header { font-weight: 600; }
+        .form-check-label { cursor: pointer; }
+        @media (max-width: 768px) {
+            #symptom-container { max-height: none; overflow-y: visible; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-4">GloHealth Symptom Checker</h1>
+        <!-- Header with Language Toggle -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-center mb-0 bangla">গ্লো হেলথ লক্ষণ পরীক্ষক</h1>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="languageToggle">
+                <label class="form-check-label bangla" for="languageToggle">English</label>
+            </div>
+        </div>
 
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                Select Your Symptoms
+        <!-- Location Section -->
+        <div class="card mb-3" id="location-section">
+            <div class="card-header bg-info text-white bangla">
+                <i class="bi bi-geo-fill"></i> অবস্থান তথ্য
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="division" class="form-label bangla">বিভাগ</label>
+                        <select class="form-select bangla" id="division" required>
+                            <option value="" selected disabled class="bangla">বিভাগ নির্বাচন করুন</option>
+                            <option value="Dhaka">ঢাকা</option>
+                            <option value="Chittagong">চট্টগ্রাম</option>
+                            <option value="Rajshahi">রাজশাহী</option>
+                            <option value="Khulna">খুলনা</option>
+                            <option value="Barisal">বরিশাল</option>
+                            <option value="Sylhet">সিলেট</option>
+                            <option value="Rangpur">রংপুর</option>
+                            <option value="Mymensingh">ময়মনসিংহ</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="zipcode" class="form-label bangla">পোস্ট কোড</label>
+                        <input type="text" class="form-control bangla" id="zipcode"
+                               placeholder="১২৩৪" maxlength="4" pattern="[০-৯\d]{4}"
+                               title="৪ ডিজিটের পোস্ট কোড লিখুন">
+                    </div>
+                    <div class="col-md-4 d-flex flex-column justify-content-end">
+                        <button class="btn btn-outline-primary bangla" id="geo-btn" onclick="getLocation()">
+                            <i class="bi bi-geo-alt"></i> আমার অবস্থান
+                        </button>
+                        <div class="d-flex align-items-center mt-2">
+                            <span id="geo-loading" class="spinner-border spinner-border-sm me-2"></span>
+                            <small id="geo-status" class="text-muted bangla">অবস্থান সনাক্ত করা হয়নি</small>
+                        </div>
+                    </div>
+                </div>
+                <div id="geo-error" class="text-danger mt-2 bangla" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Symptom Selection -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white bangla">
+                <i class="bi bi-clipboard2-pulse"></i> আপনার লক্ষণসমূহ
             </div>
             <div class="card-body" id="symptom-container">
                 {% for group_name, symptoms in symptom_groups.items() %}
                 <div class="symptom-group">
-                    <h5>{{ group_name }}</h5>
+                    <h5 class="bangla">{{ group_name }}</h5>
                     <div class="row">
                         {% for symptom in symptoms %}
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox"
                                        id="{{ symptom }}" name="{{ symptom }}">
-                                <label class="form-check-label" for="{{ symptom }}">
+                                <label class="form-check-label bangla" for="{{ symptom }}">
                                     {{ symptom.replace('_', ' ')|title }}
                                 </label>
                             </div>
@@ -40,64 +108,356 @@
             </div>
         </div>
 
-        <button class="btn btn-primary btn-lg w-100 mt-3" onclick="predict()">
-            Check Symptoms
-        </button>
+        <!-- Action Buttons -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-3">
+            <button class="btn btn-outline-secondary bangla" onclick="resetForm()">
+                <i class="bi bi-x-circle"></i> রিসেট
+            </button>
+            <button class="btn btn-primary bangla" id="submit-btn" onclick="predict()">
+                <i class="bi bi-heart-pulse"></i> পরীক্ষা করুন
+            </button>
+        </div>
 
-        <div id="results" class="card mt-4" style="display: none;">
-            <div class="card-header bg-success text-white">
-                Diagnosis Results
+        <!-- Results -->
+        <div id="results" class="card mt-3" style="display: none;">
+            <div class="card-header bg-success text-white bangla">
+                <i class="bi bi-clipboard2-check"></i> ফলাফল
             </div>
             <div class="card-body" id="results-content"></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        async function predict() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            const symptoms = {};
+        // Global variables
+        const userLocation = {
+            zip: '',
+            division: '',
+            lat: null,
+            long: null
+        };
 
-            checkboxes.forEach(checkbox => {
-                symptoms[checkbox.name] = checkbox.checked;
-            });
+        // Language toggle functionality
+        document.getElementById('languageToggle').addEventListener('change', function() {
+            // Implement language switching logic here
+            console.log('Language toggle:', this.checked ? 'English' : 'Bangla');
+        });
+
+        // Geolocation handler
+        async function getLocation() {
+            const geoBtn = document.getElementById('geo-btn');
+            const geoLoading = document.getElementById('geo-loading');
+            const geoStatus = document.getElementById('geo-status');
+            const geoError = document.getElementById('geo-error');
+
+            geoBtn.disabled = true;
+            geoLoading.style.display = 'inline-block';
+            geoError.style.display = 'none';
+            geoStatus.textContent = 'অবস্থান সনাক্ত করা হচ্ছে...';
+            geoStatus.style.color = '';
 
             try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ symptoms })
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
                 });
 
-                const data = await response.json();
+                userLocation.lat = position.coords.latitude;
+                userLocation.long = position.coords.longitude;
 
-                if (data.success) {
-                    let html = '<h4>Most Likely Conditions:</h4>';
-                    data.predictions.forEach(pred => {
-                        html += `
-                        <div class="mb-3">
-                            <h5>${pred.disease}</h5>
-                            <div class="progress">
-                                <div class="progress-bar"
-                                     style="width: ${pred.confidence * 100}%">
-                                    ${pred.probability}
-                                </div>
-                            </div>
-                        </div>
-                        `;
-                    });
+                // Update UI
+                geoLoading.style.display = 'none';
+                geoBtn.innerHTML = '<i class="bi bi-check-circle"></i> অবস্থান পাওয়া গেছে';
+                geoBtn.classList.remove('btn-outline-primary');
+                geoBtn.classList.add('btn-success');
+                geoStatus.textContent = 'অবস্থান সনাক্ত করা হয়েছে!';
+                geoStatus.style.color = 'var(--bd-success)';
 
-                    document.getElementById('results-content').innerHTML = html;
-                    document.getElementById('results').style.display = 'block';
-                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    alert(`Error: ${data.error}`);
+                // Auto-fill likely division (simplified for Bangladesh)
+                if (userLocation.lat > 23.7 && userLocation.lat < 23.9 &&
+                    userLocation.long > 90.3 && userLocation.long < 90.5) {
+                    document.getElementById('division').value = 'Dhaka';
                 }
+
             } catch (error) {
-                alert('Failed to get predictions. Please try again.');
-                console.error(error);
+                geoLoading.style.display = 'none';
+                geoBtn.disabled = false;
+                geoStatus.textContent = 'অবস্থান সনাক্ত করতে ব্যর্থ';
+                geoStatus.style.color = 'var(--bs-danger)';
+
+                geoError.textContent = `ত্রুটি: ${getGeoError(error.code)}`;
+                geoError.style.display = 'block';
+                console.error('Geolocation error:', error);
             }
         }
+
+        function getGeoError(code) {
+            const errors = {
+                1: 'অনুমতি দেওয়া হয়নি',
+                2: 'অবস্থান পাওয়া যায়নি',
+                3: 'সময়সীমা অতিক্রান্ত'
+            };
+            return errors[code] || 'অজানা ত্রুটি';
+        }
+
+        // Form submission
+       // Add this at the top of your script
+let currentUser = null;
+
+// Modified predict() function
+async function predict() {
+    // 1. Check if user is logged in
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+        alert('Please login first');
+        $('#authModal').modal('show');  // Show login modal
+        return;
+    }
+
+    // 2. Prepare symptoms data (your existing code)
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const symptoms = {};
+    checkboxes.forEach(checkbox => {
+        symptoms[checkbox.name] = true;
+    });
+
+    // 3. Get location values
+    const location = {
+        zipcode: document.getElementById('zipcode').value,
+        division: document.getElementById('division').value,
+        lat: userLocation.lat,
+        long: userLocation.long
+    };
+
+    try {
+        // 4. Send request WITH authorization header
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`  // Attach token here
+            },
+            body: JSON.stringify({
+                symptoms,
+                ...location
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Show results (your existing code)
+            showResults(data);
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Prediction failed:', error);
+        alert('Failed to submit. Please try again.');
+    }
+}
+
+        function showResults(data) {
+            const resultsContainer = document.getElementById('results-content');
+            let html = `
+                <h4 class="bangla">সম্ভাব্য রোগ নির্ণয়:</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr class="bangla">
+                                <th>রোগ</th>
+                                <th>সম্ভাবনা</th>
+                                <th>নিশ্চিততা</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.predictions.forEach(pred => {
+                html += `
+                    <tr>
+                        <td class="bangla">${pred.disease}</td>
+                        <td>${pred.probability}</td>
+                        <td>
+                            <div class="progress">
+                                <div class="progress-bar bg-success"
+                                     style="width: ${pred.confidence * 100}%">
+                                    ${Math.round(pred.confidence * 100)}%
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+
+            // Add location context if available
+            if (data.location_used) {
+                let locationText = '';
+                if (data.location_used.division) {
+                    locationText = `${data.location_used.division} বিভাগের তথ্য ব্যবহার করা হয়েছে`;
+                } else if (data.location_used.zip) {
+                    locationText = `পোস্ট কোড ${data.location_used.zip} এর তথ্য ব্যবহার করা হয়েছে`;
+                }
+
+                if (locationText) {
+                    html += `<p class="text-muted mt-3 bangla"><small>${locationText}</small></p>`;
+                }
+            }
+
+            resultsContainer.innerHTML = html;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('zipcode').value = '';
+            document.getElementById('division').value = '';
+            document.getElementById('results').style.display = 'none';
+
+            // Reset geolocation UI
+            const geoBtn = document.getElementById('geo-btn');
+            geoBtn.innerHTML = '<i class="bi bi-geo-alt"></i> আমার অবস্থান';
+            geoBtn.classList.remove('btn-success');
+            geoBtn.classList.add('btn-outline-primary');
+            geoBtn.disabled = false;
+
+            document.getElementById('geo-status').textContent = 'অবস্থান সনাক্ত করা হয়নি';
+            document.getElementById('geo-status').style.color = '';
+            document.getElementById('geo-error').style.display = 'none';
+
+            // Reset location data
+            userLocation.lat = null;
+            userLocation.long = null;
+        }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Auth Modal -->
+<div class="modal fade" id="authModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title bangla">অ্যাকাউন্ট লগইন/রেজিস্টার</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="authForm">
+          <div class="mb-3">
+            <label class="form-label bangla">ইমেইল</label>
+            <input type="email" class="form-control" id="authEmail" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label bangla">পাসওয়ার্ড</label>
+            <input type="password" class="form-control" id="authPassword" required>
+          </div>
+          <div id="signupFields" style="display:none;">
+            <div class="mb-3">
+              <label class="form-label bangla">নাম</label>
+              <input type="text" class="form-control" id="authName">
+            </div>
+            <h6 class="bangla mt-3">ঠিকানা</h6>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <input type="text" class="form-control bangla" placeholder="ঠিকানা লাইন ১" id="addressLine1">
+              </div>
+              <div class="col-md-6">
+                <input type="text" class="form-control bangla" placeholder="ঠিকানা লাইন ২" id="addressLine2">
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control bangla" placeholder="শহর" id="addressCity">
+              </div>
+              <div class="col-md-4">
+                <select class="form-select bangla" id="addressDivision">
+                  <option value="Dhaka">ঢাকা</option>
+                  <option value="Chittagong">চট্টগ্রাম</option>
+                  <!-- Add other divisions -->
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control bangla" placeholder="পোস্ট কোড" id="addressPostalCode" maxlength="4">
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3 bangla" id="authSubmit">লগইন</button>
+          <button type="button" class="btn btn-link w-100 mt-2 bangla" id="toggleAuthMode">
+            নতুন অ্যাকাউন্ট তৈরি করুন
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auth state management
+  let isSignup = false;
+
+  // Toggle between login/signup
+  document.getElementById('toggleAuthMode').addEventListener('click', () => {
+    isSignup = !isSignup;
+    const fields = document.getElementById('signupFields');
+    const submitBtn = document.getElementById('authSubmit');
+    const toggleBtn = document.getElementById('toggleAuthMode');
+
+    fields.style.display = isSignup ? 'block' : 'none';
+    submitBtn.textContent = isSignup ? 'রেজিস্টার' : 'লগইন';
+    toggleBtn.textContent = isSignup ? 'ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন' : 'নতুন অ্যাকাউন্ট তৈরি করুন';
+  });
+
+  // Handle form submission
+  document.getElementById('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+
+    try {
+      let response;
+      if (isSignup) {
+        const address = {
+          line1: document.getElementById('addressLine1').value,
+          line2: document.getElementById('addressLine2').value,
+          city: document.getElementById('addressCity').value,
+          division: document.getElementById('addressDivision').value,
+          postal_code: document.getElementById('addressPostalCode').value
+        };
+
+        response = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            name: document.getElementById('authName').value,
+            address
+          })
+        });
+      } else {
+        response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        localStorage.setItem('auth_token', data.access_token);
+        $('#authModal').modal('hide');
+        alert(isSignup ? 'অ্যাকাউন্ট তৈরি সফল!' : 'লগইন সফল!');
+      } else {
+        throw new Error(data.error);
+      }
+    } catch (error) {
+      alert(`ত্রুটি: ${error.message}`);
+    }
+  });
+</script>
 </body>
 </html>

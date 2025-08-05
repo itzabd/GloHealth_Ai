@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}লগইন{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 bangla"><i class="bi bi-box-arrow-in-right"></i> অ্যাকাউন্টে লগইন করুন</h4>
+            </div>
+            <div class="card-body">
+                <form id="loginForm" method="POST" action="/login">
+                    <div class="mb-3">
+                        <label for="email" class="form-label bangla">ইমেইল ঠিকানা</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label bangla">পাসওয়ার্ড</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 bangla">
+                        <i class="bi bi-box-arrow-in-right"></i> লগইন
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="/signup" class="bangla">নতুন অ্যাকাউন্ট তৈরি করুন</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

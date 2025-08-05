@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}ফলাফল{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0 bangla"><i class="bi bi-clipboard2-check"></i> রোগ নির্ণয় ফলাফল</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="bangla">সর্বাধিক সম্ভাব্য রোগ:</h5>
+                        <div class="card mb-3 border-primary">
+                            <div class="card-body">
+                                <h4 class="bangla text-primary">{{ prediction.top_prediction }}</h4>
+                                <div class="progress mb-2" style="height: 25px;">
+                                    <div class="progress-bar bg-primary" style="width: {{ prediction.confidence * 100 }}%">
+                                        {{ (prediction.confidence * 100)|round(1) }}%
+                                    </div>
+                                </div>
+                                <p class="bangla">
+                                    <strong>লক্ষণ:</strong>
+                                    {{ prediction.symptoms|join(', ') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="bangla">অন্যান্য সম্ভাবনা:</h5>
+                        {% for pred in prediction.other_predictions %}
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="bangla">{{ pred.disease }}</h6>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" style="width: {{ pred.confidence * 100 }}%">
+                                        {{ (pred.confidence * 100)|round(1) }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5 class="bangla">প্রস্তাবিত পদক্ষেপ:</h5>
+                    <div class="alert alert-info bangla">
+                        <i class="bi bi-info-circle"></i>
+                        অবিলম্বে নিকটস্থ স্বাস্থ্যকেন্দ্রে যোগাযোগ করুন।
+                        জরুরি অবস্থায় ১৬২৬৩ নম্বরে কল করুন।
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="/prediction" class="btn btn-outline-primary bangla">
+                            <i class="bi bi-arrow-repeat"></i> নতুন পরীক্ষা
+                        </a>
+                        <a href="/dashboard" class="btn btn-primary bangla">
+                            <i class="bi bi-speedometer2"></i> ড্যাশবোর্ডে যান
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

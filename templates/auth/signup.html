@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}রেজিস্টার{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0 bangla"><i class="bi bi-person-plus"></i> নতুন অ্যাকাউন্ট তৈরি করুন</h4>
+            </div>
+            <div class="card-body">
+                <form id="signupForm" method="POST" action="/signup">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label bangla">পুরো নাম</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label bangla">ইমেইল ঠিকানা</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label bangla">পাসওয়ার্ড</label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="bangla">ঠিকানা তথ্য</h5>
+                            <div class="mb-3">
+                                <label class="form-label bangla">ঠিকানা লাইন ১</label>
+                                <input type="text" class="form-control" name="address_line1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label bangla">ঠিকানা লাইন ২</label>
+                                <input type="text" class="form-control" name="address_line2">
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-md-6">
+                                    <label class="form-label bangla">শহর</label>
+                                    <input type="text" class="form-control" name="city" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label bangla">বিভাগ</label>
+                                    <select class="form-select" name="division" required>
+                                        <option value="Dhaka">ঢাকা</option>
+                                        <option value="Chittagong">চট্টগ্রাম</option>
+                                        <!-- Add other divisions -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label bangla">পোস্টাল কোড</label>
+                                    <input type="text" class="form-control" name="postal_code" maxlength="4" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mt-3 bangla">
+                        <i class="bi bi-person-plus"></i> অ্যাকাউন্ট তৈরি করুন
+                    </button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="/login" class="bangla">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
