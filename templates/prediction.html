@@ -1,77 +1,79 @@
 {% extends "base.html" %}
-{% block title %}লক্ষণ পরীক্ষা{% endblock %}
+{% block title %}Symptom Checker{% endblock %}
 
 {% block extra_css %}
 <style>
     .symptom-card {
-        transition: all 0.3s;
+        transition: all 0.2s ease;
         cursor: pointer;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        text-align: left;
     }
     .symptom-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-color: var(--bs-primary);
+        background-color: rgba(13, 110, 253, 0.05);
     }
     .symptom-card.selected {
         border: 2px solid var(--bs-primary);
-        background-color: rgba(13, 110, 253, 0.05);
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    .symptom-check {
+        display: none;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row">
+    <!-- Location Section -->
     <div class="col-md-4">
         <div class="card mb-4">
-            <div class="card-header bg-info text-white bangla">
-                <i class="bi bi-geo-alt"></i> অবস্থান তথ্য
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-geo-alt"></i> Location Information
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label bangla">বিভাগ</label>
+                    <label class="form-label">Division</label>
                     <select class="form-select" id="division">
-                        <option value="">বিভাগ নির্বাচন করুন</option>
+                        <option value="">Select Division</option>
                         {% for div in divisions %}
                         <option value="{{ div }}">{{ div }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label bangla">পোস্টাল কোড</label>
-                    <input type="text" class="form-control" id="zipcode" maxlength="4">
-                </div>
-                <button class="btn btn-outline-primary w-100 bangla" id="useLocationBtn">
-                    <i class="bi bi-geo-alt"></i> আমার অবস্থান ব্যবহার করুন
+                <button class="btn btn-outline-primary w-100" id="useLocationBtn">
+                    <i class="bi bi-geo-alt"></i> Use My Location
                 </button>
-                <div id="locationStatus" class="text-muted small mt-2 bangla"></div>
+                <div id="locationStatus" class="text-muted small mt-2"></div>
             </div>
         </div>
     </div>
 
+    <!-- Symptoms Section -->
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-primary text-white bangla">
-                <i class="bi bi-clipboard-pulse"></i> আপনার লক্ষণ নির্বাচন করুন
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-clipboard-pulse"></i> Select Your Symptoms
             </div>
             <div class="card-body">
                 <div class="row" id="symptomContainer">
                     {% for group, symptoms in symptom_groups.items() %}
                     <div class="col-md-6 mb-4">
-                        <h5 class="bangla">{{ group }}</h5>
+                        <h5>{{ group }}</h5>
                         {% for symptom in symptoms %}
-                        <div class="form-check symptom-card p-3 mb-2 rounded selected">
-                            <input class="form-check-input" type="checkbox"
-                                   id="symptom_{{ symptom }}" name="symptoms" value="{{ symptom }}">
-                            <label class="form-check-label bangla" for="symptom_{{ symptom }}">
-                                {{ symptom.replace('_', ' ')|title }}
-                            </label>
+                        <div class="symptom-card mb-2" data-symptom="{{ symptom }}">
+                            <input type="checkbox" class="symptom-check" value="{{ symptom }}">
+                            {{ symptom.replace('_', ' ')|title }}
                         </div>
                         {% endfor %}
                     </div>
                     {% endfor %}
                 </div>
 
-                <button class="btn btn-primary btn-lg w-100 mt-3 bangla" id="predictBtn">
-                    <i class="bi bi-heart-pulse"></i> লক্ষণ পরীক্ষা করুন
+                <button class="btn btn-primary btn-lg w-100 mt-3" id="predictBtn">
+                    <i class="bi bi-heart-pulse"></i> Check Symptoms
                 </button>
             </div>
         </div>

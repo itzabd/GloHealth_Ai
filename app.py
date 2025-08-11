@@ -223,41 +223,101 @@ def prediction():
 
 
 @app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 @login_required
 def predict():
     try:
         data = request.json
         symptoms = data.get('symptoms', [])
+        division = data.get('division')
+        lat = data.get('lat')
+        long = data.get('long')
 
+        if not symptoms or not division:
+            return jsonify({'success': False, 'error': 'Missing symptoms or division'}), 400
+
+        # Prepare model input
         input_data = {col: 0 for col in feature_cols}
-        input_data.update({k: 1 for k in symptoms if k in feature_cols})
+        input_data.update({sym: 1 for sym in symptoms if sym in feature_cols})
 
+        # Get model probabilities
         probas = model.predict_proba(pd.DataFrame([input_data]))[0]
-        top3_idx = np.argsort(probas)[-3:][::-1]
+
+        # Fetch location stats for bias
+        loc_stats_resp = supabase.from_('location_insights') \
+            .select('disease, confidence_score') \
+            .eq('division', division) \
+            .execute()
+
+        bias_map = {}
+        if loc_stats_resp.data:
+            bias_map = {row['disease']: row['confidence_score'] or 0
+                        for row in loc_stats_resp.data}
+
+        # Apply bias
+        biased_probas = []
+        for idx, base_prob in enumerate(probas):
+            disease = le.inverse_transform([idx])[0]
+            if disease in bias_map:
+                bias_factor = 1 + bias_map[disease]  # adjust multiplier as needed
+                biased_probas.append(base_prob * bias_factor)
+            else:
+                biased_probas.append(base_prob)
+
+        # Normalize probabilities
+        total = sum(biased_probas)
+        if total > 0:
+            biased_probas = [p / total for p in biased_probas]
+
+        # Get top 3 predictions
+        top3_idx = np.argsort(biased_probas)[-3:][::-1]
         predictions = [{
             'disease': le.inverse_transform([idx])[0],
-            'confidence': float(probas[idx]),
-            'probability': f"{probas[idx]:.1%}"
+            'confidence': float(biased_probas[idx]),
+            'probability': f"{biased_probas[idx]:.1%}"
         } for idx in top3_idx]
 
-        response = supabase.from_('predictions').insert({
+        # Save to predictions table
+        supabase.from_('predictions').insert({
             "user_id": current_user.id,
             "symptoms": symptoms,
             "top_prediction": predictions[0]['disease'],
             "confidence": predictions[0]['confidence'],
-            "zip_code": data.get('zipcode'),
-            "division": data.get('division'),
-            "latitude": data.get('lat'),
-            "longitude": data.get('long'),
+            "division": division,
+            "latitude": lat,
+            "longitude": long,
             "full_results": predictions
         }).execute()
 
-        return jsonify({
-            'success': True,
-            'predictions': predictions  # Just return predictions, no redirect
-        })
+        # Update location_insights with top disease
+        top_pred = predictions[0]
+        existing_resp = supabase.from_('location_insights') \
+            .select('*') \
+            .eq('division', division) \
+            .eq('disease', top_pred['disease']) \
+            .maybe_single() \
+            .execute()
+
+        if existing_resp.data is not None:
+            old_conf = existing_resp.data.get('confidence_score') or 0
+            new_conf = (old_conf + top_pred['confidence']) / 2
+            supabase.from_('location_insights').update({
+                "confidence_score": new_conf,
+                "last_updated": datetime.now().isoformat()
+            }).eq('id', existing_resp.data['id']).execute()
+        else:
+            supabase.from_('location_insights').insert({
+                "division": division,
+                "disease": top_pred['disease'],
+                "confidence_score": top_pred['confidence']
+            }).execute()
+
+        return jsonify({'success': True, 'predictions': predictions})
+
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
