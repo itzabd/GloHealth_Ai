@@ -1,0 +1,17 @@
+nohup: ignoring input
+ * Tip: There are .env files present. Install python-dotenv to use them.
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.30.0.2:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Tip: There are .env files present. Install python-dotenv to use them.
+ * Debugger is active!
+ * Debugger PIN: 598-400-630
+127.0.0.1 - - [12/Aug/2025 19:57:13] "[32mPOST /predict HTTP/1.1[0m" 302 -
+127.0.0.1 - - [12/Aug/2025 19:57:16] "[32mPOST /predict HTTP/1.1[0m" 302 -
+Login error: Invalid login credentials
+127.0.0.1 - - [12/Aug/2025 19:57:21] "POST /login HTTP/1.1" 200 -
