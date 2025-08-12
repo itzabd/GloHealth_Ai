@@ -1,52 +1,262 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>GloHealth - {% block title %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.alkalami.net/css?family=SolaimanLipi" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     {% block extra_css %}{% endblock %}
+
+    <style>
+        :root {
+            --primary-bg: #60B5FF;       /* Main background */
+            --secondary-bg: #AFDDFF;     /* Secondary background */
+            --button-light: #FFECDB;     /* Light button */
+            --button-accent: #FF9149;    /* Orange accent */
+            --text-dark: #2A4365;        /* Dark text */
+            --text-light: #FFFFFF;       /* Light text */
+        }
+
+        body {
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px; /* footer height */
+        }
+
+        /* Bengali language text style */
+        .lang-bn {
+            font-family: 'Hind Siliguri', 'SolaimanLipi', 'Noto Sans Bengali', Arial, sans-serif;
+            font-weight: 500;
+            color: black !important;
+        }
+
+        .navbar {
+            background-color: var(--secondary-bg) !important;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--text-dark) !important;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .navbar-brand .bi {
+            font-size: 1.7rem;
+            color: var(--button-accent);
+        }
+
+        .nav-link {
+            color: var(--text-dark) !important;
+            font-weight: 500;
+            margin: 0 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .nav-link .bi {
+            font-size: 1.2rem;
+            color: var(--button-accent);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--button-accent) !important;
+        }
+        .btn-link {
+    color: var(--text-dark);
+    border: 1px solid transparent;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+.btn-link:hover,
+.btn-link:focus {
+    color: var(--text-dark);
+    border-color: black;
+    background-color: transparent;
+    text-decoration: none;
+    box-shadow: none;
+}
+
+        .btn-light {
+            background-color: var(--button-light);
+            border-color: var(--button-light);
+            color: var(--text-dark);
+        }
+
+        .btn-accent {
+            background-color: var(--button-accent);
+            border-color: var(--button-accent);
+            color: black;
+        }
+
+        .btn-light:hover,
+        .btn-accent:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        footer {
+            background-color: var(--text-dark) !important;
+            color: white;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .language-toggle {
+            background-color: var(--button-light);
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+            gap: 6px;
+            color: var(--text-dark);
+        }
+
+        .language-toggle:hover {
+            background-color: var(--button-accent);
+            color: black;
+        }
+
+        .language-toggle i {
+            font-size: 1.2rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            border-radius: 15px;
+            padding: 3rem;
+            color: var(--text-dark);
+        }
+
+        /* Bilingual text styling */
+        .lang-bn,
+        .lang-en {
+            display: inline;
+        }
+
+        /* Show single language only */
+        body.single-language.bn .lang-en,
+        body.single-language.en .lang-bn {
+            display: none !important;
+        }
+
+        body.single-language.bn .lang-bn,
+        body.single-language.en .lang-en {
+            display: inline !important;
+        }
+
+        /* Section header example style */
+        h1.section-header,
+        h2.section-header,
+        h3.section-header,
+        h4.section-header,
+        h5.section-header {
+            background-color: var(--button-accent);
+            color: black;
+            padding: 0.3rem 0.7rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container">
-            <a class="navbar-brand bangla" href="/">গ্লো হেলথ</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-heart-pulse-fill"></i>
+                <span class="lang-bn bangla">গ্লো হেলথ</span>
+                <span class="lang-en">GloHealth</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="/dashboard">
-                            <i class="bi bi-speedometer2"></i> ড্যাশবোর্ড
+                            <i class="bi bi-speedometer2"></i>
+                            <span class="lang-bn bangla">ড্যাশবোর্ড</span>
+                            <span class="lang-en">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/prediction">
-                            <i class="bi bi-clipboard-pulse"></i> লক্ষণ পরীক্ষা
+                            <i class="bi bi-clipboard-pulse"></i>
+                            <span class="lang-bn bangla">লক্ষণ পরীক্ষা</span>
+                            <span class="lang-en">Symptom Check</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/logout">
-                            <i class="bi bi-box-arrow-right"></i> লগআউট
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="lang-bn bangla">লগআউট</span>
+                            <span class="lang-en">Logout</span>
                         </a>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="/login">
-                            <i class="bi bi-box-arrow-in-right"></i> লগইন
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span class="lang-bn bangla">লগইন</span>
+                            <span class="lang-en">Login</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/signup">
-                            <i class="bi bi-person-plus"></i> রেজিস্টার
+                            <i class="bi bi-person-plus"></i>
+                            <span class="lang-bn bangla">রেজিস্টার</span>
+                            <span class="lang-en">Register</span>
                         </a>
                     </li>
                     {% endif %}
+
+                    <li class="nav-item ms-3">
+                        <button class="language-toggle" id="languageToggle" aria-label="Toggle Language">
+                            <i class="bi bi-translate"></i>
+                            <span class="lang-bn bangla">English</span>
+                            <span class="lang-en">বাংলা</span>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -56,9 +266,10 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <span class="lang-bn bangla">{{ message }}</span>
+                        <span class="lang-en">{{ message }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -67,13 +278,64 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container text-center bangla">
-            <p>© ২০২৩ গ্লো হেলথ - বাংলাদেশের জন্য স্বাস্থ্য সেবা</p>
+    <footer>
+        <div class="container d-flex justify-content-between">
+            <div>
+                <span class="lang-bn bangla">© ২০২৫ গ্লো হেলথ - বাংলাদেশের জন্য স্বাস্থ্য সেবা</span>
+                <span class="lang-en">© 2025 GloHealth - Healthcare for Bangladesh</span>
+            </div>
+            <div>
+                <span class="lang-bn bangla">যোগাযোগ: info@glohealth.com</span>
+                <span class="lang-en">Contact: info@glohealth.com</span>
+            </div>
         </div>
     </footer>
 
+    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Language toggle script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageToggle = document.getElementById('languageToggle');
+            const body = document.body;
+
+            // Load saved language or default based on browser
+            const savedLang = localStorage.getItem('preferredLanguage') || (navigator.language.startsWith('bn') ? 'bn' : 'en');
+            setLanguage(savedLang);
+
+            languageToggle.addEventListener('click', function() {
+                const currentLang = body.classList.contains('bn') ? 'en' : 'bn';
+                setLanguage(currentLang);
+                localStorage.setItem('preferredLanguage', currentLang);
+            });
+
+            function setLanguage(lang) {
+                if (lang === 'bn') {
+                    body.classList.add('single-language', 'bn');
+                    body.classList.remove('en');
+                } else {
+                    body.classList.add('single-language', 'en');
+                    body.classList.remove('bn');
+                }
+
+                // Show/hide language spans globally
+                document.querySelectorAll('.lang-en').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.lang-bn').forEach(el => el.style.display = 'none');
+
+                if (lang === 'bn') {
+                    document.querySelectorAll('.lang-bn').forEach(el => el.style.display = '');
+                    document.querySelector('#languageToggle .lang-en').style.display = 'block';
+                    document.querySelector('#languageToggle .lang-bn').style.display = 'none';
+                } else {
+                    document.querySelectorAll('.lang-en').forEach(el => el.style.display = '');
+                    document.querySelector('#languageToggle .lang-en').style.display = 'none';
+                    document.querySelector('#languageToggle .lang-bn').style.display = 'block';
+                }
+            }
+        });
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,135 +1,112 @@
 {% extends "base.html" %}
 {% block title %}Register/রেজিস্টার{% endblock %}
 
-{% block extra_css %}
-<style>
-    .language-switch {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-    }
-    .bangla-font {
-        font-family: 'SolaimanLipi', 'Siyam Rupali', Arial, sans-serif;
-    }
-    .form-label.bangla {
-        font-weight: 600;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="row justify-content-center position-relative">
-    <!-- Language Switch -->
-    <div class="language-switch">
-        <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-outline-secondary active" id="englishBtn">English</button>
-            <button type="button" class="btn btn-outline-secondary" id="banglaBtn">বাংলা</button>
-        </div>
-    </div>
-
     <div class="col-md-8">
         <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h4 class="mb-0"><span class="english">Create New Account</span><span class="bangla" style="display:none">নতুন অ্যাকাউন্ট তৈরি করুন</span> <i class="bi bi-person-plus"></i></h4>
+            <div class="card-header bg-success text-white d-flex align-items-center gap-2">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-plus"></i>
+                    <span class="lang-en">Create New Account</span>
+                    <span class="lang-bn">নতুন অ্যাকাউন্ট তৈরি করুন</span>
+                </h4>
             </div>
             <div class="card-body">
                 <form id="signupForm" method="POST" action="/signup">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label english">Full Name</label>
-                                <label class="form-label bangla" style="display:none">পুরো নাম</label>
-                                <input type="text" class="form-control" name="name" required>
+                                <label class="form-label">
+                                    <span class="lang-en">Full Name</span>
+                                    <span class="lang-bn">পুরো নাম</span>
+                                </label>
+                                <input type="text" class="form-control" name="name" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label english">Email Address</label>
-                                <label class="form-label bangla" style="display:none">ইমেইল ঠিকানা</label>
-                                <input type="email" class="form-control" name="email" required>
+                                <label class="form-label">
+                                    <span class="lang-en">Email Address</span>
+                                    <span class="lang-bn">ইমেইল ঠিকানা</span>
+                                </label>
+                                <input type="email" class="form-control" name="email" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label english">Password</label>
-                                <label class="form-label bangla" style="display:none">পাসওয়ার্ড</label>
-                                <input type="password" class="form-control" name="password" required>
+                                <label class="form-label">
+                                    <span class="lang-en">Password</span>
+                                    <span class="lang-bn">পাসওয়ার্ড</span>
+                                </label>
+                                <input type="password" class="form-control" name="password" required />
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h5 class="english">Address Information</h5>
-                            <h5 class="bangla" style="display:none">ঠিকানা তথ্য</h5>
+                            <h5 class="section-header">
+                                <span class="lang-en">Address Information</span>
+                                <span class="lang-bn">ঠিকানা তথ্য</span>
+                            </h5>
                             <div class="mb-3">
-                                <label class="form-label english">Address Line 1</label>
-                                <label class="form-label bangla" style="display:none">ঠিকানা লাইন ১</label>
-                                <input type="text" class="form-control" name="address_line1" required>
+                                <label class="form-label">
+                                    <span class="lang-en">Address Line 1</span>
+                                    <span class="lang-bn">ঠিকানা লাইন ১</span>
+                                </label>
+                                <input type="text" class="form-control" name="address_line1" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label english">Address Line 2 (Optional)</label>
-                                <label class="form-label bangla" style="display:none">ঠিকানা লাইন ২ (ঐচ্ছিক)</label>
-                                <input type="text" class="form-control" name="address_line2">
+                                <label class="form-label">
+                                    <span class="lang-en">Address Line 2 (Optional)</span>
+                                    <span class="lang-bn">ঠিকানা লাইন ২ (ঐচ্ছিক)</span>
+                                </label>
+                                <input type="text" class="form-control" name="address_line2" />
                             </div>
                             <div class="row g-2">
                                 <div class="col-md-6">
-                                    <label class="form-label english">City</label>
-                                    <label class="form-label bangla" style="display:none">শহর</label>
-                                    <input type="text" class="form-control" name="city" required>
+                                    <label class="form-label">
+                                        <span class="lang-en">City</span>
+                                        <span class="lang-bn">শহর</span>
+                                    </label>
+                                    <input type="text" class="form-control" name="city" required />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label english">Division</label>
-                                    <label class="form-label bangla" style="display:none">বিভাগ</label>
+                                    <label class="form-label">
+                                        <span class="lang-en">Division</span>
+                                        <span class="lang-bn">বিভাগ</span>
+                                    </label>
                                     <select class="form-select" name="division" required>
-                                        <option value="Dhaka">Dhaka/ঢাকা</option>
-                                        <option value="Chittagong">Chittagong/চট্টগ্রাম</option>
-                                        <option value="Rajshahi">Rajshahi/রাজশাহী</option>
-                                        <option value="Khulna">Khulna/খুলনা</option>
-                                        <option value="Barisal">Barisal/বরিশাল</option>
-                                        <option value="Sylhet">Sylhet/সিলেট</option>
-                                        <option value="Rangpur">Rangpur/রংপুর</option>
-                                        <option value="Mymensingh">Mymensingh/ময়মনসিংহ</option>
+                                        <option value="Dhaka">Dhaka / ঢাকা</option>
+                                        <option value="Chittagong">Chittagong / চট্টগ্রাম</option>
+                                        <option value="Rajshahi">Rajshahi / রাজশাহী</option>
+                                        <option value="Khulna">Khulna / খুলনা</option>
+                                        <option value="Barisal">Barisal / বরিশাল</option>
+                                        <option value="Sylhet">Sylhet / সিলেট</option>
+                                        <option value="Rangpur">Rangpur / রংপুর</option>
+                                        <option value="Mymensingh">Mymensingh / ময়মনসিংহ</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label english">Postal Code</label>
-                                    <label class="form-label bangla" style="display:none">পোস্টাল কোড</label>
-                                    <input type="text" class="form-control" name="postal_code" maxlength="4" required>
+                                    <label class="form-label">
+                                        <span class="lang-en">Postal Code</span>
+                                        <span class="lang-bn">পোস্টাল কোড</span>
+                                    </label>
+                                    <input type="text" maxlength="4" class="form-control" name="postal_code" required />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 mt-3">
-                        <span class="english"><i class="bi bi-person-plus"></i> Create Account</span>
-                        <span class="bangla" style="display:none"><i class="bi bi-person-plus"></i> অ্যাকাউন্ট তৈরি করুন</span>
+
+                    <button type="submit" class="btn btn-accent w-100 mt-3">
+                        <i class="bi bi-person-plus"></i>
+                        <span class="lang-en">Create Account</span>
+                        <span class="lang-bn">অ্যাকাউন্ট তৈরি করুন</span>
                     </button>
                 </form>
+
                 <div class="text-center mt-3">
-                    <a href="/login" class="english">Already have an account? Login</a>
-                    <a href="/login" class="bangla" style="display:none">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</a>
+                    <a href="/login" class="btn btn-link">
+                        <span class="lang-en">Already have an account? Login</span>
+                        <span class="lang-bn">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Language toggle functionality
-    document.getElementById('englishBtn').addEventListener('click', function() {
-        document.querySelectorAll('.english').forEach(el => el.style.display = '');
-        document.querySelectorAll('.bangla').forEach(el => el.style.display = 'none');
-        this.classList.add('active');
-        document.getElementById('banglaBtn').classList.remove('active');
-    });
-
-    document.getElementById('banglaBtn').addEventListener('click', function() {
-        document.querySelectorAll('.english').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.bangla').forEach(el => el.style.display = '');
-        this.classList.add('active');
-        document.getElementById('englishBtn').classList.remove('active');
-    });
-
-    // Set default language based on browser or user preference
-    if (navigator.language.startsWith('bn')) {
-        document.getElementById('banglaBtn').click();
-    }
-});
-</script>
 {% endblock %}

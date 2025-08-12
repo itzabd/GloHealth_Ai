@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, ExtraTreesClassifier
 from sklearn.svm import SVC
 from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, f1_score, accuracy_score
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 import seaborn as sns
@@ -17,7 +18,8 @@ from imblearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
 import json
 from datetime import datetime
-
+from collections import Counter
+from sklearn.preprocessing import LabelEncoder
 
 class ModelTrainer:
     def __init__(self):
@@ -46,6 +48,30 @@ class ModelTrainer:
                 probability=True,
                 class_weight='balanced',
                 random_state=42
+            ),
+            'LogisticRegression': LogisticRegression(
+                multi_class='multinomial',
+                solver='lbfgs',
+                max_iter=1000,
+                class_weight='balanced',
+                random_state=42,
+                n_jobs=-1
+            ),
+            'GradientBoosting': GradientBoostingClassifier(
+                n_estimators=200,
+                learning_rate=0.1,
+                max_depth=5,
+                random_state=42,
+                subsample=0.8
+            ),
+            'ExtraTrees': ExtraTreesClassifier(
+                n_estimators=300,
+                class_weight='balanced_subsample',
+                random_state=42,
+                max_depth=12,
+                min_samples_split=3,
+                max_features='log2',
+                n_jobs=-1
             )
         }
         self.best_model = None
@@ -70,7 +96,8 @@ class ModelTrainer:
         self.geo_test = test_df[geo_cols].copy()
 
         # Encode labels consistently
-        self.le.fit(pd.concat([train_df['prognosis'], test_df['prognosis']]))
+        all_prognosis = pd.concat([train_df['prognosis'], test_df['prognosis']])
+        self.le.fit(all_prognosis)
 
         # Prepare features EXCLUDING geo columns
         X_train = train_df.drop(['prognosis'] + geo_cols, axis=1)
