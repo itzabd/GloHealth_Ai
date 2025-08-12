@@ -186,6 +186,44 @@ class GeoAnalyzer:
         except Exception as e:
             print(f"❌ Analysis failed: {str(e)}")
 
+    def calculate_regional_prevalence(self, df):
+        """Calculate disease prevalence by division."""
+        # Group by division and disease
+        regional_stats = df.groupby(['division', 'predicted']) \
+            .agg(count=('predicted', 'size'),
+                 avg_confidence=('confidence', 'mean')) \
+            .reset_index()
+
+        # Normalize counts to get prevalence scores
+        division_totals = regional_stats.groupby('division')['count'].sum()
+        regional_stats['prevalence_score'] = regional_stats.apply(
+            lambda row: row['count'] / division_totals[row['division']],
+            axis=1
+        )
+
+        return regional_stats
+
+    def update_supabase_insights(self, df):
+        """Update Supabase with enhanced regional insights."""
+        regional_stats = self.calculate_regional_prevalence(df)
+
+        records = []
+        for _, row in regional_stats.iterrows():
+            records.append({
+                'division': row['division'],
+                'disease': row['predicted'],
+                'confidence_score': float(row['avg_confidence']),
+                'prevalence_score': float(row['prevalence_score']),
+                'last_updated': datetime.now().isoformat()
+            })
+
+        # Batch upsert
+        response = self.supabase.table('location_insights').upsert(
+            records,
+            on_conflict='division,disease'
+        ).execute()
+
+        return response
 
 if __name__ == "__main__":
     analyzer = GeoAnalyzer()

@@ -223,7 +223,6 @@ def prediction():
 
 
 @app.route('/predict', methods=['POST'])
-@app.route('/predict', methods=['POST'])
 @login_required
 def predict():
     try:
@@ -236,61 +235,136 @@ def predict():
         if not symptoms or not division:
             return jsonify({'success': False, 'error': 'Missing symptoms or division'}), 400
 
-        # Prepare model input
+        # === 1. Prepare model input ===
         input_data = {col: 0 for col in feature_cols}
         input_data.update({sym: 1 for sym in symptoms if sym in feature_cols})
 
-        # Get model probabilities
+        # === 2. Get base model probabilities ===
         probas = model.predict_proba(pd.DataFrame([input_data]))[0]
 
-        # Fetch location stats for bias
-        loc_stats_resp = supabase.from_('location_insights') \
-            .select('disease, confidence_score') \
-            .eq('division', division) \
-            .execute()
+        # === 3. Get regional disease prevalence data ===
+        regional_weights = defaultdict(float)
+        current_date = datetime.now()
 
-        bias_map = {}
-        if loc_stats_resp.data:
-            bias_map = {row['disease']: row['confidence_score'] or 0
-                        for row in loc_stats_resp.data}
+        try:
+            # First get division-level data
+            regional_query = supabase.from_('location_insights') \
+                .select('disease, confidence_score, last_updated') \
+                .eq('division', division)
 
-        # Apply bias
-        biased_probas = []
+            # Add spatial query if coordinates are available
+            if lat and long:
+                try:
+                    point = f"POINT({float(long)} {float(lat)})"
+                    regional_query = regional_query.or_(
+                        f"and(latitude.not.is.null,longitude.not.is.null," +
+                        f"st_dwithin(st_makepoint(longitude, latitude)::geography," +
+                        f"st_geographyfromtext('{point}'), 50000))"
+                    )
+                except ValueError:
+                    pass  # Skip spatial query if coordinates are invalid
+
+            regional_data = regional_query.execute()
+
+            if hasattr(regional_data, 'data'):
+                for row in regional_data.data:
+                    try:
+                        last_updated = datetime.fromisoformat(row['last_updated'].replace('Z', '+00:00'))
+                        days_old = (current_date - last_updated).days
+                        decay_factor = max(0.5, 1 - (days_old / 30))
+                        regional_weights[row['disease']] += row['confidence_score'] * decay_factor
+                    except Exception as e:
+                        print(f"Error processing regional data row: {str(e)}")
+                        continue
+        except Exception as e:
+            print(f"Error fetching regional data: {str(e)}")
+
+        # === 4. Apply regional adjustment ===
+        adjusted_probas = []
+        max_regional_weight = max(regional_weights.values()) if regional_weights else 1
+
         for idx, base_prob in enumerate(probas):
             disease = le.inverse_transform([idx])[0]
-            if disease in bias_map:
-                bias_factor = 1 + bias_map[disease]  # adjust multiplier as needed
-                biased_probas.append(base_prob * bias_factor)
-            else:
-                biased_probas.append(base_prob)
+            seasonal_factor = _get_seasonal_adjustment(disease)
+            regional_factor = 1 + (regional_weights.get(disease, 0) / max_regional_weight)
+            adjusted_probas.append(base_prob * regional_factor * seasonal_factor)
 
         # Normalize probabilities
-        total = sum(biased_probas)
+        total = sum(adjusted_probas)
         if total > 0:
-            biased_probas = [p / total for p in biased_probas]
+            adjusted_probas = [p / total for p in adjusted_probas]
 
-        # Get top 3 predictions
-        top3_idx = np.argsort(biased_probas)[-3:][::-1]
+        # === 5. Get top predictions ===
+        top3_idx = np.argsort(adjusted_probas)[-3:][::-1]
         predictions = [{
             'disease': le.inverse_transform([idx])[0],
-            'confidence': float(biased_probas[idx]),
-            'probability': f"{biased_probas[idx]:.1%}"
+            'confidence': float(adjusted_probas[idx]),
+            'probability': f"{adjusted_probas[idx]:.1%}",
+            'regional_influence': regional_weights.get(le.inverse_transform([idx])[0], 0)
         } for idx in top3_idx]
 
-        # Save to predictions table
-        supabase.from_('predictions').insert({
-            "user_id": current_user.id,
+        # === 6. Save prediction and update regional data ===
+        try:
+            save_prediction_and_update_insights(current_user.id, symptoms, predictions, division, lat, long)
+        except Exception as e:
+            print(f"Error saving prediction: {str(e)}")
+
+        return jsonify({'success': True, 'predictions': predictions})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+def save_prediction_and_update_insights(user_id, symptoms, predictions, division, lat, long):
+    """Save prediction and update regional disease prevalence data."""
+    try:
+        # Get user's postal code from profile
+        profile = supabase.from_('user_profiles') \
+            .select('postal_code') \
+            .eq('id', user_id) \
+            .maybe_single() \
+            .execute()
+
+        zip_code = profile.data.get('postal_code') if hasattr(profile, 'data') and profile.data else None
+
+        # 1. Save the prediction
+        prediction_data = {
+            "user_id": user_id,
             "symptoms": symptoms,
             "top_prediction": predictions[0]['disease'],
             "confidence": predictions[0]['confidence'],
             "division": division,
             "latitude": lat,
             "longitude": long,
-            "full_results": predictions
-        }).execute()
+            "full_results": predictions,
+            "zip_code": zip_code  # Add zip_code to prediction
+        }
 
-        # Update location_insights with top disease
+        prediction_result = supabase.from_('predictions').insert(prediction_data).execute()
+
+        if not hasattr(prediction_result, 'data'):
+            raise Exception("Failed to save prediction")
+
+        # 2. Update location insights
         top_pred = predictions[0]
+        update_data = {
+            "zip_code": zip_code or "0000",  # Default if null
+            "division": division,
+            "disease": top_pred['disease'],
+            "confidence_score": top_pred['confidence'],
+            "last_updated": datetime.now().isoformat()
+        }
+
+        # Only add coordinates if available
+        if lat and long:
+            update_data.update({
+                "latitude": lat,
+                "longitude": long
+            })
+
+        # Check if record exists
         existing_resp = supabase.from_('location_insights') \
             .select('*') \
             .eq('division', division) \
@@ -298,26 +372,45 @@ def predict():
             .maybe_single() \
             .execute()
 
-        if existing_resp.data is not None:
-            old_conf = existing_resp.data.get('confidence_score') or 0
-            new_conf = (old_conf + top_pred['confidence']) / 2
-            supabase.from_('location_insights').update({
-                "confidence_score": new_conf,
-                "last_updated": datetime.now().isoformat()
-            }).eq('id', existing_resp.data['id']).execute()
-        else:
-            supabase.from_('location_insights').insert({
-                "division": division,
-                "disease": top_pred['disease'],
-                "confidence_score": top_pred['confidence']
-            }).execute()
+        if hasattr(existing_resp, 'data') and existing_resp.data:
+            # Update existing record
+            old_conf = existing_resp.data.get('confidence_score', 0)
+            update_data['confidence_score'] = (old_conf * 0.7) + (top_pred['confidence'] * 0.3)
 
-        return jsonify({'success': True, 'predictions': predictions})
+            update_result = supabase.from_('location_insights') \
+                .update(update_data) \
+                .eq('id', existing_resp.data['id']) \
+                .execute()
+        else:
+            # Create new record
+            update_result = supabase.from_('location_insights') \
+                .insert(update_data) \
+                .execute()
+
+        if not hasattr(update_result, 'data'):
+            raise Exception("Failed to update location insights")
 
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        print(f"Error in save_prediction_and_update_insights: {str(e)}")
+        raise
 
+def _get_seasonal_adjustment(disease):
+    """Get seasonal adjustment factor for a disease."""
+    try:
+        month = datetime.now().month
+        seasonal_data = supabase.from_('disease_seasonality') \
+            .select('avg_cases') \
+            .eq('disease', disease) \
+            .eq('month', month) \
+            .maybe_single() \
+            .execute()
 
+        if hasattr(seasonal_data, 'data') and seasonal_data.data:
+            avg_cases = seasonal_data.data.get('avg_cases', 1.0)
+            return 0.8 + (0.4 * avg_cases)
+    except Exception as e:
+        print(f"Error getting seasonal data: {str(e)}")
 
+    return 1.0  # Default no adjustment if no data or error
 if __name__ == '__main__':
     app.run(debug=True)
