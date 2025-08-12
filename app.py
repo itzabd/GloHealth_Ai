@@ -223,10 +223,17 @@ def prediction():
 
 
 @app.route('/predict', methods=['POST'])
-@app.route('/predict', methods=['POST'])
 @login_required
 def predict():
     try:
+        # Ensure Supabase auth for this request
+        access_token = session.get('supabase_access_token')
+        if access_token:
+            try:
+                supabase.postgrest.auth(access_token)
+            except Exception:
+                pass
+
         data = request.json
         symptoms = data.get('symptoms', [])
         division = data.get('division')
@@ -242,22 +249,27 @@ def predict():
 
         # Get model probabilities
         probas = model.predict_proba(pd.DataFrame([input_data]))[0]
+        probas = np.asarray(probas)
 
-        # Fetch location stats for bias
-        loc_stats_resp = supabase.from_('location_insights') \
-            .select('disease, confidence_score') \
-            .eq('division', division) \
-            .execute()
-
+        # Fetch location stats for bias (non-fatal if fails)
         bias_map = {}
-        if loc_stats_resp.data:
-            bias_map = {row['disease']: row['confidence_score'] or 0
-                        for row in loc_stats_resp.data}
+        try:
+            loc_stats_resp = supabase.from_('location_insights') \
+                .select('disease, confidence_score') \
+                .eq('division', division) \
+                .execute()
+            if loc_stats_resp.data:
+                bias_map = {row['disease']: row['confidence_score'] or 0
+                            for row in loc_stats_resp.data}
+        except Exception as supa_err:
+            print(f"Warning: failed to fetch location insights: {supa_err}")
 
         # Apply bias
         biased_probas = []
-        for idx, base_prob in enumerate(probas):
-            disease = le.inverse_transform([idx])[0]
+        classes_indices = getattr(model, 'classes_', np.arange(len(probas)))
+        for col_idx, base_prob in enumerate(probas):
+            class_idx = int(classes_indices[col_idx]) if hasattr(classes_indices, '__len__') else int(col_idx)
+            disease = le.inverse_transform([class_idx])[0]
             if disease in bias_map:
                 bias_factor = 1 + bias_map[disease]  # adjust multiplier as needed
                 biased_probas.append(base_prob * bias_factor)
@@ -272,52 +284,60 @@ def predict():
         # Get top 3 predictions
         top3_idx = np.argsort(biased_probas)[-3:][::-1]
         predictions = [{
-            'disease': le.inverse_transform([idx])[0],
+            'disease': le.inverse_transform([int(classes_indices[idx])])[0],
             'confidence': float(biased_probas[idx]),
             'probability': f"{biased_probas[idx]:.1%}"
         } for idx in top3_idx]
 
-        # Save to predictions table
-        supabase.from_('predictions').insert({
-            "user_id": current_user.id,
-            "symptoms": symptoms,
-            "top_prediction": predictions[0]['disease'],
-            "confidence": predictions[0]['confidence'],
-            "division": division,
-            "latitude": lat,
-            "longitude": long,
-            "full_results": predictions
-        }).execute()
-
-        # Update location_insights with top disease
-        top_pred = predictions[0]
-        existing_resp = supabase.from_('location_insights') \
-            .select('*') \
-            .eq('division', division) \
-            .eq('disease', top_pred['disease']) \
-            .maybe_single() \
-            .execute()
-
-        if existing_resp.data is not None:
-            old_conf = existing_resp.data.get('confidence_score') or 0
-            new_conf = (old_conf + top_pred['confidence']) / 2
-            supabase.from_('location_insights').update({
-                "confidence_score": new_conf,
-                "last_updated": datetime.now().isoformat()
-            }).eq('id', existing_resp.data['id']).execute()
-        else:
-            supabase.from_('location_insights').insert({
+        # Save to predictions table (non-fatal if fails)
+        try:
+            supabase.from_('predictions').insert({
+                "user_id": current_user.id,
+                "symptoms": symptoms,
+                "top_prediction": predictions[0]['disease'],
+                "confidence": predictions[0]['confidence'],
                 "division": division,
-                "disease": top_pred['disease'],
-                "confidence_score": top_pred['confidence']
+                "latitude": lat,
+                "longitude": long,
+                "full_results": predictions
             }).execute()
+        except Exception as supa_err:
+            print(f"Warning: failed to insert prediction: {supa_err}")
+
+        # Update location_insights with top disease (non-fatal if fails)
+        try:
+            top_pred = predictions[0]
+            existing_resp = supabase.from_('location_insights') \
+                .select('*') \
+                .eq('division', division) \
+                .eq('disease', top_pred['disease']) \
+                .maybe_single() \
+                .execute()
+
+            if existing_resp.data is not None:
+                old_conf = existing_resp.data.get('confidence_score') or 0
+                new_conf = (old_conf + top_pred['confidence']) / 2
+                supabase.from_('location_insights').update({
+                    "confidence_score": new_conf,
+                    "last_updated": datetime.now().isoformat()
+                }).eq('id', existing_resp.data['id']).execute()
+            else:
+                supabase.from_('location_insights').insert({
+                    "division": division,
+                    "disease": top_pred['disease'],
+                    "confidence_score": top_pred['confidence']
+                }).execute()
+        except Exception as supa_err:
+            print(f"Warning: failed to upsert location insights: {supa_err}")
 
         return jsonify({'success': True, 'predictions': predictions})
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True, threaded=True)
