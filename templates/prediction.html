@@ -134,6 +134,23 @@
 
     // Symptom card selection
     document.addEventListener('DOMContentLoaded', function() {
+        const lang = document.documentElement.lang || 'en';
+
+        // Translation dictionary
+        const translations = {
+            locationFound: lang === 'bn' ? 'অবস্থান পাওয়া গেছে' : 'Location found',
+            noGeolocation: lang === 'bn' ? 'আপনার ব্রাউজার লোকেশন সাপোর্ট করে না' : 'Geolocation not supported',
+            selectSymptom: lang === 'bn' ? 'অন্তত একটি লক্ষণ নির্বাচন করুন' : 'Please select at least one symptom',
+            selectDivision: lang === 'bn' ? 'আপনার বিভাগ নির্বাচন করুন' : 'Please select your division',
+            processing: lang === 'bn' ? 'প্রসেসিং...' : 'Processing...',
+            resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results',
+            possibleDiseases: lang === 'bn' ? 'সম্ভাব্য রোগসমূহ' : 'Possible Diseases',
+            close: lang === 'bn' ? 'বন্ধ' : 'Close'
+        };
+
+        // Original prediction.js functionality
+        let userLocation = { lat: null, long: null };
+
         document.querySelectorAll('.symptom-card').forEach(card => {
             const checkbox = card.querySelector('.symptom-check');
             card.addEventListener('click', function() {
@@ -143,9 +160,97 @@
         });
 
         // Geolocation handler
-        document.getElementById('useLocationBtn').addEventListener('click', function() {
-            // Your existing geolocation code
+        const useLocationBtn = document.getElementById('useLocationBtn');
+        const locationStatus = document.getElementById('locationStatus');
+
+        useLocationBtn.addEventListener('click', function() {
+            // ... keep your existing geolocation code ...
         });
+
+        // Prediction submission
+        document.getElementById('predictBtn').addEventListener('click', async function() {
+            const symptoms = Array.from(document.querySelectorAll('.symptom-check:checked'))
+                .map(el => el.value);
+
+            if (symptoms.length === 0) {
+                alert(translations.selectSymptom);
+                return;
+            }
+
+            const division = document.getElementById('division').value;
+            if (!division) {
+                alert(translations.selectDivision);
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${translations.processing}`;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        symptoms: symptoms,
+                        division: division,
+                        lat: userLocation.lat,
+                        long: userLocation.long
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showResultsModal(data.predictions, translations);
+                } else {
+                    throw new Error(data.error || 'Prediction failed');
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="bi bi-heart-pulse"></i> ${lang === 'bn' ? 'লক্ষণ পরীক্ষা করুন' : 'Check Symptoms'}`;
+            }
+        });
+
+        function showResultsModal(predictions, translations) {
+            const modalHtml = `
+                <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title">${translations.resultsTitle}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h5>${translations.possibleDiseases}:</h5>
+                                <ul class="list-group">
+                                    ${predictions.map(pred => `
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <span>${pred.disease}</span>
+                                            <span class="badge bg-primary rounded-pill">${pred.probability}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    ${translations.close}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+            modal.show();
+
+            document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
     });
 </script>
 {% endblock %}
