@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
+<span class="lang-en">Geographic Insights</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .map-container {
+        height: 600px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    /* FIX FOR FOLIUM MAP */
+    .folium-map {
+        height: 100% !important;
+        width: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .data-placeholder {
+        height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .disease-card {
+        border-left: 4px solid;
+        transition: all 0.3s;
+    }
+
+    .disease-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px rgba(0,0,0,0.15);
+    }
+
+    .table-responsive {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    /* Ensure map controls are visible */
+    .leaflet-control-container {
+        z-index: 1000;
+    }
+
+    /* Loading state for map */
+    .map-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2 class="section-header">
+            <span class="lang-bn">বাংলাদেশে রোগের বিস্তার</span>
+            <span class="lang-en">Disease Spread in Bangladesh</span>
+        </h2>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="lang-bn">রোগের ভৌগলিক বণ্টন</span>
+                    <span class="lang-en">Geographic Distribution</span>
+                </h5>
+                {% if map_html %}
+                <div class="map-container" id="mapContainer">
+                    {{ map_html|safe }}
+                </div>
+                {% else %}
+                <div class="data-placeholder">
+                    <div class="text-center">
+                        <i class="bi bi-map" style="font-size: 3rem; color: #6c757d;"></i>
+                        <p class="mt-3">
+                            <span class="lang-bn">মানচিত্র ডেটা পাওয়া যায়নি</span>
+                            <span class="lang-en">Map data not available</span>
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if division_counts and top_diseases %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="lang-bn">বিভাগ অনুযায়ী রোগের সংখ্যা</span>
+                    <span class="lang-en">Disease Count by Division</span>
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <span class="lang-bn">বিভাগ</span>
+                                    <span class="lang-en">Division</span>
+                                </th>
+                                {% for disease in top_diseases %}
+                                <th>{{ disease }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for division, diseases in division_counts.items() %}
+                            <tr>
+                                <td>{{ division }}</td>
+                                {% for disease in top_diseases %}
+                                <td>{{ diseases.get(disease, 0) }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="lang-bn">শীর্ষ রোগসমূহ</span>
+                    <span class="lang-en">Top Diseases</span>
+                </h5>
+                <div class="row">
+                    {% for disease in top_diseases %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card disease-card" style="border-left-color: {{ disease|get_disease_color }};">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2">{{ disease }}</h6>
+                                <p class="card-text">
+                                    <span class="lang-bn">মোট কেস:</span>
+                                    <span class="lang-en">Total cases:</span>
+                                    <strong>{{ disease_totals.get(disease, 0) }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <span class="lang-bn">বিশ্লেষণের জন্য পর্যাপ্ত ডেটা নেই</span>
+    <span class="lang-en">Not enough data for analysis</span>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// JavaScript to ensure map loads properly
+document.addEventListener('DOMContentLoaded', function() {
+    const mapContainer = document.getElementById('mapContainer');
+    if (mapContainer) {
+        // Force redraw of map after a short delay to ensure proper rendering
+        setTimeout(() => {
+            const maps = mapContainer.querySelectorAll('.folium-map');
+            maps.forEach(map => {
+                if (map._leaflet_map) {
+                    map._leaflet_map.invalidateSize();
+                }
+            });
+        }, 100);
+    }
+});
+</script>
+{% endblock %}
