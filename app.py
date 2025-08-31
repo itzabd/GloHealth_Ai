@@ -638,5 +638,94 @@ def get_disease_color_filter(disease):
     }
     return color_map.get(disease, 'gray')
 
+# List doctors (paid feature)
+@app.route('/doctors')
+@login_required
+def doctors():
+    try:
+        division = request.args.get('division', None)
+        specialty = request.args.get('specialty', None)
+
+        query = supabase.from_('doctors').select('*')
+
+        if division:
+            query = query.eq('division', division)
+        if specialty:
+            query = query.eq('specialty', specialty)
+
+        response = query.execute()
+
+        doctors_list = response.data if hasattr(response, 'data') else []
+
+        return render_template('doctors.html',
+                               current_user=current_user,
+                               doctors=doctors_list)
+    except Exception as e:
+        print(f"Doctors list error: {str(e)}")
+        return render_template('doctors.html',
+                               current_user=current_user,
+                               doctors=[],
+                               error="Unable to load doctors")
+# Book appointment route
+@app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
+@login_required
+def book_appointment(doctor_id):
+    try:
+        # Fetch doctor details
+        doctor_resp = supabase.from_('doctors').select('*').eq('id', doctor_id).maybe_single().execute()
+        doctor = doctor_resp.data if hasattr(doctor_resp, 'data') else None
+        if not doctor:
+            return "Doctor not found", 404
+
+        if request.method == 'POST':
+            scheduled_time = request.form.get('scheduled_time')
+            payment_done = request.form.get('payment_done')  # Simulate payment checkbox
+
+            if not scheduled_time:
+                return "Please select a time", 400
+
+            status = 'confirmed' if payment_done == 'yes' else 'pending'
+            payment_status = 'paid' if payment_done == 'yes' else 'unpaid'
+
+            supabase.from_('appointments').insert({
+                'user_id': current_user.id,
+                'doctor_id': doctor_id,
+                'scheduled_time': scheduled_time,
+                'status': status,
+                'payment_status': payment_status
+            }).execute()
+
+            return redirect(url_for('appointments'))
+
+        return render_template('book_appointment.html',
+                               current_user=current_user,
+                               doctor=doctor)
+    except Exception as e:
+        print(f"Book appointment error: {str(e)}")
+        return "Error booking appointment", 500
+# View user appointments
+@app.route('/appointments')
+@login_required
+def appointments():
+    try:
+        response = supabase.from_('appointments') \
+            .select('*, doctors(*)') \
+            .eq('user_id', current_user.id) \
+            .order('scheduled_time', desc=True) \
+            .execute()
+
+        appointments_list = response.data if hasattr(response, 'data') else []
+
+        return render_template('appointments.html',
+                               current_user=current_user,
+                               appointments=appointments_list)
+    except Exception as e:
+        print(f"Appointments error: {str(e)}")
+        return render_template('appointments.html',
+                               current_user=current_user,
+                               appointments=[],
+                               error="Unable to load appointments")
+
+
 if __name__ == '__main__':
     app.run(debug=True)

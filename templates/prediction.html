@@ -113,7 +113,10 @@ document.addEventListener('DOMContentLoaded', function() {
         processing: lang === 'bn' ? 'প্রসেসিং...' : 'Processing...',
         resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results',
         possibleDiseases: lang === 'bn' ? 'সম্ভাব্য রোগসমূহ' : 'Possible Diseases',
-        close: lang === 'bn' ? 'বন্ধ' : 'Close'
+        close: lang === 'bn' ? 'বন্ধ' : 'Close',
+        recommendedDoctors: lang === 'bn' ? 'প্রস্তাবিত ডাক্তারগণ' : 'Recommended Doctors',
+        nearbyHospitals: lang === 'bn' ? 'নিকটস্থ হাসপাতাল' : 'Nearby Hospitals',
+        noRecommendations: lang === 'bn' ? 'কোনো প্রস্তাবনা পাওয়া যায়নি।' : 'No recommendations available.'
     };
 
     let userLocation = { lat: null, long: null };
@@ -155,8 +158,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ symptoms, division, lat: userLocation.lat, long: userLocation.long })
             });
             const data = await response.json();
-            if (data.success) { showResultsModal(data.predictions); }
-            else { throw new Error(data.error || 'Prediction failed'); }
+            if (data.success) {
+                // Pass recommended doctors/hospitals from backend if available
+                const recommendedDoctors = data.recommendedDoctors || [];
+                const recommendedHospitals = data.recommendedHospitals || [];
+                showResultsModal(data.predictions, recommendedDoctors, recommendedHospitals);
+            } else { throw new Error(data.error || 'Prediction failed'); }
         } catch(err) { alert(`Error: ${err.message}`); }
         finally {
             this.disabled = false;
@@ -164,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function showResultsModal(predictions){
+    function showResultsModal(predictions, recommendedDoctors = [], recommendedHospitals = []) {
         const modalHtml = `
         <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header bg-primary text-white">
                         <h5 class="modal-title">${translations.resultsTitle}</h5>
@@ -175,11 +182,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="modal-body">
                         <h5>${translations.possibleDiseases}:</h5>
-                        <ul class="list-group">
+                        <ul class="list-group mb-3">
                             ${predictions.map(p => `<li class="list-group-item d-flex justify-content-between align-items-center">
                                 <span>${p.disease}</span>
                                 <span class="badge bg-primary rounded-pill">${p.probability}</span>
                             </li>`).join('')}
+                        </ul>
+
+                        <h5>${translations.recommendedDoctors}:</h5>
+                        <ul class="list-group mb-3">
+                            ${recommendedDoctors.length ? recommendedDoctors.map(d => `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>${d.name} (${d.specialty})</span>
+                                    <button class="btn btn-success btn-sm" onclick="bookDoctor('${d.id}')">Book Appointment</button>
+                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
+                        </ul>
+
+                        <h5>${translations.nearbyHospitals}:</h5>
+                        <ul class="list-group">
+                            ${recommendedHospitals.length ? recommendedHospitals.map(h => `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>${h.name} - ${h.department}</span>
+                                    <button class="btn btn-warning btn-sm" onclick="visitHospital('${h.id}')">Visit / Details</button>
+                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
                         </ul>
                     </div>
                     <div class="modal-footer">
@@ -193,6 +218,11 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.show();
         document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function(){ this.remove(); });
     }
+
+    // Example handlers for buttons (replace with actual logic)
+    window.bookDoctor = function(doctorId) { alert(`Redirecting to booking for doctor ID: ${doctorId}`); }
+    window.visitHospital = function(hospitalId) { alert(`Redirecting to hospital info for ID: ${hospitalId}`); }
 });
 </script>
 {% endblock %}
+
