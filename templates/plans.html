@@ -8,6 +8,8 @@ body {
     background: linear-gradient(135deg, #00b4db, #0083b0, #3a7bd5) !important;
     color: #1a202c;
 }
+
+/* Glassy Cards */
 .card-hover {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(12px) saturate(150%);
@@ -20,6 +22,8 @@ body {
     transform: translateY(-6px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.25);
 }
+
+/* Accent Button */
 .btn-accent {
     background: linear-gradient(90deg, #FF9149, #FF6B6B);
     border: none;
@@ -33,27 +37,56 @@ body {
     opacity: 0.9;
     transform: scale(1.03);
 }
+
+/* Details Button */
+.btn-outline-primary {
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    font-weight: 500;
+    border: 2px solid #409eff;
+    color: #409eff;
+    transition: 0.3s;
+}
+.btn-outline-primary:hover {
+    background: #409eff;
+    color: white;
+    transform: scale(1.03);
+}
+
+/* Section Header */
+.section-header {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #60B5FF, #409eff);
+    color: white;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-wrapper">
     <div class="row mb-4 justify-content-center">
-        <div class="col-md-8">
-            <h2 class="section-header text-center mb-4">Available Plans</h2>
-            <div class="row g-4">
-                {% for plan in plans %}
-                <div class="col-md-4">
-                    <div class="card card-hover h-100 text-center p-3">
-                        <h5>{{ plan.name }}</h5>
-                        <p>{{ plan.details }}</p>
-                        <h6>{{ plan.price }}</h6>
-                        <button class="btn btn-accent mt-2">Subscribe</button>
-                    </div>
-                </div>
-                {% endfor %}
+        <div class="col-md-8 text-center">
+            <h2 class="section-header">Available Plans</h2>
+        </div>
+    </div>
+    <div class="row g-4 justify-content-center">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card card-hover h-100 text-center p-3">
+                <h5>{{ plan.name }}</h5>
+                <p>{{ plan.details }}</p>
+                <h6>{{ plan.price }}</h6>
+                <!-- Subscribe goes to mock payment page -->
+                <a href="{{ url_for('subscribe_plan', plan_name=plan.name) }}" class="btn btn-accent mt-2">Subscribe</a>
+                <!-- Details goes to plan details page -->
+                <a href="{{ url_for('plan_details', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Details</a>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

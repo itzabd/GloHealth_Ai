@@ -708,6 +708,27 @@ def plans():
         {"name": "Ultimate Plan", "price": "2500 BDT", "details": "All-inclusive consultation, priority support."}
     ]
     return render_template("plans.html", plans=plans_data)
+@app.route('/subscribe/<plan_name>', methods=['GET', 'POST'])
+@login_required
+def subscribe_plan(plan_name):
+    # Mock plan data (in real scenario, fetch from DB)
+    plans_data = {
+        "Basic Plan": {"price": "500 BDT"},
+        "Premium Plan": {"price": "1200 BDT"},
+        "Ultimate Plan": {"price": "2500 BDT"}
+    }
+
+    plan = plans_data.get(plan_name)
+    if not plan:
+        flash("Plan not found!", "danger")
+        return redirect(url_for('plans'))
+
+    if request.method == 'POST':
+        # For mock, just flash a success message
+        flash(f"Payment for {plan_name} successful!", "success")
+        return redirect(url_for('plans'))
+
+    return render_template("subscribe.html", plan_name=plan_name, plan=plan)
 
 if __name__ == '__main__':
     app.run(debug=True)
