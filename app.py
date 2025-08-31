@@ -11,7 +11,8 @@ from folium.plugins import HeatMap, MarkerCluster
 from flask import Flask, render_template, redirect, url_for, request, flash
 from datetime import datetime, timedelta
 from flask import abort, flash, redirect, url_for, render_template
-
+from functools import wraps
+from flask import abort
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or 'dev-secret-key-change-me'
@@ -34,12 +35,12 @@ feature_cols = joblib.load('results/feature_columns.joblib')
 
 # User class
 class User(UserMixin):
-    def __init__(self, id, email, name, address):
+    def __init__(self, id, email, name, address, is_admin=False):
         self.id = id
         self.email = email
         self.name = name
         self.address = address
-
+        self.is_admin = is_admin  # New field
 
 # User loader
 @login_manager.user_loader
@@ -59,23 +60,282 @@ def load_user(user_id):
             return None
 
         # Get profile data
-        profile = supabase.from_('user_profiles') \
+        profile_resp = supabase.from_('user_profiles') \
             .select('*') \
             .eq('id', user_id) \
             .maybe_single() \
             .execute()
+        profile = profile_resp.data if hasattr(profile_resp, 'data') else {}
 
+        # Return User instance with is_admin
         return User(
             id=user_id,
             email=user_response.user.email,
             name=user_response.user.user_metadata.get('name', ''),
-            address=profile.data if profile.data else {}
+            address=profile,
+            is_admin=profile.get('is_admin', False)  # Fetch admin flag
         )
+
     except Exception as e:
         print(f"Error loading user: {str(e)}")
         return None
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not getattr(current_user, 'is_admin', False):
+            abort(403)  # Forbidden
+        return f(*args, **kwargs)
+    return decorated_function
+@app.route('/admin/dashboard')
+@login_required
+@admin_required
+def admin_dashboard():
+    # Example: show system stats, user management, etc.
+    users = supabase.from_('user_profiles').select('*').execute().data
+    appointments = supabase.from_('appointments').select('*').execute().data
+    return render_template('admin_dashboard.html', users=users, appointments=appointments)
+
+
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        users_resp = supabase.from_("user_profiles").select("*").execute()
+        users = users_resp.data if hasattr(users_resp, "data") else []
+        return render_template("admin_users.html", users=users)
+    except Exception as e:
+        print(f"Admin Users error: {e}")
+        flash("Error fetching users", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+
+@app.route('/admin/doctors')
+@login_required
+def admin_doctors():
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        doctors_resp = supabase.from_('doctors').select('*').execute()
+        doctors = doctors_resp.data if hasattr(doctors_resp, 'data') else []
+        return render_template('admin_doctors.html', doctors=doctors)
+    except Exception as e:
+        print(f"Admin Doctors error: {str(e)}")
+        return redirect(url_for('admin_dashboard'))
+@app.route('/admin/appointments')
+@login_required
+def admin_appointments():
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        appointments_resp = supabase.from_('appointments') \
+            .select('*, users(*), doctors(*)') \
+            .order('scheduled_time', desc=True) \
+            .execute()
+        appointments = appointments_resp.data if hasattr(appointments_resp, 'data') else []
+        return render_template('admin_appointments.html', appointments=appointments)
+    except Exception as e:
+        print(f"Admin Appointments error: {str(e)}")
+        return redirect(url_for('admin_dashboard'))
+@app.route("/edit_user/<user_id>", methods=["GET", "POST"])
+def edit_user(user_id):
+    if request.method == "POST":
+        full_name = request.form["full_name"]
+        email = request.form["email"]
+        city = request.form["city"]
+        division = request.form["division"]
+
+        # Update user_profiles
+        update_response = supabase.from_("user_profiles").update({
+            "full_name": full_name,
+            "email": email,
+            "city": city,
+            "division": division
+        }).eq("id", user_id).execute()
+
+        flash("User updated successfully!", "success")
+        return redirect(url_for("admin_users"))
+
+    # Fetch user for pre-fill
+    user = supabase.from_("user_profiles").select("*").eq("id", user_id).single().execute()
+    return render_template("edit_user.html", user=user.data)
+
+
+
+@app.route("/delete_user/<user_id>", methods=["GET"])
+def delete_user(user_id):
+    try:
+        # First delete from user_profiles
+        supabase.from_("user_profiles").delete().eq("id", user_id).execute()
+
+        # # Then delete from auth.users
+        # supabase.auth.admin.delete_user(user_id)
+
+        flash("User deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting user: {str(e)}", "danger")
+
+    return redirect(url_for("admin_users"))
+
+# Add Doctor
+@app.route('/admin/doctors/add', methods=['GET', 'POST'])
+@login_required
+def add_doctor():
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        try:
+            data = {
+                "name": request.form.get("name"),
+                "specialization": request.form.get("specialization"),
+                "email": request.form.get("email"),
+                "phone": request.form.get("phone")
+            }
+            supabase.from_('doctors').insert(data).execute()
+            flash("Doctor added successfully", "success")
+            return redirect(url_for('admin_doctors'))
+        except Exception as e:
+            print(f"Add doctor error: {str(e)}")
+            flash("Error adding doctor", "danger")
+            return redirect(url_for('admin_doctors'))
+
+    return render_template('add_doctor.html')
+
+
+# Edit Doctor
+@app.route('/admin/doctors/edit/<doctor_id>', methods=['GET', 'POST'])
+@login_required
+def edit_doctor(doctor_id):
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        doctor_resp = supabase.from_('doctors').select('*').eq('id', doctor_id).maybe_single().execute()
+        doctor = doctor_resp.data
+
+        if request.method == 'POST':
+            updated_data = {
+                "name": request.form.get("name"),
+                "specialization": request.form.get("specialization"),
+                "email": request.form.get("email"),
+                "phone": request.form.get("phone")
+            }
+            supabase.from_('doctors').update(updated_data).eq('id', doctor_id).execute()
+            flash("Doctor updated successfully", "success")
+            return redirect(url_for('admin_doctors'))
+
+        return render_template('edit_doctor.html', doctor=doctor)
+    except Exception as e:
+        print(f"Edit doctor error: {str(e)}")
+        flash("Error editing doctor", "danger")
+        return redirect(url_for('admin_doctors'))
+
+
+# Delete Doctor
+@app.route('/admin/doctors/delete/<doctor_id>', methods=['POST'])
+@login_required
+def delete_doctor(doctor_id):
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        supabase.from_('doctors').delete().eq('id', doctor_id).execute()
+        flash("Doctor deleted successfully", "success")
+    except Exception as e:
+        print(f"Delete doctor error: {str(e)}")
+        flash("Error deleting doctor", "danger")
+    return redirect(url_for('admin_doctors'))
+# Edit Appointment
+@app.route('/admin/appointments/edit/<appointment_id>', methods=['GET', 'POST'])
+@login_required
+def edit_appointment(appointment_id):
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        resp = supabase.from_('appointments').select('*').eq('id', appointment_id).maybe_single().execute()
+        appointment = resp.data
+
+        if request.method == 'POST':
+            updated_data = {
+                "scheduled_time": request.form.get("scheduled_time"),
+                "status": request.form.get("status"),
+                "payment_status": request.form.get("payment_status")
+            }
+            supabase.from_('appointments').update(updated_data).eq('id', appointment_id).execute()
+            flash("Appointment updated successfully", "success")
+            return redirect(url_for('admin_appointments'))
+
+        return render_template('edit_appointment.html', appointment=appointment)
+    except Exception as e:
+        print(f"Edit appointment error: {str(e)}")
+        flash("Error editing appointment", "danger")
+        return redirect(url_for('admin_appointments'))
+
+
+# Delete Appointment
+@app.route('/admin/appointments/delete/<appointment_id>', methods=['POST'])
+@login_required
+def delete_appointment(appointment_id):
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        supabase.from_('appointments').delete().eq('id', appointment_id).execute()
+        flash("Appointment deleted successfully", "success")
+    except Exception as e:
+        print(f"Delete appointment error: {str(e)}")
+        flash("Error deleting appointment", "danger")
+    return redirect(url_for('admin_appointments'))
+@app.route('/admin/settings', methods=['GET', 'POST'])
+@login_required
+def admin_settings():
+    if not getattr(current_user, 'is_admin', False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
+
+    try:
+        # Fetch current settings
+        resp = supabase.from_('system_settings').select('*').maybe_single().execute()
+        settings = resp.data or {}
+
+        if request.method == 'POST':
+            updated_settings = {
+                "site_name": request.form.get("site_name"),
+                "support_email": request.form.get("support_email"),
+                "checkup_fee": request.form.get("checkup_fee")
+            }
+            if settings.get("id"):
+                supabase.from_('system_settings').update(updated_settings).eq('id', settings["id"]).execute()
+            else:
+                supabase.from_('system_settings').insert(updated_settings).execute()
+
+            flash("Settings updated successfully", "success")
+            return redirect(url_for('admin_settings'))
+
+        return render_template('admin_settings.html', settings=settings)
+    except Exception as e:
+        print(f"Update settings error: {str(e)}")
+        flash("Error updating settings", "danger")
+        return redirect(url_for('admin_dashboard'))
+
+
 
 # Custom datetime filter
+
 @app.template_filter('datetimeformat')
 def format_datetime(value, format="%Y-%m-%d %H:%M"):
     if value is None:
@@ -130,7 +390,7 @@ def signup():
                 "password": request.form['password'],
                 "options": {
                     "data": {
-                        "name": request.form['name'],
+                        "full_name": request.form['name'],  # 👈 use full_name consistently
                         "division": request.form['division']
                     },
                     "email_confirm": False
@@ -138,13 +398,16 @@ def signup():
             })
 
             if auth_response.user:
-                # Insert profile data
+                user = auth_response.user  # shortcut
+
                 profile_response = supabase.from_("user_profiles").insert({
-                    "id": auth_response.user.id,
+                    "id": user.id,
                     "address_line1": request.form['address_line1'],
                     "city": request.form['city'],
                     "division": request.form['division'],
-                    "postal_code": request.form['postal_code']
+                    "postal_code": request.form['postal_code'],
+                    "full_name": user.user_metadata.get("full_name"),  # 👈 now matches
+                    "email": user.email
                 }).execute()
 
                 # Sign in the user
@@ -168,6 +431,7 @@ def signup():
             return render_template('auth/signup.html', error=str(e))
 
     return render_template('auth/signup.html')
+
 
 
 @app.route('/dashboard')

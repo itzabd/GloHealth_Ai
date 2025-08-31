@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
+<span class="lang-en" lang="en">System Settings</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card-hover {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px) saturate(150%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    padding: 1rem;
+}
+.card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+.btn-accent {
+    background: linear-gradient(90deg, #FF9149, #FF6B6B);
+    border: none;
+    color: white;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    transition: 0.3s;
+}
+.btn-accent:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <div class="row mb-4">
+        <div class="col text-center">
+            <h2 class="section-header">
+                <span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
+                <span class="lang-en" lang="en">System Settings</span>
+            </h2>
+        </div>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        <!-- Example setting card -->
+        <div class="col-md-4 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">সাধারণ সেটিংস</span>
+                        <span class="lang-en" lang="en">General Settings</span>
+                    </h5>
+                    <p>Change system configurations.</p>
+                    <a href="{{ url_for('update_settings') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">আপডেট করুন</span>
+                        <span class="lang-en" lang="en">Update</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- Add more cards for settings -->
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleLanguage(lang) {
+    localStorage.setItem("lang", lang);
+    document.querySelectorAll('.lang-bn').forEach(el => el.style.display = lang === 'bn' ? '' : 'none');
+    document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem("lang") || (navigator.language.startsWith('bn') ? 'bn' : 'en');
+    toggleLanguage(savedLang);
+});
+</script>
+{% endblock %}
