@@ -1,8 +1,44 @@
 {% extends "base.html" %}
 
 {% block title %}My Appointments{% endblock %}
-
 {% block content %}
+<style>
+    body {
+        background: url('/static/images/blur-bg.jpg') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #4b72e6, #0a3e61);
+    }
+    .table thead th {
+        border-bottom: 2px solid rgba(253, 20, 230, 0.3);
+        color: #3d6adb;
+    }
+    .table tbody td {
+        color: #000000;
+        vertical-align: middle;
+    }
+    .table tbody tr {
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .table tbody tr:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .table {
+        background: rgba(70, 67, 67, 0.748);
+        border-radius: 1px;
+        border: 2px solid rgb(0, 0, 0);
+        border-style: groove;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    h2 {
+        color: #3ffc00;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+
 <div class="container mt-4">
     <h2>My Appointments</h2>
     <table class="table table-bordered">
