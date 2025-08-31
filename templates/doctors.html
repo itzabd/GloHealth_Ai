@@ -1,17 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Ultimate Plan Features{% endblock %}
+
+{% block title %}Doctors{% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
-    <h2>Ultimate Plan Features</h2>
-    <ul>
-        <li>All-inclusive consultation</li>
-        <li>Priority support and appointments</li>
-        <li>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</li>
-        <li>Comprehensive health reports</li>
-    </ul>
-
-    <h4 class="mt-4">Available Doctors</h4>
+<div class="container mt-4">
+    <h2>Available Doctors</h2>
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -30,15 +23,13 @@
                 <td>{{ doctor.hospital }}</td>
                 <td>{{ doctor.consultation_fee }} BDT</td>
                 <td>
-    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-accent btn-sm">
-        Book
-    </a>
-</td>
+                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-primary btn-sm">
+                        Book
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
 </div>
 {% endblock %}

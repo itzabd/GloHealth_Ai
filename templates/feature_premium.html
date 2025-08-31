@@ -29,7 +29,11 @@
                 <td>{{ doctor.specialty }}</td>
                 <td>{{ doctor.hospital }}</td>
                 <td>{{ doctor.consultation_fee }} BDT</td>
-                <td><button class="btn btn-accent btn-sm">Book</button></td>
+                <td>
+    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-accent btn-sm">
+        Book
+    </a>
+</td>
             </tr>
             {% endfor %}
         </tbody>

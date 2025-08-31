@@ -174,19 +174,31 @@ def signup():
 @login_required
 def dashboard():
     try:
-        predictions = supabase.from_('predictions') \
+        # Fetch last 5 predictions
+        predictions_resp = supabase.from_('predictions') \
             .select('*') \
-            .eq('user_id', current_user.id) \
+            .eq('user_id', str(current_user.id)) \
             .order('timestamp', desc=True) \
             .limit(5) \
             .execute()
+        predictions = predictions_resp.data if hasattr(predictions_resp, 'data') else []
+
+        # Fetch all user appointments
+        appointments_resp = supabase.from_('appointments') \
+            .select('*') \
+            .eq('user_id', str(current_user.id)) \
+            .order('scheduled_time', desc=True) \
+            .execute()
+        appointments = appointments_resp.data if hasattr(appointments_resp, 'data') else []
 
         return render_template('dashboard.html',
                                current_user=current_user,
-                               predictions=predictions.data)
+                               predictions=predictions,
+                               appointments=appointments)
     except Exception as e:
         print(f"Dashboard error: {str(e)}")
         return redirect(url_for('login'))
+
 
 
 @app.route('/logout')
@@ -626,37 +638,30 @@ def get_disease_color_filter(disease):
 @app.route('/doctors')
 @login_required
 def doctors():
-    try:
-        division = request.args.get('division', None)
-        specialty = request.args.get('specialty', None)
+    division = request.args.get('division')
+    specialty = request.args.get('specialty')
 
-        query = supabase.from_('doctors').select('*')
+    query = supabase.from_('doctors').select('*')
+    if division:
+        query = query.eq('division', division)
+    if specialty:
+        query = query.eq('specialty', specialty)
 
-        if division:
-            query = query.eq('division', division)
-        if specialty:
-            query = query.eq('specialty', specialty)
+    response = query.execute()
+    doctors_list = response.data if hasattr(response, 'data') else []
 
-        response = query.execute()
-
-        doctors_list = response.data if hasattr(response, 'data') else []
-
-        return render_template('doctors.html',
-                               current_user=current_user,
-                               doctors=doctors_list)
-    except Exception as e:
-        print(f"Doctors list error: {str(e)}")
-        return render_template('doctors.html',
-                               current_user=current_user,
-                               doctors=[],
-                               error="Unable to load doctors")
+    return render_template('doctors.html', doctors=doctors_list)
 # Book appointment route
 @app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
 @login_required
 def book_appointment(doctor_id):
     try:
         # Fetch doctor details
-        doctor_resp = supabase.from_('doctors').select('*').eq('id', doctor_id).maybe_single().execute()
+        doctor_resp = supabase.from_('doctors')\
+                              .select('*')\
+                              .eq('id', doctor_id)\
+                              .maybe_single()\
+                              .execute()
         doctor = doctor_resp.data if hasattr(doctor_resp, 'data') else None
         if not doctor:
             return "Doctor not found", 404
@@ -669,7 +674,6 @@ def book_appointment(doctor_id):
             .order("start_date", desc=True)\
             .limit(1)\
             .execute()
-
         subscription = sub_resp.data[0] if sub_resp.data else None
         if not subscription:
             flash("You need an active subscription to book an appointment.", "danger")
@@ -677,31 +681,41 @@ def book_appointment(doctor_id):
 
         if request.method == 'POST':
             scheduled_time = request.form.get('scheduled_time')
-            payment_done = request.form.get('payment_done')  # Simulate payment checkbox
+            payment_done = request.form.get('payment_done') == 'yes'  # checkbox: paid
+            use_points = request.form.get('use_points') == 'yes'      # checkbox: free checkup
 
             if not scheduled_time:
-                return "Please select a time", 400
+                flash("Please select a date and time", "warning")
+                return redirect(url_for('book_appointment', doctor_id=doctor_id))
 
-            # Check if free checkup points are available
-            use_points = request.form.get('use_points') == 'yes'  # Checkbox in form
+            # Default status/payment
+            status = 'pending'
+            payment_status = 'unpaid'
+
+            # Handle free checkup
             if use_points:
                 if subscription["checkup_points"] <= 0:
                     flash("No free checkups remaining for this month.", "warning")
                     return redirect(url_for('features', plan_name=subscription["plan_name"]))
-                # Deduct one point
-                supabase.table("user_subscriptions").update({
-                    "checkup_points": subscription["checkup_points"] - 1
-                }).eq("id", subscription["id"]).execute()
+
+                # Deduct one free checkup point
+                new_points = subscription["checkup_points"] - 1
+                supabase.table("user_subscriptions") \
+                    .update({"checkup_points": new_points}) \
+                    .eq("id", subscription["id"]) \
+                    .execute()
+
+                subscription["checkup_points"] = new_points
                 status = 'confirmed'
                 payment_status = 'free'
             else:
                 # Paid booking
-                status = 'confirmed' if payment_done == 'yes' else 'pending'
-                payment_status = 'paid' if payment_done == 'yes' else 'unpaid'
+                status = 'confirmed' if payment_done else 'pending'
+                payment_status = 'paid' if payment_done else 'unpaid'
 
             # Insert appointment
             supabase.from_('appointments').insert({
-                'user_id': current_user.id,
+                'user_id': str(current_user.id),
                 'doctor_id': doctor_id,
                 'scheduled_time': scheduled_time,
                 'status': status,
@@ -711,34 +725,44 @@ def book_appointment(doctor_id):
             flash("Appointment booked successfully!", "success")
             return redirect(url_for('appointments'))
 
-        return render_template('book_appointment.html',
-                               current_user=current_user,
-                               doctor=doctor,
-                               subscription=subscription)
+        # GET request: show form
+        return render_template(
+            'book_appointment.html',
+            doctor=doctor,
+            subscription=subscription
+        )
+
     except Exception as e:
         print(f"Book appointment error: {str(e)}")
         return "Error booking appointment", 500
+
 @app.route('/appointments')
 @login_required
 def appointments():
     try:
+        # Fetch user's appointments with doctor info
         response = supabase.from_('appointments') \
             .select('*, doctors(*)') \
-            .eq('user_id', current_user.id) \
+            .eq('user_id', str(current_user.id)) \
             .order('scheduled_time', desc=True) \
             .execute()
 
+        # Extract data safely
         appointments_list = response.data if hasattr(response, 'data') else []
 
-        return render_template('appointments.html',
-                               current_user=current_user,
-                               appointments=appointments_list)
+        return render_template(
+            'appointments.html',
+            current_user=current_user,
+            appointments=appointments_list
+        )
     except Exception as e:
         print(f"Appointments error: {str(e)}")
-        return render_template('appointments.html',
-                               current_user=current_user,
-                               appointments=[],
-                               error="Unable to load appointments")
+        return render_template(
+            'appointments.html',
+            current_user=current_user,
+            appointments=[],
+            error="Unable to load appointments"
+        )
 
 # app.py
 # Plans page

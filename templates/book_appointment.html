@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Book Appointment with Dr. {{ doctor.name }}</h2>
+    <p>Specialty: {{ doctor.specialty }}</p>
+    <p>Hospital: {{ doctor.hospital }}</p>
+    <p>Consultation Fee: {{ doctor.consultation_fee }} BDT</p>
+
+ <p>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</p>
+
+<form method="POST">
+    <div class="mb-3">
+        <label for="scheduled_time" class="form-label">Select Date & Time</label>
+        <input type="datetime-local" name="scheduled_time" class="form-control" required>
+    </div>
+
+    {% if subscription and subscription.checkup_points > 0 %}
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" name="use_points" value="yes" id="usePoints">
+        <label class="form-check-label" for="usePoints">Use free checkup</label>
+    </div>
+    {% endif %}
+
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" name="payment_done" value="yes" id="paymentDone">
+        <label class="form-check-label" for="paymentDone">Payment done</label>
+    </div>
+
+    <button type="submit" class="btn btn-success">Book Appointment</button>
+</form>
+
+</div>
+{% endblock %}

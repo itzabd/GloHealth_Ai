@@ -210,6 +210,33 @@ footer {
             </div>
         </div>
     </div>
+<!-- My Appointments Card -->
+    <div class="col-md-4 mb-3 d-flex">
+        <div class="card card-hover w-100 card-centered h-100">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <span class="lang-bn" lang="bn">আমার অ্যাপয়েন্টমেন্ট</span>
+                    <span class="lang-en" lang="en">My Appointments</span>
+                </h5>
+                <h3>{{ appointments|length if appointments else 0 }}</h3>
+                <p>
+                    <span class="lang-bn" lang="bn">আপনার আসন্ন অ্যাপয়েন্টমেন্ট</span>
+                    <span class="lang-en" lang="en">Upcoming appointments</span>
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('appointments') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">দেখুন</span>
+                        <span class="lang-en" lang="en">View</span>
+                    </a>
+                    <a href="{{ url_for('doctors') }}" class="btn btn-outline-primary">
+                        <span class="lang-bn" lang="bn">বুক করুন</span>
+                        <span class="lang-en" lang="en">Book</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Recent Tests Table -->
     <div class="row justify-content-center mb-4">
