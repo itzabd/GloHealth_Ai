@@ -1,76 +1,92 @@
 {% extends "base.html" %}
-{% block title %}Register/রেজিস্টার{% endblock %}
+{% block title %}Register / রেজিস্টার{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center position-relative">
-    <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white d-flex align-items-center gap-2">
-                <h4 class="mb-0">
-                    <i class="bi bi-person-plus"></i>
+<style>
+    /* Gradient background for page */
+    body {
+        background: linear-gradient(135deg, #0187ee, #5978ce);
+    }
+</style>
+<div class="row justify-content-center position-relative py-4">
+    <div class="col-md-8 col-lg-7">
+        <div class="card shadow-lg border-0 rounded-4">
+            <!-- Gradient Header -->
+            <div class="card-header text-white d-flex align-items-center gap-2 rounded-top-4" 
+                 style="background: linear-gradient(135deg, #123493, #1a649c);">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-plus-fill me-1"></i>
                     <span class="lang-en">Create New Account</span>
                     <span class="lang-bn">নতুন অ্যাকাউন্ট তৈরি করুন</span>
                 </h4>
             </div>
-            <div class="card-body">
+
+            <!-- Body -->
+            <div class="card-body p-4">
                 <form id="signupForm" method="POST" action="/signup">
                     <div class="row">
+                        <!-- Left Column -->
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label">
+                                <label class="form-label fw-semibold">
                                     <span class="lang-en">Full Name</span>
                                     <span class="lang-bn">পুরো নাম</span>
                                 </label>
-                                <input type="text" class="form-control" name="name" required />
+                                <input type="text" class="form-control rounded-3" name="name" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
+                                <label class="form-label fw-semibold">
                                     <span class="lang-en">Email Address</span>
                                     <span class="lang-bn">ইমেইল ঠিকানা</span>
                                 </label>
-                                <input type="email" class="form-control" name="email" required />
+                                <input type="email" class="form-control rounded-3" name="email" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
+                                <label class="form-label fw-semibold">
                                     <span class="lang-en">Password</span>
                                     <span class="lang-bn">পাসওয়ার্ড</span>
                                 </label>
-                                <input type="password" class="form-control" name="password" required />
+                                <input type="password" class="form-control rounded-3" name="password" required />
                             </div>
                         </div>
+
+                        <!-- Right Column -->
                         <div class="col-md-6">
-                            <h5 class="section-header">
+                            <h5 class="section-header mb-3  fw-bold"
+                            style="background: linear-gradient(135deg, #274eb9, #62808d); color: #ffffff; padding: 8px 12px; border-radius: 6px;">
+                                <i class="bi bi-geo-alt-fill me-1"></i>
                                 <span class="lang-en">Address Information</span>
                                 <span class="lang-bn">ঠিকানা তথ্য</span>
                             </h5>
+                            
                             <div class="mb-3">
-                                <label class="form-label">
+                                <label class="form-label fw-semibold">
                                     <span class="lang-en">Address Line 1</span>
                                     <span class="lang-bn">ঠিকানা লাইন ১</span>
                                 </label>
-                                <input type="text" class="form-control" name="address_line1" required />
+                                <input type="text" class="form-control rounded-3" name="address_line1" required />
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">
+                                <label class="form-label fw-semibold">
                                     <span class="lang-en">Address Line 2 (Optional)</span>
                                     <span class="lang-bn">ঠিকানা লাইন ২ (ঐচ্ছিক)</span>
                                 </label>
-                                <input type="text" class="form-control" name="address_line2" />
+                                <input type="text" class="form-control rounded-3" name="address_line2" />
                             </div>
-                            <div class="row g-2">
+                            <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">
+                                    <label class="form-label fw-semibold">
                                         <span class="lang-en">City</span>
                                         <span class="lang-bn">শহর</span>
                                     </label>
-                                    <input type="text" class="form-control" name="city" required />
+                                    <input type="text" class="form-control rounded-3" name="city" required />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">
+                                    <label class="form-label fw-semibold">
                                         <span class="lang-en">Division</span>
                                         <span class="lang-bn">বিভাগ</span>
                                     </label>
-                                    <select class="form-select" name="division" required>
+                                    <select class="form-select rounded-3" name="division" required>
                                         <option value="Dhaka">Dhaka / ঢাকা</option>
                                         <option value="Chittagong">Chittagong / চট্টগ্রাম</option>
                                         <option value="Rajshahi">Rajshahi / রাজশাহী</option>
@@ -82,25 +98,29 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">
+                                    <label class="form-label fw-semibold">
                                         <span class="lang-en">Postal Code</span>
                                         <span class="lang-bn">পোস্টাল কোড</span>
                                     </label>
-                                    <input type="text" maxlength="4" class="form-control" name="postal_code" required />
+                                    <input type="text" maxlength="4" class="form-control rounded-3" name="postal_code" required />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-accent w-100 mt-3">
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-success w-100 mt-4 py-2 fw-semibold rounded-3 shadow-sm"
+                    style="background: linear-gradient(135deg, #2c53c0, #0c5970);">
+                        
                         <i class="bi bi-person-plus"></i>
                         <span class="lang-en">Create Account</span>
                         <span class="lang-bn">অ্যাকাউন্ট তৈরি করুন</span>
                     </button>
                 </form>
 
+                <!-- Login Link -->
                 <div class="text-center mt-3">
-                    <a href="/login" class="btn btn-link">
+                    <a href="/login" class="btn btn-link text-decoration-none">
                         <span class="lang-en">Already have an account? Login</span>
                         <span class="lang-bn">ইতিমধ্যে অ্যাকাউন্ট আছে? লগইন করুন</span>
                     </a>
