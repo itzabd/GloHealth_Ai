@@ -3,82 +3,45 @@
 
 {% block extra_css %}
 <style>
-/* Card headers theme colors */
-.card-header.bg-primary { background-color: #60B5FF !important; color: white; }
-.card-header.bg-info { background-color: #0dcaf0 !important; color: white; }
 
-/* Section title like Geo Insight */
-.section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #2A4365; border-bottom: 2px solid #FF9149; padding-bottom: 0.3rem; }
-
-/* Compact Symptom Cards */
-.symptom-card { display: flex; align-items: center; padding: 4px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
-.symptom-card:hover { border-color: #60B5FF; background-color: rgba(96, 181, 255, 0.1); }
-.symptom-card.selected { border: 2px solid #60B5FF; background-color: rgba(96, 181, 255, 0.15); }
-.symptom-check { display: none; }
-.symptom-text { flex-grow: 1; }
-
-/* Language toggle */
-.lang-toggle { position: absolute; top: 15px; right: 15px; }
-
-/* Two-column layout for Other Symptoms */
-.symptom-group.other-symptoms .symptom-card { width: 48%; display: inline-flex; margin-right: 2%; margin-bottom: 4px; }
-.symptom-group.other-symptoms .symptom-card:nth-child(2n) { margin-right: 0; }
-
-/* Responsive */
-@media (max-width: 768px) {
-    .symptom-group.other-symptoms .symptom-card { width: 100%; margin-right: 0; }
-}
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid position-relative">
+<div class="container-fluid py-4 position-relative">
     <!-- Language Toggle -->
     <div class="lang-toggle">
-        <div class="btn-group btn-group-sm">
+        <div class="btn-group btn-group-sm shadow-sm">
             <button class="btn btn-outline-primary {% if lang == 'en' %}active{% endif %}" onclick="setLanguage('en')">English</button>
             <button class="btn btn-outline-primary {% if lang == 'bn' %}active{% endif %}" onclick="setLanguage('bn')">বাংলা</button>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Location Card -->
-        <div class="col-lg-4 mb-3 d-flex justify-content-center">
-            <div class="card card-hover w-100 h-100">
-                <div class="card-header">
-                    <i class="bi bi-geo-alt"></i> {% if lang == 'bn' %}অবস্থান তথ্য{% else %}Location Information{% endif %}
+
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="padding: 20px 24px;">
                     <div class="mb-3">
-                        <label class="form-label">{% if lang == 'bn' %}বিভাগ{% else %}Division{% endif %}</label>
-                        <select class="form-select" id="division">
+                        <label class="form-label fw-semibold">{% if lang == 'bn' %}বিভাগ{% else %}Division{% endif %}</label>
+                        <select class="form-select rounded-3" id="division">
                             <option value="">{% if lang == 'bn' %}বিভাগ নির্বাচন করুন{% else %}Select Division{% endif %}</option>
                             {% for div in divisions %}
                             <option value="{{ div }}">{{ div }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="btn btn-accent w-100" id="useLocationBtn">
-                        <i class="bi bi-geo-alt"></i> {% if lang == 'bn' %}আমার অবস্থান ব্যবহার করুন{% else %}Use My Location{% endif %}
+
                     </button>
                     <div id="locationStatus" class="text-muted small mt-2"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Symptoms Card -->
-        <div class="col-lg-8 mb-3 d-flex justify-content-center">
-            <div class="card card-hover w-100 h-100">
-                <div class="card-header">
-                    <i class="bi bi-clipboard-pulse"></i> {% if lang == 'bn' %}আপনার লক্ষণ নির্বাচন করুন{% else %}Select Your Symptoms{% endif %}
+
                 </div>
                 <div class="card-body">
                     <div class="row" id="symptomContainer">
                         {% for group, symptoms in symptom_groups.items() %}
-                        <div class="col-md-6 symptom-group {% if group == 'Other' %}other-symptoms{% endif %}">
-                            <h5 class="section-title">
-                                {% if lang == 'bn' %}{{ group_bn_mapping[group] }}{% else %}{{ group }}{% endif %}
-                            </h5>
+
                             {% for symptom in symptoms %}
                             <div class="symptom-card" data-symptom="{{ symptom }}">
                                 <input type="checkbox" class="symptom-check" value="{{ symptom }}">
@@ -90,8 +53,7 @@
                         </div>
                         {% endfor %}
                     </div>
-                    <button class="btn btn-accent btn-lg w-100 mt-3" id="predictBtn">
-                        <i class="bi bi-heart-pulse"></i> {% if lang == 'bn' %}লক্ষণ পরীক্ষা করুন{% else %}Check Symptoms{% endif %}
+
                     </button>
                 </div>
             </div>
@@ -121,94 +83,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let userLocation = { lat: null, long: null };
 
-    // Symptom card selection
-    document.querySelectorAll('.symptom-card').forEach(card => {
-        const checkbox = card.querySelector('.symptom-check');
-        card.addEventListener('click', function() {
-            checkbox.checked = !checkbox.checked;
-            this.classList.toggle('selected', checkbox.checked);
+
         });
     });
 
-    // Geolocation
-    const useLocationBtn = document.getElementById('useLocationBtn');
-    const locationStatus = document.getElementById('locationStatus');
-    useLocationBtn.addEventListener('click', function() {
-        if (!navigator.geolocation) { locationStatus.innerText = translations.noGeolocation; return; }
-        navigator.geolocation.getCurrentPosition(
-            pos => { userLocation.lat = pos.coords.latitude; userLocation.long = pos.coords.longitude; locationStatus.innerText = translations.locationFound; },
-            err => { locationStatus.innerText = err.message; }
-        );
-    });
 
-    // Predict button
-    document.getElementById('predictBtn').addEventListener('click', async function() {
-        const symptoms = Array.from(document.querySelectorAll('.symptom-check:checked')).map(e => e.value);
-        const division = document.getElementById('division').value;
-        if (!symptoms.length) { alert(translations.selectSymptom); return; }
-        if (!division) { alert(translations.selectDivision); return; }
-
-        this.disabled = true;
-        this.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${translations.processing}`;
-
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ symptoms, division, lat: userLocation.lat, long: userLocation.long })
-            });
-            const data = await response.json();
-            if (data.success) {
-                // Pass recommended doctors/hospitals from backend if available
-                const recommendedDoctors = data.recommendedDoctors || [];
-                const recommendedHospitals = data.recommendedHospitals || [];
-                showResultsModal(data.predictions, recommendedDoctors, recommendedHospitals);
-            } else { throw new Error(data.error || 'Prediction failed'); }
-        } catch(err) { alert(`Error: ${err.message}`); }
-        finally {
-            this.disabled = false;
-            this.innerHTML = `<i class="bi bi-heart-pulse"></i> ${lang==='bn'?'লক্ষণ পরীক্ষা করুন':'Check Symptoms'}`;
-        }
-    });
-
-    function showResultsModal(predictions, recommendedDoctors = [], recommendedHospitals = []) {
-        const modalHtml = `
-        <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">${translations.resultsTitle}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h5>${translations.possibleDiseases}:</h5>
-                        <ul class="list-group mb-3">
-                            ${predictions.map(p => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>${p.disease}</span>
-                                <span class="badge bg-primary rounded-pill">${p.probability}</span>
-                            </li>`).join('')}
-                        </ul>
-
-                        <h5>${translations.recommendedDoctors}:</h5>
-                        <ul class="list-group mb-3">
-                            ${recommendedDoctors.length ? recommendedDoctors.map(d => `
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>${d.name} (${d.specialty})</span>
-                                    <button class="btn btn-success btn-sm" onclick="bookDoctor('${d.id}')">Book Appointment</button>
-                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
-                        </ul>
-
-                        <h5>${translations.nearbyHospitals}:</h5>
-                        <ul class="list-group">
-                            ${recommendedHospitals.length ? recommendedHospitals.map(h => `
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>${h.name} - ${h.department}</span>
-                                    <button class="btn btn-warning btn-sm" onclick="visitHospital('${h.id}')">Visit / Details</button>
-                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${translations.close}</button>
                     </div>
                 </div>
             </div>
@@ -219,10 +98,4 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function(){ this.remove(); });
     }
 
-    // Example handlers for buttons (replace with actual logic)
-    window.bookDoctor = function(doctorId) { alert(`Redirecting to booking for doctor ID: ${doctorId}`); }
-    window.visitHospital = function(hospitalId) { alert(`Redirecting to hospital info for ID: ${hospitalId}`); }
-});
-</script>
-{% endblock %}
 
