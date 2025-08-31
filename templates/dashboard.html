@@ -1,152 +1,95 @@
 {% extends "base.html" %}
-{% block title %}ড্যাশবোর্ড{% endblock %}
 
-{% block content %}
+{% block title %}
+<span class="lang-bn">ড্যাশবোর্ড</span>
+<span class="lang-en">Dashboard</span>
+{% endblock %}
+
+{% block extra_css %}
 <style>
-    :root{
-        /* Palette (accessible, cohesive) */
-        --brand-teal:#0EA5E9;    /* sky-500 */
-        --brand-cyan:#22D3EE;    /* cyan-400 */
-        --brand-blue:#2563EB;    /* blue-600 */
-        --brand-deep:#0B3B7A;    /* deep accent for shadows */
+/* Card hover effect and colors */
+.card-hover {
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
 
-        /* Glass + text */
-        --glass: rgba(255,255,255,0.10);
-        --glass-strong: rgba(255,255,255,0.16);
-        --stroke: rgba(255,255,255,0.22);
-        --text-main:#F8FAFC;     /* near-white */
-        --text-dim: rgba(248,250,252,0.9);
-    }
+/* Centered cards */
+.card-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
 
-    body{
-        min-height:100vh;
-        /* Layered gradient adds depth and evens out the “washed” look */
-        background:
-            radial-gradient(1100px 700px at 15% 20%, rgba(34,211,238,0.35), transparent 60%),
-            radial-gradient(900px 600px at 85% 10%, rgba(59,130,246,0.35), transparent 60%),
-            linear-gradient(135deg, var(--brand-teal), var(--brand-cyan) 45%, var(--brand-blue) 85%);
-        color: var(--text-main);
-    }
-
-    /* Card Styling (refined glassmorphism) */
-    .card{
-        border: 1px solid var(--stroke);
-        border-radius:20px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
-        backdrop-filter: blur(12px) saturate(120%);
-        -webkit-backdrop-filter: blur(12px) saturate(120%);
-        color: var(--text-main);
-        box-shadow: 0 8px 28px rgba(11,59,122,0.18);
-        transition: transform .3s ease, box-shadow .3s ease, background .3s ease, border-color .3s ease;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.35);
-    }
-    .card:hover{
-        transform: translateY(-6px);
-        background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10));
-        border-color: rgba(255,255,255,0.28);
-        box-shadow: 0 14px 34px rgba(11,59,122,0.28);
-    }
-
-    /* Card header with consistent gradient and contrast */
-    .card-header{
-        border-radius:20px 20px 0 0 !important;
-        font-weight:600;
-        background: linear-gradient(90deg, rgba(2,132,199,0.85), rgba(6,182,212,0.85));
-        border-bottom: 1px solid rgba(255,255,255,0.22);
-        color:#fff;
-        text-shadow:0 1px 2px rgba(0,0,0,0.45);
-    }
-    /* keep your optional variants */
-    .card-header.bg-info{ background: linear-gradient(90deg, #2CF2BD, #2CA6F2); }
-    .card-header.bg-primary{ background: linear-gradient(90deg, #2C68F2, #7CEAF2); }
-
-    /* Fade-in Animation */
-    @keyframes fadeInUp{
-        from{opacity:0; transform: translateY(24px);}
-        to{opacity:1; transform: translateY(0);}
-    }
-    .fade-in{ animation: fadeInUp .9s ease forwards; }
-    @media (prefers-reduced-motion: reduce){
-        .fade-in{ animation:none; }
-    }
-
-    /* Accent button (stronger, clear focus & hover) */
-    .btn-accent{
-        background: linear-gradient(135deg, var(--brand-blue), var(--brand-teal));
-        border: 1px solid rgba(255,255,255,0.25);
-        color:#fff;
-        font-weight:600;
-        border-radius:30px;
-        padding:.5rem 1.2rem;
-        box-shadow: 0 6px 16px rgba(11,59,122,0.25);
-        transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
-        text-shadow:0 1px 1px rgba(0,0,0,0.35);
-    }
-    .btn-accent:hover{
-        transform: translateY(-2px);
-        filter: brightness(1.05);
-        box-shadow: 0 10px 22px rgba(11,59,122,0.35);
-        text-decoration:none;
-        color:#fff;
-    }
-
-    /* Table styling: better contrast + subtle stripes */
-    /* Table styling: better readability */
-.table {
+/* Table styling like Geo Insight */
+.table-container {
+    max-height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+.table-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 350px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+.table-compact {
+    width: 100%;
     margin-bottom: 0;
 }
-
-.table thead th {
-    background: linear-gradient(90deg, rgba(2,132,199,0.9), rgba(6,182,212,0.9));
-    color: #fff;
-    border: none !important;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+.table-compact th,
+.table-compact td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
     white-space: nowrap;
+    vertical-align: middle;
+}
+.table-compact th {
+    background-color: #60B5FF;
+    color: white;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.table-compact tbody tr:hover td {
+    background-color: #f8f9fa;
+}
+.table-compact tbody tr:hover td:first-child {
+    background-color: #e9ecef;
 }
 
-/* Rows: darker glass background for readability */
-.table-hover tbody tr {
-    background: rgba(0, 0, 0, 0.45); /* dark navy glass */
-    transition: background-color 0.25s ease, transform 0.2s ease;
+/* Section title styling */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2A4365;
+    border-bottom: 2px solid #FF9149;
+    padding-bottom: 0.5rem;
 }
 
-.table-hover tbody tr:nth-child(even) {
-    background: rgba(15, 23, 42, 0.55);
-}
-
-.table-hover tbody tr:hover {
-    background: rgba(34, 211, 238, 0.25); /* accent highlight */
-    transform: scale(1.005);
-}
-
-/* Text inside cells */
-.table-hover tbody td {
-    color: #000000; /* bright white */
-    border-color: rgba(255, 255, 255, 0.08) !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
-}
-
-
-    /* Minor polish for the “Geographic Insights” card title */
-    .card-title{
-        color:#fff;
-        text-shadow:0 1px 2px rgba(0,0,0,0.35);
+/* Responsive */
+@media (max-width: 768px) {
+    .table-scroll-wrapper {
+        max-height: 300px;
+        font-size: 0.8rem;
     }
-    .card-text{
-        color: rgba(0, 0, 0, 0.92);
-    }
+}
 </style>
+{% endblock %}
 
-<div class="row">
-    <!-- User Info -->
-    <div class="col-12 col-md-4 fade-in">
-        <div class="card mb-4">
-            <div class="card-header text-white bangla">
-                <i class="bi bi-person"></i> ব্যবহারকারী তথ্য
-            </div>
+{% block content %}
+
             <div class="card-body">
-                <h5 class="bangla">{{ current_user.name }}</h5>
-                <p class="bangla">
+                <h5>{{ current_user.name }}</h5>
+                <p>
                     <i class="bi bi-envelope"></i> {{ current_user.email }}<br>
                     <i class="bi bi-geo-alt"></i> {{ current_user.address.city }}, {{ current_user.address.division }}
                 </p>
@@ -154,15 +97,7 @@
         </div>
     </div>
 
-    <!-- Geographic Insights -->
-    <div class="col-12 col-md-4 mb-4 fade-in" style="animation-delay: .2s;">
-        <div class="card h-100">
-            <div class="card-body">
-                <h5 class="card-title fw-bold">
-                    <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
-                    <span class="lang-en">Geographic Insights</span>
-                </h5>
-                <p class="card-text">
+
                     <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
                     <span class="lang-en">View disease spread across Bangladesh</span>
                 </p>
@@ -174,34 +109,6 @@
         </div>
     </div>
 
-    <!-- Recent Tests -->
-    <div class="col-12 col-md-8 fade-in" style="animation-delay: .4s;">
-        <div class="card">
-            <div class="card-header text-white bangla">
-                <i class="bi bi-clock-history"></i> সাম্প্রতিক পরীক্ষা
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover text-white">
-                        <thead>
-                            <tr class="bangla">
-                                <th>তারিখ</th>
-                                <th>লক্ষণ</th>
-                                <th>রোগ</th>
-                                <th>নিশ্চিততা</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for pred in predictions %}
-                            <tr>
-                                <td>{{ pred.formatted_time }}</td>
-                                <td>{{ pred.symptoms|join(', ') }}</td>
-                                <td class="bangla">{{ pred.top_prediction }}</td>
-                                <td>{{ (pred.confidence * 100)|round(1) }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>

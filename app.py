@@ -502,8 +502,6 @@ def calculate_location_boost(division: str, disease: str) -> float:
         print(f"Error calculating location boost: {str(e)}")
 
     return 1.0  # Default no boost
-
-
 @app.route('/geo_insights')
 @login_required
 def geo_insights():
@@ -525,7 +523,7 @@ def geo_insights():
         bd_center = [23.6850, 90.3563]
         bd_map = folium.Map(location=bd_center, zoom_start=7, tiles='cartodbpositron')
 
-        # Add Bangladesh boundary
+        # Bangladesh boundary
         bd_bounds = [[20.5, 88.0], [26.5, 92.5]]
         folium.Rectangle(
             bounds=bd_bounds,
@@ -537,55 +535,66 @@ def geo_insights():
             popup='Bangladesh'
         ).add_to(bd_map)
 
-        # Prepare data for heatmap
+        # Division coordinates (approximate centers)
+        division_coordinates = {
+            'Dhaka': [23.8103, 90.4125],
+            'Chittagong': [22.3569, 91.7832],
+            'Rajshahi': [24.3745, 88.6042],
+            'Khulna': [22.8456, 89.5403],
+            'Barisal': [22.7010, 90.3535],
+            'Sylhet': [24.8910, 91.8710],
+            'Rangpur': [25.7439, 89.2752],
+            'Mymensingh': [24.7471, 90.4203]
+        }
+
+        # Heatmap and marker cluster
         heat_data = []
+        marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
+
         for _, row in df.iterrows():
-            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
-                heat_data.append([
-                    float(row['latitude']),
-                    float(row['longitude']),
-                    float(row.get('case_count', 1))
-                ])
+            division = row.get('division')
+            if division and division in division_coordinates:
+                lat, lon = division_coordinates[division]
+                case_count = row.get('case_count', 1)
+                if pd.notna(lat) and pd.notna(lon) and pd.notna(case_count):
+                    heat_data.append([float(lat), float(lon), float(case_count)])
+                    popup = f"""
+                    <b>{row.get('disease', 'N/A')}</b><br>
+                    Cases: {case_count}<br>
+                    Division: {division}<br>
+                    Confidence: {row.get('confidence_score', 0):.1%}
+                    """
+                    folium.Marker(
+                        location=[float(lat), float(lon)],
+                        popup=popup,
+                        icon=folium.Icon(
+                            color='red' if case_count > 10
+                            else 'orange' if case_count > 5
+                            else 'green'
+                        )
+                    ).add_to(marker_cluster)
 
         if heat_data:
             HeatMap(
                 heat_data,
                 name="Case Density",
-                radius=20,
-                blur=15,
+                radius=25,
+                blur=20,
                 max_zoom=1,
                 gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
             ).add_to(bd_map)
 
-        # Add clustered markers
-        marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
-        for _, row in df.iterrows():
-            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
-                popup = f"""
-                <b>{row.get('disease', 'N/A')}</b><br>
-                Cases: {row.get('case_count', 0)}<br>
-                Division: {row.get('division', 'Unknown')}<br>
-                Confidence: {row.get('confidence_score', 0):.1%}
-                """
-                folium.Marker(
-                    location=[float(row['latitude']), float(row['longitude'])],
-                    popup=popup,
-                    icon=folium.Icon(
-                        color='red' if row.get('case_count', 0) > 10
-                        else 'orange' if row.get('case_count', 0) > 5
-                        else 'green'
-                    )
-                ).add_to(marker_cluster)
-
         folium.LayerControl().add_to(bd_map)
         map_html = bd_map._repr_html_() if bd_map else None
 
-        # Process division statistics
+        # Prepare statistics
         division_counts_dict = {}
         disease_totals = {}
         top_diseases = []
+        all_diseases = []
 
         if not df.empty and 'division' in df.columns and 'disease' in df.columns:
+            # Pivot table for counts
             division_counts = df.pivot_table(
                 index='division',
                 columns='disease',
@@ -593,18 +602,18 @@ def geo_insights():
                 aggfunc='sum',
                 fill_value=0
             )
-
             division_counts_dict = division_counts.to_dict('index')
             disease_totals = division_counts.sum().to_dict()
             top_diseases = division_counts.sum().nlargest(5).index.tolist()
+            all_diseases = df['disease'].unique().tolist()
 
-        # RETURN THE RESPONSE (THIS WAS MISSING)
         return render_template('geo_insights.html',
                                current_user=current_user,
                                map_html=map_html,
                                division_counts=division_counts_dict,
                                disease_totals=disease_totals,
-                               top_diseases=top_diseases)
+                               top_diseases=top_diseases,
+                               all_diseases=all_diseases)
 
     except Exception as e:
         print(f"Geo insights error: {str(e)}")
@@ -613,6 +622,7 @@ def geo_insights():
         return render_template('geo_insights.html',
                                current_user=current_user,
                                error=str(e))
+
 # THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
 @app.template_filter('get_disease_color')
 def get_disease_color_filter(disease):
@@ -627,6 +637,95 @@ def get_disease_color_filter(disease):
         'Malaria': 'pink'
     }
     return color_map.get(disease, 'gray')
+
+# List doctors (paid feature)
+@app.route('/doctors')
+@login_required
+def doctors():
+    try:
+        division = request.args.get('division', None)
+        specialty = request.args.get('specialty', None)
+
+        query = supabase.from_('doctors').select('*')
+
+        if division:
+            query = query.eq('division', division)
+        if specialty:
+            query = query.eq('specialty', specialty)
+
+        response = query.execute()
+
+        doctors_list = response.data if hasattr(response, 'data') else []
+
+        return render_template('doctors.html',
+                               current_user=current_user,
+                               doctors=doctors_list)
+    except Exception as e:
+        print(f"Doctors list error: {str(e)}")
+        return render_template('doctors.html',
+                               current_user=current_user,
+                               doctors=[],
+                               error="Unable to load doctors")
+# Book appointment route
+@app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
+@login_required
+def book_appointment(doctor_id):
+    try:
+        # Fetch doctor details
+        doctor_resp = supabase.from_('doctors').select('*').eq('id', doctor_id).maybe_single().execute()
+        doctor = doctor_resp.data if hasattr(doctor_resp, 'data') else None
+        if not doctor:
+            return "Doctor not found", 404
+
+        if request.method == 'POST':
+            scheduled_time = request.form.get('scheduled_time')
+            payment_done = request.form.get('payment_done')  # Simulate payment checkbox
+
+            if not scheduled_time:
+                return "Please select a time", 400
+
+            status = 'confirmed' if payment_done == 'yes' else 'pending'
+            payment_status = 'paid' if payment_done == 'yes' else 'unpaid'
+
+            supabase.from_('appointments').insert({
+                'user_id': current_user.id,
+                'doctor_id': doctor_id,
+                'scheduled_time': scheduled_time,
+                'status': status,
+                'payment_status': payment_status
+            }).execute()
+
+            return redirect(url_for('appointments'))
+
+        return render_template('book_appointment.html',
+                               current_user=current_user,
+                               doctor=doctor)
+    except Exception as e:
+        print(f"Book appointment error: {str(e)}")
+        return "Error booking appointment", 500
+# View user appointments
+@app.route('/appointments')
+@login_required
+def appointments():
+    try:
+        response = supabase.from_('appointments') \
+            .select('*, doctors(*)') \
+            .eq('user_id', current_user.id) \
+            .order('scheduled_time', desc=True) \
+            .execute()
+
+        appointments_list = response.data if hasattr(response, 'data') else []
+
+        return render_template('appointments.html',
+                               current_user=current_user,
+                               appointments=appointments_list)
+    except Exception as e:
+        print(f"Appointments error: {str(e)}")
+        return render_template('appointments.html',
+                               current_user=current_user,
+                               appointments=[],
+                               error="Unable to load appointments")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
