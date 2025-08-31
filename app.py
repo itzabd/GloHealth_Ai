@@ -696,6 +696,18 @@ def appointments():
                                appointments=[],
                                error="Unable to load appointments")
 
+# app.py
+
+@app.route('/plans')
+@login_required
+def plans():
+    # You can fetch plan data from database if needed
+    plans_data = [
+        {"name": "Basic Plan", "price": "500 BDT", "details": "Access to general consultation."},
+        {"name": "Premium Plan", "price": "1200 BDT", "details": "Includes specialist consultation and reports."},
+        {"name": "Ultimate Plan", "price": "2500 BDT", "details": "All-inclusive consultation, priority support."}
+    ]
+    return render_template("plans.html", plans=plans_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
