@@ -7,26 +7,60 @@
 
 {% block extra_css %}
 <style>
-/* Card hover effect and colors */
-.card-hover {
+/* ---------- Global Enhancements ---------- */
+body {
+    background: linear-gradient(135deg, #f8fbff 0%, #f1f7ff 100%);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Headings */
+h2.section-header {
+    font-weight: 700;
+    color: #2A4365;
+    border-bottom: 3px solid #60B5FF;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+/* ---------- Card Styles ---------- */
+.card {
+    border-radius: 16px;
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
-    height: 100%;
 }
+
 .card-hover:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
-/* Centered cards */
-.card-centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
+/* Card titles */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2A4365;
+    border-bottom: 2px solid #FF9149;
+    padding-bottom: 0.3rem;
+    margin-bottom: 1rem;
 }
 
-/* Table styling like Geo Insight */
+/* Accent buttons */
+.btn-accent {
+    background: #60B5FF;
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.4rem 1.2rem;
+    transition: 0.3s;
+}
+.btn-accent:hover {
+    background: #4a9de0;
+    color: #fff;
+}
+
+/* ---------- Table Styling ---------- */
 .table-container {
     max-height: 400px;
     overflow: hidden;
@@ -37,49 +71,48 @@
     overflow-y: auto;
     max-height: 350px;
     border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border-radius: 12px;
 }
 .table-compact {
     width: 100%;
     margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 .table-compact th,
 .table-compact td {
-    padding: 0.5rem;
-    font-size: 0.85rem;
+    padding: 0.65rem;
+    font-size: 0.88rem;
     white-space: nowrap;
     vertical-align: middle;
 }
 .table-compact th {
-    background-color: #60B5FF;
+    background: linear-gradient(90deg, #60B5FF, #4a9de0);
     color: white;
-    font-weight: 500;
+    font-weight: 600;
     position: sticky;
     top: 0;
     z-index: 10;
 }
+.table-compact tbody tr:nth-child(even) {
+    background-color: #f9fbfd;
+}
 .table-compact tbody tr:hover td {
-    background-color: #f8f9fa;
-}
-.table-compact tbody tr:hover td:first-child {
-    background-color: #e9ecef;
+    background-color: #f1f5f9;
+    transition: background 0.2s;
 }
 
-/* Section title styling */
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: #2A4365;
-    border-bottom: 2px solid #FF9149;
-    padding-bottom: 0.5rem;
-}
-
-/* Responsive */
+/* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .table-scroll-wrapper {
         max-height: 300px;
         font-size: 0.8rem;
+    }
+    .section-title {
+        font-size: 1rem;
+    }
+    h2.section-header {
+        font-size: 1.3rem;
     }
 }
 </style>
@@ -101,12 +134,11 @@
         <div class="card card-hover w-100 card-centered border-primary">
             <div class="card-body">
                 <h5 class="section-title">
-                <span class="lang-bn">ব্যবহারকারী তথ্য</span>
-                <span class="lang-en">User Info</span>
-            </h5></div>
-            <div class="card-body">
+                    <span class="lang-bn">ব্যবহারকারী তথ্য</span>
+                    <span class="lang-en">User Info</span>
+                </h5>
                 <h5>{{ current_user.name }}</h5>
-                <p>
+                <p class="text-muted">
                     <i class="bi bi-envelope"></i> {{ current_user.email }}<br>
                     <i class="bi bi-geo-alt"></i> {{ current_user.address.city }}, {{ current_user.address.division }}
                 </p>
@@ -122,7 +154,7 @@
                     <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
                     <span class="lang-en">Geographic Insights</span>
                 </h5>
-                <p>
+                <p class="text-muted">
                     <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
                     <span class="lang-en">View disease spread across Bangladesh</span>
                 </p>
@@ -181,5 +213,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
