@@ -3,36 +3,115 @@
 
 {% block extra_css %}
 <style>
-/* Card headers theme colors */
-.card-header.bg-primary { background-color: #60B5FF !important; color: white; }
-.card-header.bg-info { background-color: #0dcaf0 !important; color: white; }
+/* ====== Background ====== */
+body {
+    background: linear-gradient(135deg, #f0f9ff, #cfe0f7, #e0f2ff);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-/* Section title like Geo Insight */
-.section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #2A4365; border-bottom: 2px solid #FF9149; padding-bottom: 0.3rem; }
+/* ====== Glassmorphism Cards ====== */
+.card {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(14px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
 
-/* Compact Symptom Cards */
-.symptom-card { display: flex; align-items: center; padding: 4px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
-.symptom-card:hover { border-color: #60B5FF; background-color: rgba(96, 181, 255, 0.1); }
-.symptom-card.selected { border: 2px solid #60B5FF; background-color: rgba(96, 181, 255, 0.15); }
+/* Card headers */
+.card-header {
+    font-weight: 600;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #60B5FF, #4094E6);
+    color: white;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+/* Section title */
+.section-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2A4365;
+    border-left: 4px solid #FF9149;
+    padding-left: 0.5rem;
+}
+
+/* Symptom Cards */
+.symptom-card {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    background: rgba(255,255,255,0.6);
+}
+.symptom-card:hover {
+    border-color: #60B5FF;
+    background-color: rgba(96, 181, 255, 0.15);
+}
+.symptom-card.selected {
+    border: 2px solid #60B5FF;
+    background-color: rgba(96, 181, 255, 0.25);
+}
 .symptom-check { display: none; }
 .symptom-text { flex-grow: 1; }
 
 /* Language toggle */
-.lang-toggle { position: absolute; top: 15px; right: 15px; }
+.lang-toggle {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
 
-/* Two-column layout for Other Symptoms */
-.symptom-group.other-symptoms .symptom-card { width: 48%; display: inline-flex; margin-right: 2%; margin-bottom: 4px; }
+/* Buttons */
+.btn-accent {
+    background: linear-gradient(135deg, #60B5FF, #4094E6);
+    color: #fff;
+    font-weight: 500;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+}
+.btn-accent:hover {
+    background: linear-gradient(135deg, #4aa0ff, #2b82d9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Other Symptoms two-column */
+.symptom-group.other-symptoms .symptom-card {
+    width: 48%;
+    display: inline-flex;
+    margin-right: 2%;
+    margin-bottom: 6px;
+}
 .symptom-group.other-symptoms .symptom-card:nth-child(2n) { margin-right: 0; }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .symptom-group.other-symptoms .symptom-card { width: 100%; margin-right: 0; }
+    .symptom-group.other-symptoms .symptom-card {
+        width: 100%;
+        margin-right: 0;
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid position-relative">
+<div class="container-fluid position-relative py-4">
     <!-- Language Toggle -->
     <div class="lang-toggle">
         <div class="btn-group btn-group-sm">
@@ -41,10 +120,10 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- Location Card -->
-        <div class="col-lg-4 mb-3 d-flex justify-content-center">
-            <div class="card card-hover w-100 h-100">
+        <div class="col-lg-4 d-flex justify-content-center">
+            <div class="card card-hover w-100">
                 <div class="card-header">
                     <i class="bi bi-geo-alt"></i> {% if lang == 'bn' %}অবস্থান তথ্য{% else %}Location Information{% endif %}
                 </div>
@@ -67,8 +146,8 @@
         </div>
 
         <!-- Symptoms Card -->
-        <div class="col-lg-8 mb-3 d-flex justify-content-center">
-            <div class="card card-hover w-100 h-100">
+        <div class="col-lg-8 d-flex justify-content-center">
+            <div class="card card-hover w-100">
                 <div class="card-header">
                     <i class="bi bi-clipboard-pulse"></i> {% if lang == 'bn' %}আপনার লক্ষণ নির্বাচন করুন{% else %}Select Your Symptoms{% endif %}
                 </div>
@@ -111,12 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         selectSymptom: lang === 'bn' ? 'অন্তত একটি লক্ষণ নির্বাচন করুন' : 'Please select at least one symptom',
         selectDivision: lang === 'bn' ? 'আপনার বিভাগ নির্বাচন করুন' : 'Please select your division',
         processing: lang === 'bn' ? 'প্রসেসিং...' : 'Processing...',
-        resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results',
-        possibleDiseases: lang === 'bn' ? 'সম্ভাব্য রোগসমূহ' : 'Possible Diseases',
-        close: lang === 'bn' ? 'বন্ধ' : 'Close',
-        recommendedDoctors: lang === 'bn' ? 'প্রস্তাবিত ডাক্তারগণ' : 'Recommended Doctors',
-        nearbyHospitals: lang === 'bn' ? 'নিকটস্থ হাসপাতাল' : 'Nearby Hospitals',
-        noRecommendations: lang === 'bn' ? 'কোনো প্রস্তাবনা পাওয়া যায়নি।' : 'No recommendations available.'
+        resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results'
     };
 
     let userLocation = { lat: null, long: null };
@@ -159,10 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const data = await response.json();
             if (data.success) {
-                // Pass recommended doctors/hospitals from backend if available
-                const recommendedDoctors = data.recommendedDoctors || [];
-                const recommendedHospitals = data.recommendedHospitals || [];
-                showResultsModal(data.predictions, recommendedDoctors, recommendedHospitals);
+                showResultsModal(data.predictions);
             } else { throw new Error(data.error || 'Prediction failed'); }
         } catch(err) { alert(`Error: ${err.message}`); }
         finally {
@@ -213,8 +284,6 @@ function showResultsModal(predictions) {
     document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
 }
 
-
 });
 </script>
 {% endblock %}
-
