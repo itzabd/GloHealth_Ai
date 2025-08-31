@@ -7,7 +7,8 @@ from supabase import create_client
 import joblib
 import pandas as pd
 import numpy as np
-
+import folium
+from folium.plugins import HeatMap, MarkerCluster
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or 'dev-secret-key-change-me'
@@ -227,48 +228,52 @@ def update_location_insights(division, disease, confidence, zip_code=None, lat=N
     try:
         # Get existing record if available
         existing = supabase.from_('location_insights') \
-            .select('id, case_count, confidence_score') \
+            .select('id, case_count, confidence_score, prevalence_score') \
             .eq('division', division) \
             .eq('disease', disease) \
             .maybe_single() \
             .execute()
 
-        # Initialize with defaults
+        # Prepare update data according to your table schema
         update_data = {
             "division": division,
             "disease": disease,
-            "confidence_score": confidence,
+            "confidence_score": float(confidence),
             "last_updated": datetime.now().isoformat(),
             "zip_code": zip_code or "0000"
         }
 
+        # Add coordinates if available
         if lat and long:
             update_data.update({
-                "latitude": lat,
-                "longitude": long
+                "lat": float(lat),
+                "lon": float(long),
+                "latitude": float(lat),
+                "longitude": float(long)
             })
 
         # Calculate running averages if record exists
         if existing and existing.data:
             old_count = existing.data.get('case_count', 1) or 1
             old_conf = existing.data.get('confidence_score', 0) or 0
+            old_prevalence = existing.data.get('prevalence_score', 0) or 0
 
             update_data.update({
                 "case_count": old_count + 1,
                 "confidence_score": (old_conf * old_count + confidence) / (old_count + 1),
-                "prevalence_score": min(1.0, (old_count + 1) / 1000)
+                "prevalence_score": min(1.0, (old_count + 1) / 1000)  # Adjust as needed
             })
 
-            # Update existing record by ID
+            # Update existing record by ID using the correct unique constraint
             supabase.from_('location_insights') \
                 .update(update_data) \
                 .eq('id', existing.data['id']) \
                 .execute()
         else:
-            # Insert new record
+            # Insert new record with initial values
             update_data.update({
                 "case_count": 1,
-                "prevalence_score": 0.001
+                "prevalence_score": 0.001  # Initial prevalence score
             })
             supabase.from_('location_insights') \
                 .insert(update_data) \
@@ -475,7 +480,7 @@ def calculate_location_boost(division: str, disease: str) -> float:
     try:
         # Fetch latest disease prevalence for the division
         res = supabase.from_('location_insights') \
-            .select('confidence_score, prevalence_score') \
+            .select('confidence_score, prevalence_score, case_count') \
             .eq('division', division) \
             .eq('disease', disease) \
             .order('last_updated', desc=True) \
@@ -484,14 +489,144 @@ def calculate_location_boost(division: str, disease: str) -> float:
 
         if res.data and len(res.data) > 0:
             record = res.data[0]
-            # Calculate boost using both confidence and prevalence
-            raw_boost = 1.0 + (record['confidence_score'] or 0) * (record['prevalence_score'] or 0.5)
+            # Calculate boost using confidence, prevalence, and case count
+            conf_score = record.get('confidence_score', 0) or 0
+            prev_score = record.get('prevalence_score', 0) or 0
+            case_count = record.get('case_count', 0) or 0
+
+            # More sophisticated boost calculation
+            raw_boost = 1.0 + (conf_score * 0.6) + (prev_score * 0.3) + (min(case_count, 100) / 100 * 0.1)
             return min(2.0, max(1.0, raw_boost))  # Clamp between 1.0-2.0
 
     except Exception as e:
         print(f"Error calculating location boost: {str(e)}")
 
     return 1.0  # Default no boost
+
+
+@app.route('/geo_insights')
+@login_required
+def geo_insights():
+    try:
+        # GET DATA FROM location_insights TABLE
+        response = supabase.from_('location_insights') \
+            .select('*') \
+            .order('last_updated', desc=True) \
+            .execute()
+
+        if not hasattr(response, 'data') or not response.data:
+            return render_template('geo_insights.html',
+                                   current_user=current_user,
+                                   error="No location insights data available")
+
+        df = pd.DataFrame(response.data)
+
+        # Create Bangladesh map
+        bd_center = [23.6850, 90.3563]
+        bd_map = folium.Map(location=bd_center, zoom_start=7, tiles='cartodbpositron')
+
+        # Add Bangladesh boundary
+        bd_bounds = [[20.5, 88.0], [26.5, 92.5]]
+        folium.Rectangle(
+            bounds=bd_bounds,
+            color='#000000',
+            weight=2,
+            fill=True,
+            fillColor='#ffff00',
+            fillOpacity=0.1,
+            popup='Bangladesh'
+        ).add_to(bd_map)
+
+        # Prepare data for heatmap
+        heat_data = []
+        for _, row in df.iterrows():
+            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
+                heat_data.append([
+                    float(row['latitude']),
+                    float(row['longitude']),
+                    float(row.get('case_count', 1))
+                ])
+
+        if heat_data:
+            HeatMap(
+                heat_data,
+                name="Case Density",
+                radius=20,
+                blur=15,
+                max_zoom=1,
+                gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
+            ).add_to(bd_map)
+
+        # Add clustered markers
+        marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
+        for _, row in df.iterrows():
+            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
+                popup = f"""
+                <b>{row.get('disease', 'N/A')}</b><br>
+                Cases: {row.get('case_count', 0)}<br>
+                Division: {row.get('division', 'Unknown')}<br>
+                Confidence: {row.get('confidence_score', 0):.1%}
+                """
+                folium.Marker(
+                    location=[float(row['latitude']), float(row['longitude'])],
+                    popup=popup,
+                    icon=folium.Icon(
+                        color='red' if row.get('case_count', 0) > 10
+                        else 'orange' if row.get('case_count', 0) > 5
+                        else 'green'
+                    )
+                ).add_to(marker_cluster)
+
+        folium.LayerControl().add_to(bd_map)
+        map_html = bd_map._repr_html_() if bd_map else None
+
+        # Process division statistics
+        division_counts_dict = {}
+        disease_totals = {}
+        top_diseases = []
+
+        if not df.empty and 'division' in df.columns and 'disease' in df.columns:
+            division_counts = df.pivot_table(
+                index='division',
+                columns='disease',
+                values='case_count',
+                aggfunc='sum',
+                fill_value=0
+            )
+
+            division_counts_dict = division_counts.to_dict('index')
+            disease_totals = division_counts.sum().to_dict()
+            top_diseases = division_counts.sum().nlargest(5).index.tolist()
+
+        # RETURN THE RESPONSE (THIS WAS MISSING)
+        return render_template('geo_insights.html',
+                               current_user=current_user,
+                               map_html=map_html,
+                               division_counts=division_counts_dict,
+                               disease_totals=disease_totals,
+                               top_diseases=top_diseases)
+
+    except Exception as e:
+        print(f"Geo insights error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return render_template('geo_insights.html',
+                               current_user=current_user,
+                               error=str(e))
+# THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
+@app.template_filter('get_disease_color')
+def get_disease_color_filter(disease):
+    """Template filter to get disease color."""
+    color_map = {
+        'Diabetes': 'red',
+        'Hypertension': 'blue',
+        'Asthma': 'green',
+        'Flu': 'orange',
+        'COVID-19': 'purple',
+        'Dengue': 'darkred',
+        'Malaria': 'pink'
+    }
+    return color_map.get(disease, 'gray')
 
 if __name__ == '__main__':
     app.run(debug=True)

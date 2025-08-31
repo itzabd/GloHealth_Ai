@@ -17,7 +17,25 @@
             </div>
         </div>
     </div>
-
+<!-- In templates/dashboard.html, add this card somewhere in the layout -->
+<div class="col-md-4 mb-4">
+    <div class="card h-100">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
+                <span class="lang-en">Geographic Insights</span>
+            </h5>
+            <p class="card-text">
+                <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
+                <span class="lang-en">View disease spread across Bangladesh</span>
+            </p>
+            <a href="{{ url_for('geo_insights') }}" class="btn btn-accent">
+                <span class="lang-bn">দেখুন</span>
+                <span class="lang-en">View Map</span>
+            </a>
+        </div>
+    </div>
+</div>
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-primary text-white bangla">
