@@ -223,66 +223,35 @@ def prediction():
                                       'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'])
 
 
-def update_location_insights(division, disease=None, confidence=0, zip_code=None, lat=None, long=None):
-    """Updates disease prevalence data for a location with default placeholders."""
+def update_location_insights(division, disease, confidence, zip_code=None, lat=None, long=None):
+    """Insert a new location insight entry every time"""
     try:
-        # Provide default values if missing
-        disease = disease or "Unknown Disease"
-        zip_code = zip_code or "0000"
-
-        # Check existing record
-        existing = supabase.from_('location_insights') \
-            .select('id, case_count, confidence_score, prevalence_score') \
-            .eq('zip_code', zip_code) \
-            .eq('disease', disease) \
-            .maybe_single() \
-            .execute()
-
-        update_data = {
+        # Prepare data
+        insert_data = {
             "division": division,
             "disease": disease,
             "confidence_score": float(confidence),
             "last_updated": datetime.now().isoformat(),
-            "zip_code": zip_code
+            "zip_code": zip_code or "0000",
+            "case_count": 1,
+            "prevalence_score": 0.001  # initial placeholder
         }
 
+        # Add coordinates if available
         if lat and long:
-            update_data.update({
+            insert_data.update({
                 "lat": float(lat),
                 "lon": float(long),
                 "latitude": float(lat),
                 "longitude": float(long)
             })
 
-        if existing and existing.data:
-            old_count = existing.data.get('case_count', 1)
-            old_conf = existing.data.get('confidence_score', 0)
-            old_prev = existing.data.get('prevalence_score', 0)
-
-            update_data.update({
-                "case_count": old_count + 1,
-                "confidence_score": (old_conf * old_count + confidence) / (old_count + 1),
-                "prevalence_score": min(1.0, (old_count + 1)/1000)
-            })
-
-            # Update existing record
-            supabase.from_('location_insights') \
-                .update(update_data) \
-                .eq('id', existing.data['id']) \
-                .execute()
-        else:
-            update_data.update({
-                "case_count": 1,
-                "prevalence_score": 0.001
-            })
-            supabase.from_('location_insights') \
-                .insert(update_data) \
-                .execute()
+        # Insert new record
+        supabase.from_('location_insights').insert(insert_data).execute()
 
     except Exception as e:
-        print(f"⚠️ Error updating location insights: {str(e)}")
+        print(f"⚠️ Error inserting location insight: {str(e)}")
         raise
-
 
 @app.route('/predict', methods=['POST'])
 @login_required
@@ -304,7 +273,7 @@ def predict():
             .eq('id', current_user.id) \
             .maybe_single() \
             .execute()
-        zip_code = profile.data.get('postal_code') if hasattr(profile, 'data') and profile.data else None
+        zip_code = profile.data.get('postal_code') if profile and getattr(profile, 'data', None) else None
 
         # 3. Prepare model input
         input_data = {col: 0 for col in feature_cols}
@@ -322,18 +291,18 @@ def predict():
 
         # 6. Normalize probabilities
         total = sum(boosted_probas)
-        normalized_probas = [p / total for p in boosted_probas] if total > 0 else boosted_probas
+        normalized_probas = [p / total for p in boosted_probas] if total > 0 else [0]*len(boosted_probas)
 
         # 7. Prepare predictions
         top3_idx = np.argsort(normalized_probas)[-3:][::-1]
         predictions = [{
             'disease': le.inverse_transform([idx])[0],
             'confidence': float(normalized_probas[idx]),
-            'probability': f"{normalized_probas[idx]:.1%}",
+            'probability': f"{normalized_probas[idx]*100:.1f}%",
             'regional_influence': calculate_location_boost(division, le.inverse_transform([idx])[0]) - 1
         } for idx in top3_idx]
 
-        # 8. Save results
+        # 8. Save prediction results
         prediction_data = {
             "user_id": current_user.id,
             "symptoms": symptoms,
@@ -347,7 +316,7 @@ def predict():
         }
         supabase.from_('predictions').insert(prediction_data).execute()
 
-        # 9. Update location insights
+        # 9. Insert new location insight every time
         update_location_insights(
             division=division,
             disease=predictions[0]['disease'],
@@ -727,6 +696,18 @@ def appointments():
                                appointments=[],
                                error="Unable to load appointments")
 
+# app.py
+
+@app.route('/plans')
+@login_required
+def plans():
+    # You can fetch plan data from database if needed
+    plans_data = [
+        {"name": "Basic Plan", "price": "500 BDT", "details": "Access to general consultation."},
+        {"name": "Premium Plan", "price": "1200 BDT", "details": "Includes specialist consultation and reports."},
+        {"name": "Ultimate Plan", "price": "2500 BDT", "details": "All-inclusive consultation, priority support."}
+    ]
+    return render_template("plans.html", plans=plans_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
