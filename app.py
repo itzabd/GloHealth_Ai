@@ -537,45 +537,72 @@ def geo_insights():
             popup='Bangladesh'
         ).add_to(bd_map)
 
-        # Prepare data for heatmap
+        # Division coordinates (approximate centers of each division)
+        division_coordinates = {
+            'Dhaka': [23.8103, 90.4125],
+            'Chittagong': [22.3569, 91.7832],
+            'Rajshahi': [24.3745, 88.6042],
+            'Khulna': [22.8456, 89.5403],
+            'Barisal': [22.7010, 90.3535],
+            'Sylhet': [24.8910, 91.8710],
+            'Rangpur': [25.7439, 89.2752],
+            'Mymensingh': [24.7471, 90.4203]
+        }
+
+        # Prepare data for heatmap and markers using division coordinates
         heat_data = []
-        for _, row in df.iterrows():
-            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
-                heat_data.append([
-                    float(row['latitude']),
-                    float(row['longitude']),
-                    float(row.get('case_count', 1))
-                ])
-
-        if heat_data:
-            HeatMap(
-                heat_data,
-                name="Case Density",
-                radius=20,
-                blur=15,
-                max_zoom=1,
-                gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
-            ).add_to(bd_map)
-
-        # Add clustered markers
         marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
+
         for _, row in df.iterrows():
-            if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
-                popup = f"""
-                <b>{row.get('disease', 'N/A')}</b><br>
-                Cases: {row.get('case_count', 0)}<br>
-                Division: {row.get('division', 'Unknown')}<br>
-                Confidence: {row.get('confidence_score', 0):.1%}
-                """
-                folium.Marker(
-                    location=[float(row['latitude']), float(row['longitude'])],
-                    popup=popup,
-                    icon=folium.Icon(
-                        color='red' if row.get('case_count', 0) > 10
-                        else 'orange' if row.get('case_count', 0) > 5
-                        else 'green'
-                    )
-                ).add_to(marker_cluster)
+            division = row.get('division')
+            if division and division in division_coordinates:
+                lat, lon = division_coordinates[division]
+                case_count = row.get('case_count', 1)
+
+                # VALIDATE DATA BEFORE ADDING TO HEATMAP
+                if (pd.notna(lat) and pd.notna(lon) and pd.notna(case_count) and
+                        isinstance(lat, (int, float)) and isinstance(lon, (int, float)) and
+                        isinstance(case_count, (int, float))):
+                    # Add to heatmap
+                    heat_data.append([float(lat), float(lon), float(case_count)])
+
+                    # Add marker for this division
+                    popup = f"""
+                    <b>{row.get('disease', 'N/A')}</b><br>
+                    Cases: {case_count}<br>
+                    Division: {division}<br>
+                    Confidence: {row.get('confidence_score', 0):.1%}
+                    """
+                    folium.Marker(
+                        location=[float(lat), float(lon)],
+                        popup=popup,
+                        icon=folium.Icon(
+                            color='red' if case_count > 10
+                            else 'orange' if case_count > 5
+                            else 'green'
+                        )
+                    ).add_to(marker_cluster)
+
+        # Add heatmap if we have valid data
+        if heat_data:
+            # CONVERT TO NUMPY ARRAY AND REMOVE ANY REMAINING NaNs
+            heat_array = np.array(heat_data)
+            valid_indices = ~np.isnan(heat_array).any(axis=1)
+            clean_heat_data = heat_array[valid_indices].tolist()
+
+            if clean_heat_data:
+                HeatMap(
+                    clean_heat_data,
+                    name="Case Density",
+                    radius=25,
+                    blur=20,
+                    max_zoom=1,
+                    gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
+                ).add_to(bd_map)
+            else:
+                print("No valid heatmap data after cleaning")
+        else:
+            print("No heatmap data available")
 
         folium.LayerControl().add_to(bd_map)
         map_html = bd_map._repr_html_() if bd_map else None
@@ -598,7 +625,6 @@ def geo_insights():
             disease_totals = division_counts.sum().to_dict()
             top_diseases = division_counts.sum().nlargest(5).index.tolist()
 
-        # RETURN THE RESPONSE (THIS WAS MISSING)
         return render_template('geo_insights.html',
                                current_user=current_user,
                                map_html=map_html,
