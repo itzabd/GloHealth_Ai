@@ -238,46 +238,69 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 function showResultsModal(predictions) {
-    const comments = [
-        "Early detection is crucial.",
-        "Consult a specialist for confirmation.",
-        "Lifestyle changes may help manage this condition.",
-        "Follow-up tests are recommended.",
-        "Monitor symptoms regularly.",
-        "Treatment options vary based on severity.",
-        "Ensure proper hydration and rest."
-    ];
+        const comments = [
+            "Early detection is crucial.",
+            "Consult a specialist for confirmation.",
+            "Lifestyle changes may help manage this condition.",
+            "Follow-up tests are recommended.",
+            "Monitor symptoms regularly.",
+            "Treatment options vary based on severity.",
+            "Ensure proper hydration and rest."
+        ];
 
-    const modalHtml = `
-    <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color:#60B5FF; color:white;">
-                    <h5 class="modal-title">${translations.resultsTitle}</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="background-color:#f8f9fa;">
-                    <ul class="list-group mb-3">
-                        ${predictions.map(p => `
-                            <li class="list-group-item d-flex flex-column" style="border-left: 4px solid #FF9149; margin-bottom:6px;">
-                                <span style="font-weight:600; color:#2A4365;">${p.disease} — Confidence: ${p.probability}</span>
-                                <small style="color:#555;">${comments[Math.floor(Math.random()*comments.length)]}</small>
-                            </li>
-                        `).join('')}
-                    </ul>
-                    <div class="text-center">
-                        <a href="/plans" class="btn btn-lg" style="background-color:#FF9149; color:white; border:none;">Consult with Doctor</a>
+        // Backend will inject the current subscription plan name (if any)
+        const userPlan = "{{ user_plan_name if user_plan_name else '' }}";
+        let actionBtn = "";
+
+        if (userPlan) {
+            // If subscribed → go to that plan's features
+            actionBtn = `<a href="/features/${userPlan}" class="btn btn-lg"
+                            style="background-color:#FF9149; color:white; border:none;">
+                            View ${userPlan} Features
+                         </a>`;
+        } else {
+            // If not subscribed → go to plans
+            actionBtn = `<a href="/plans" class="btn btn-lg"
+                            style="background-color:#FF9149; color:white; border:none;">
+                            Subscribe to Unlock Features
+                         </a>`;
+        }
+
+        const modalHtml = `
+        <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header" style="background-color:#60B5FF; color:white;">
+                        <h5 class="modal-title">${translations.resultsTitle}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" style="background-color:#f8f9fa;">
+                        <ul class="list-group mb-3">
+                            ${predictions.map(p => `
+                                <li class="list-group-item d-flex flex-column"
+                                    style="border-left: 4px solid #FF9149; margin-bottom:6px;">
+                                    <span style="font-weight:600; color:#2A4365;">
+                                        ${p.disease} — Confidence: ${p.probability}
+                                    </span>
+                                    <small style="color:#555;">
+                                        ${comments[Math.floor(Math.random()*comments.length)]}
+                                    </small>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <div class="text-center">
+                            ${actionBtn}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>`;
+        </div>`;
 
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-    modal.show();
-    document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
-}
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        modal.show();
+        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() { this.remove(); });
+    }
 
 });
 </script>

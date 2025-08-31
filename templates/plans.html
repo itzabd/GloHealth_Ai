@@ -106,9 +106,11 @@ body {
                 {% set subscribed = user_subscriptions | selectattr("plan_name", "equalto", plan.name) | list %}
 
                 {% if subscribed %}
+                    <!-- Already subscribed -->
                     <button class="btn btn-secondary mt-2" disabled>Subscribed</button>
                     <a href="{{ url_for('features', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Features</a>
                 {% else %}
+                    <!-- Not subscribed -->
                     <form action="{{ url_for('subscribe_plan', plan_name=plan.name) }}" method="POST">
                         <button type="submit" class="btn btn-accent mt-2">Subscribe</button>
                     </form>

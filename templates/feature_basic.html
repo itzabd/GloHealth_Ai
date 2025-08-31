@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block title %}Basic Plan Features{% endblock %}
 
 {% block content %}
@@ -8,8 +7,36 @@
     <ul>
         <li>Access to general consultation</li>
         <li>Basic health reports</li>
-        <li>1 general checkup per month</li>
+        <li>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</li>
+        <li>Book appointment with general doctors</li>
     </ul>
+
+    <h4 class="mt-4">Available Doctors</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>Hospital</th>
+                <th>Consultation Fee</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+            {% if doctor.specialty.lower() == 'general' %}
+            <tr>
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.specialty }}</td>
+                <td>{{ doctor.hospital }}</td>
+                <td>{{ doctor.consultation_fee }} BDT</td>
+                <td><button class="btn btn-accent btn-sm">Book</button></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
     <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
 </div>
 {% endblock %}

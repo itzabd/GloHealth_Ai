@@ -10,6 +10,7 @@ import folium
 from folium.plugins import HeatMap, MarkerCluster
 from flask import Flask, render_template, redirect, url_for, request, flash
 from datetime import datetime, timedelta
+from flask import abort, flash, redirect, url_for, render_template
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -196,7 +197,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-# Prediction routes
 @app.route('/prediction')
 @login_required
 def prediction():
@@ -219,11 +219,23 @@ def prediction():
         if not matched:
             symptom_groups['Other'].append(symptom)
 
-    return render_template('prediction.html',
-                           symptom_groups=symptom_groups,
-                           divisions=['Dhaka', 'Chittagong', 'Rajshahi', 'Khulna',
-                                      'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'])
+    # Fetch active subscription for current user from Supabase
+    response = supabase.table("user_subscriptions") \
+                       .select("plan_name") \
+                       .eq("user_id", str(current_user.id)) \
+                       .eq("active", True) \
+                       .order("start_date", desc=True) \
+                       .limit(1) \
+                       .execute()
 
+    user_plan_name = response.data[0]['plan_name'] if response.data else None
+
+    return render_template(
+        'prediction.html',
+        symptom_groups=symptom_groups,
+        divisions=['Dhaka', 'Chittagong', 'Rajshahi', 'Khulna', 'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'],
+        user_plan_name=user_plan_name  # Pass the active plan to the template
+    )
 
 def update_location_insights(division, disease, confidence, zip_code=None, lat=None, long=None):
     """Insert a new location insight entry every time"""
@@ -649,6 +661,20 @@ def book_appointment(doctor_id):
         if not doctor:
             return "Doctor not found", 404
 
+        # Fetch user's active subscription with checkup points
+        sub_resp = supabase.table("user_subscriptions")\
+            .select("*")\
+            .eq("user_id", str(current_user.id))\
+            .eq("active", True)\
+            .order("start_date", desc=True)\
+            .limit(1)\
+            .execute()
+
+        subscription = sub_resp.data[0] if sub_resp.data else None
+        if not subscription:
+            flash("You need an active subscription to book an appointment.", "danger")
+            return redirect(url_for('plans'))
+
         if request.method == 'POST':
             scheduled_time = request.form.get('scheduled_time')
             payment_done = request.form.get('payment_done')  # Simulate payment checkbox
@@ -656,9 +682,24 @@ def book_appointment(doctor_id):
             if not scheduled_time:
                 return "Please select a time", 400
 
-            status = 'confirmed' if payment_done == 'yes' else 'pending'
-            payment_status = 'paid' if payment_done == 'yes' else 'unpaid'
+            # Check if free checkup points are available
+            use_points = request.form.get('use_points') == 'yes'  # Checkbox in form
+            if use_points:
+                if subscription["checkup_points"] <= 0:
+                    flash("No free checkups remaining for this month.", "warning")
+                    return redirect(url_for('features', plan_name=subscription["plan_name"]))
+                # Deduct one point
+                supabase.table("user_subscriptions").update({
+                    "checkup_points": subscription["checkup_points"] - 1
+                }).eq("id", subscription["id"]).execute()
+                status = 'confirmed'
+                payment_status = 'free'
+            else:
+                # Paid booking
+                status = 'confirmed' if payment_done == 'yes' else 'pending'
+                payment_status = 'paid' if payment_done == 'yes' else 'unpaid'
 
+            # Insert appointment
             supabase.from_('appointments').insert({
                 'user_id': current_user.id,
                 'doctor_id': doctor_id,
@@ -667,15 +708,16 @@ def book_appointment(doctor_id):
                 'payment_status': payment_status
             }).execute()
 
+            flash("Appointment booked successfully!", "success")
             return redirect(url_for('appointments'))
 
         return render_template('book_appointment.html',
                                current_user=current_user,
-                               doctor=doctor)
+                               doctor=doctor,
+                               subscription=subscription)
     except Exception as e:
         print(f"Book appointment error: {str(e)}")
         return "Error booking appointment", 500
-# View user appointments
 @app.route('/appointments')
 @login_required
 def appointments():
@@ -738,12 +780,19 @@ def subscribe_plan(plan_name):
     start_date = datetime.now()
     end_date = start_date + timedelta(days=30)  # Example: 30-day subscription
 
+    plan_points = {
+        "Basic Plan": 1,
+        "Premium Plan": 2,
+        "Ultimate Plan": 5
+    }
+
     supabase.table("user_subscriptions").insert({
         "user_id": str(current_user.id),
         "plan_name": plan_name,
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
-        "active": True
+        "active": True,
+        "checkup_points": plan_points.get(plan_name, 0)
     }).execute()
 
     flash(f"Subscribed to {plan_name} successfully!", "success")
@@ -789,37 +838,37 @@ def plan_details(plan_name):
 
 
 # Feature page for subscribed plans
-@app.route('/features/<plan_name>')
-@login_required
-def plan_feature(plan_name):
-    # You can also fetch subscription to ensure user is active
-    subscription = supabase.table("user_subscriptions")\
-        .select("*")\
-        .eq("user_id", current_user.id)\
-        .eq("plan_name", plan_name)\
-        .eq("active", True)\
-        .execute().data
-
-    if not subscription:
-        flash("You are not subscribed to this plan!", "danger")
-        return redirect(url_for('plans'))
-
-    # Mock features per plan
-    features_data = {
-        "Basic Plan": ["Feature A", "Feature B", "Feature C"],
-        "Premium Plan": ["Feature D", "Feature E", "Feature F"],
-        "Ultimate Plan": ["Feature G", "Feature H", "Feature I"]
-    }
-
-    features = features_data.get(plan_name, [])
-    return render_template("features.html", plan_name=plan_name, features=features)
-from flask import abort
+# @app.route('/features/<plan_name>')
+# @login_required
+# def plan_feature(plan_name):
+#     # You can also fetch subscription to ensure user is active
+#     subscription = supabase.table("user_subscriptions")\
+#         .select("*")\
+#         .eq("user_id", current_user.id)\
+#         .eq("plan_name", plan_name)\
+#         .eq("active", True)\
+#         .execute().data
+#
+#     if not subscription:
+#         flash("You are not subscribed to this plan!", "danger")
+#         return redirect(url_for('plans'))
+#
+#     # Mock features per plan
+#     features_data = {
+#         "Basic Plan": ["Feature A", "Feature B", "Feature C"],
+#         "Premium Plan": ["Feature D", "Feature E", "Feature F"],
+#         "Ultimate Plan": ["Feature G", "Feature H", "Feature I"]
+#     }
+#
+#     features = features_data.get(plan_name, [])
+#     return render_template("features.html", plan_name=plan_name, features=features)
+# from flask import abort
 
 # Feature page access based on subscription
 @app.route('/features/<plan_name>')
 @login_required
 def features(plan_name):
-    # Check if user has active subscription
+    # Check subscription
     subscription = supabase.table("user_subscriptions")\
         .select("*")\
         .eq("user_id", str(current_user.id))\
@@ -831,14 +880,40 @@ def features(plan_name):
         flash("You need to subscribe to access this feature page.", "danger")
         return redirect(url_for('plans'))
 
-    # Render the appropriate feature page
+    # Query doctors based on plan level
     if plan_name == "Basic Plan":
-        return render_template("feature_basic.html")
+        doctors = supabase.table("doctors")\
+            .select("*")\
+            .eq("specialty", "General")\
+            .execute().data
     elif plan_name == "Premium Plan":
-        return render_template("feature_premium.html")
+        doctors = supabase.table("doctors")\
+            .select("*")\
+            .execute().data
     elif plan_name == "Ultimate Plan":
-        return render_template("feature_ultimate.html")
+        doctors = supabase.table("doctors")\
+            .select("*")\
+            .execute().data
     else:
         abort(404)
+
+    # Fetch subscription for points display
+    subscription_resp = supabase.table("user_subscriptions") \
+        .select("*") \
+        .eq("user_id", str(current_user.id)) \
+        .eq("active", True) \
+        .order("start_date", desc=True) \
+        .limit(1) \
+        .execute()
+
+    subscription = subscription_resp.data[0] if subscription_resp.data else None
+
+    # Render template with doctors and subscription
+    if plan_name == "Basic Plan":
+        return render_template("feature_basic.html", doctors=doctors, subscription=subscription)
+    elif plan_name == "Premium Plan":
+        return render_template("feature_premium.html", doctors=doctors, subscription=subscription)
+    elif plan_name == "Ultimate Plan":
+        return render_template("feature_ultimate.html", doctors=doctors, subscription=subscription)
 if __name__ == '__main__':
     app.run(debug=True)

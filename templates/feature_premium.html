@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block title %}Premium Plan Features{% endblock %}
 
 {% block content %}
@@ -8,9 +7,34 @@
     <ul>
         <li>Includes specialist consultation</li>
         <li>Detailed health reports</li>
-        <li>2 checkups per month</li>
+       <li>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</li>
         <li>Priority appointment scheduling</li>
     </ul>
+
+    <h4 class="mt-4">Available Doctors</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialty</th>
+                <th>Hospital</th>
+                <th>Consultation Fee</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+            <tr>
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.specialty }}</td>
+                <td>{{ doctor.hospital }}</td>
+                <td>{{ doctor.consultation_fee }} BDT</td>
+                <td><button class="btn btn-accent btn-sm">Book</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
 </div>
 {% endblock %}
