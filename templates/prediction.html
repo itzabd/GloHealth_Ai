@@ -171,57 +171,69 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function showResultsModal(predictions, recommendedDoctors = [], recommendedHospitals = []) {
-        const modalHtml = `
-        <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title">${translations.resultsTitle}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h5>${translations.possibleDiseases}:</h5>
-                        <ul class="list-group mb-3">
-                            ${predictions.map(p => `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>${p.disease}</span>
-                                <span class="badge bg-primary rounded-pill">${p.probability}</span>
-                            </li>`).join('')}
-                        </ul>
+function showResultsModal(predictions) {
+    const comments = [
+        "Patient should monitor symptoms closely.",
+        "Recommend consulting a specialist if symptoms persist.",
+        "Regular check-ups advised.",
+        "Lifestyle modifications may help.",
+        "Early diagnosis improves treatment outcomes."
+    ];
 
-                        <h5>${translations.recommendedDoctors}:</h5>
-                        <ul class="list-group mb-3">
-                            ${recommendedDoctors.length ? recommendedDoctors.map(d => `
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>${d.name} (${d.specialty})</span>
-                                    <button class="btn btn-success btn-sm" onclick="bookDoctor('${d.id}')">Book Appointment</button>
-                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
-                        </ul>
+    const modalHtml = `
+    <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">${translations.resultsTitle}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>${translations.possibleDiseases}:</h5>
+                    <ul class="list-group">
+                        ${predictions.map(p => {
+                            // Convert probability to number
+                            let prob = parseFloat(p.probability);
+                            if (isNaN(prob)) prob = 0;
 
-                        <h5>${translations.nearbyHospitals}:</h5>
-                        <ul class="list-group">
-                            ${recommendedHospitals.length ? recommendedHospitals.map(h => `
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>${h.name} - ${h.department}</span>
-                                    <button class="btn btn-warning btn-sm" onclick="visitHospital('${h.id}')">Visit / Details</button>
-                                </li>`).join('') : `<li class="list-group-item">${translations.noRecommendations}</li>`}
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${translations.close}</button>
+                            // If probability > 1, assume it's in 0-100 range
+                            if (prob > 1) prob = prob / 100;
+
+                            const percentage = (prob * 100).toFixed(1) + '%';
+                            const comment = comments[Math.floor(Math.random() * comments.length)];
+
+                            return `
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span>${p.disease}</span>
+                                    <span class="badge bg-primary rounded-pill">${percentage}</span>
+                                </div>
+                                <small class="text-muted">${comment}</small>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                    <div class="mt-3 text-center">
+                        <button class="btn btn-success btn-lg" onclick="goToPlan()">
+                            Consult with Doctor
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>`;
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-        modal.show();
-        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function(){ this.remove(); });
-    }
+        </div>
+    </div>`;
 
-    // Example handlers for buttons (replace with actual logic)
-    window.bookDoctor = function(doctorId) { alert(`Redirecting to booking for doctor ID: ${doctorId}`); }
-    window.visitHospital = function(hospitalId) { alert(`Redirecting to hospital info for ID: ${hospitalId}`); }
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+    modal.show();
+    document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function(){ this.remove(); });
+}
+
+// Redirect function
+window.goToPlan = function() {
+    window.location.href = '/plans';
+}
+
+
 });
 </script>
 {% endblock %}

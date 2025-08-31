@@ -223,27 +223,29 @@ def prediction():
                                       'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'])
 
 
-def update_location_insights(division, disease, confidence, zip_code=None, lat=None, long=None):
-    """Updates disease prevalence data for a location with proper constraints"""
+def update_location_insights(division, disease=None, confidence=0, zip_code=None, lat=None, long=None):
+    """Updates disease prevalence data for a location with default placeholders."""
     try:
-        # Get existing record if available
+        # Provide default values if missing
+        disease = disease or "Unknown Disease"
+        zip_code = zip_code or "0000"
+
+        # Check existing record
         existing = supabase.from_('location_insights') \
             .select('id, case_count, confidence_score, prevalence_score') \
-            .eq('division', division) \
+            .eq('zip_code', zip_code) \
             .eq('disease', disease) \
             .maybe_single() \
             .execute()
 
-        # Prepare update data according to your table schema
         update_data = {
             "division": division,
             "disease": disease,
             "confidence_score": float(confidence),
             "last_updated": datetime.now().isoformat(),
-            "zip_code": zip_code or "0000"
+            "zip_code": zip_code
         }
 
-        # Add coordinates if available
         if lat and long:
             update_data.update({
                 "lat": float(lat),
@@ -252,36 +254,35 @@ def update_location_insights(division, disease, confidence, zip_code=None, lat=N
                 "longitude": float(long)
             })
 
-        # Calculate running averages if record exists
         if existing and existing.data:
-            old_count = existing.data.get('case_count', 1) or 1
-            old_conf = existing.data.get('confidence_score', 0) or 0
-            old_prevalence = existing.data.get('prevalence_score', 0) or 0
+            old_count = existing.data.get('case_count', 1)
+            old_conf = existing.data.get('confidence_score', 0)
+            old_prev = existing.data.get('prevalence_score', 0)
 
             update_data.update({
                 "case_count": old_count + 1,
                 "confidence_score": (old_conf * old_count + confidence) / (old_count + 1),
-                "prevalence_score": min(1.0, (old_count + 1) / 1000)  # Adjust as needed
+                "prevalence_score": min(1.0, (old_count + 1)/1000)
             })
 
-            # Update existing record by ID using the correct unique constraint
+            # Update existing record
             supabase.from_('location_insights') \
                 .update(update_data) \
                 .eq('id', existing.data['id']) \
                 .execute()
         else:
-            # Insert new record with initial values
             update_data.update({
                 "case_count": 1,
-                "prevalence_score": 0.001  # Initial prevalence score
+                "prevalence_score": 0.001
             })
             supabase.from_('location_insights') \
                 .insert(update_data) \
                 .execute()
 
     except Exception as e:
-        print(f"Error updating location insights: {str(e)}")
+        print(f"⚠️ Error updating location insights: {str(e)}")
         raise
+
 
 @app.route('/predict', methods=['POST'])
 @login_required
