@@ -1,71 +1,185 @@
 {% extends "base.html" %}
-{% block title %}ড্যাশবোর্ড{% endblock %}
+
+{% block title %}
+<span class="lang-bn">ড্যাশবোর্ড</span>
+<span class="lang-en">Dashboard</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Card hover effect and colors */
+.card-hover {
+    transition: all 0.3s ease;
+    height: 100%;
+}
+.card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* Centered cards */
+.card-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Table styling like Geo Insight */
+.table-container {
+    max-height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+.table-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 350px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+}
+.table-compact {
+    width: 100%;
+    margin-bottom: 0;
+}
+.table-compact th,
+.table-compact td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.table-compact th {
+    background-color: #60B5FF;
+    color: white;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.table-compact tbody tr:hover td {
+    background-color: #f8f9fa;
+}
+.table-compact tbody tr:hover td:first-child {
+    background-color: #e9ecef;
+}
+
+/* Section title styling */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2A4365;
+    border-bottom: 2px solid #FF9149;
+    padding-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table-scroll-wrapper {
+        max-height: 300px;
+        font-size: 0.8rem;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-4">
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white bangla">
-                <i class="bi bi-person"></i> ব্যবহারকারী তথ্য
-            </div>
+<div class="row mb-5">
+    <div class="col text-center">
+        <h2 class="section-header">
+            <span class="lang-bn">ড্যাশবোর্ড</span>
+            <span class="lang-en">Dashboard</span>
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-4 justify-content-center">
+    <!-- User Info Card -->
+    <div class="col-md-4 mb-3 d-flex justify-content-center">
+        <div class="card card-hover w-100 card-centered border-primary">
             <div class="card-body">
-                <h5 class="bangla">{{ current_user.name }}</h5>
-                <p class="bangla">
+                <h5 class="section-title">
+                <span class="lang-bn">ব্যবহারকারী তথ্য</span>
+                <span class="lang-en">User Info</span>
+            </h5></div>
+            <div class="card-body">
+                <h5>{{ current_user.name }}</h5>
+                <p>
                     <i class="bi bi-envelope"></i> {{ current_user.email }}<br>
                     <i class="bi bi-geo-alt"></i> {{ current_user.address.city }}, {{ current_user.address.division }}
                 </p>
             </div>
         </div>
     </div>
-<!-- In templates/dashboard.html, add this card somewhere in the layout -->
-<div class="col-md-4 mb-4">
-    <div class="card h-100">
-        <div class="card-body">
-            <h5 class="card-title">
-                <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
-                <span class="lang-en">Geographic Insights</span>
-            </h5>
-            <p class="card-text">
-                <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
-                <span class="lang-en">View disease spread across Bangladesh</span>
-            </p>
-            <a href="{{ url_for('geo_insights') }}" class="btn btn-accent">
-                <span class="lang-bn">দেখুন</span>
-                <span class="lang-en">View Map</span>
-            </a>
+
+    <!-- Geographic Insights Card -->
+    <div class="col-md-4 mb-3 d-flex justify-content-center">
+        <div class="card card-hover w-100 card-centered border-primary">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
+                    <span class="lang-en">Geographic Insights</span>
+                </h5>
+                <p>
+                    <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
+                    <span class="lang-en">View disease spread across Bangladesh</span>
+                </p>
+                <a href="{{ url_for('geo_insights') }}" class="btn btn-accent">
+                    <span class="lang-bn">দেখুন</span>
+                    <span class="lang-en">View Map</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-primary text-white bangla">
-                <i class="bi bi-clock-history"></i> সাম্প্রতিক পরীক্ষা
-            </div>
+
+<!-- Recent Tests Table -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-8 mb-3">
+        <div class="card card-hover h-100">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr class="bangla">
-                                <th>তারিখ</th>
-                                <th>লক্ষণ</th>
-                                <th>রোগ</th>
-                                <th>নিশ্চিততা</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for pred in predictions %}
-                            <tr>
-                                <td>{{ pred.formatted_time }}</td>
-                                <td>{{ pred.symptoms|join(', ') }}</td>
-                                <td class="bangla">{{ pred.top_prediction }}</td>
-                                <td>{{ (pred.confidence * 100)|round(1) }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <h6 class="section-title text-center">
+                    <span class="lang-bn">সাম্প্রতিক পরীক্ষা</span>
+                    <span class="lang-en">Recent Tests</span>
+                </h6>
+                <div class="table-container">
+                    <div class="table-scroll-wrapper">
+                        <table class="table table-compact">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>
+                                        <span class="lang-bn">লক্ষণ</span>
+                                        <span class="lang-en">Symptoms</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-bn">রোগ</span>
+                                        <span class="lang-en">Disease</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-bn">নিশ্চিততা</span>
+                                        <span class="lang-en">Percentage</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pred in predictions %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ pred.symptoms|join(', ') }}</td>
+                                    <td class="bangla">{{ pred.top_prediction }}</td>
+                                    <td>{{ (pred.confidence * 100)|round(1) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}

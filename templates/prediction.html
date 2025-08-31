@@ -3,45 +3,31 @@
 
 {% block extra_css %}
 <style>
-    /* Symptom Cards */
-    .symptom-card {
-        transition: all 0.2s ease;
-        cursor: pointer;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-    }
-    .symptom-card:hover {
-        border-color: #0d6efd;
-        background-color: rgba(13, 110, 253, 0.05);
-    }
-    .symptom-card.selected {
-        border: 2px solid #0d6efd;
-        background-color: rgba(13, 110, 253, 0.1);
-    }
-    .symptom-check {
-        display: none;
-    }
-    .symptom-text {
-        flex-grow: 1;
-    }
+/* Card headers theme colors */
+.card-header.bg-primary { background-color: #60B5FF !important; color: white; }
+.card-header.bg-info { background-color: #0dcaf0 !important; color: white; }
 
-    /* Language Toggle */
-    .lang-toggle {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-    }
+/* Section title like Geo Insight */
+.section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #2A4365; border-bottom: 2px solid #FF9149; padding-bottom: 0.3rem; }
 
-    /* Responsive Layout */
-    @media (max-width: 768px) {
-        .symptom-group {
-            margin-bottom: 20px;
-        }
-    }
+/* Compact Symptom Cards */
+.symptom-card { display: flex; align-items: center; padding: 4px 8px; margin-bottom: 4px; border: 1px solid #dee2e6; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease; }
+.symptom-card:hover { border-color: #60B5FF; background-color: rgba(96, 181, 255, 0.1); }
+.symptom-card.selected { border: 2px solid #60B5FF; background-color: rgba(96, 181, 255, 0.15); }
+.symptom-check { display: none; }
+.symptom-text { flex-grow: 1; }
+
+/* Language toggle */
+.lang-toggle { position: absolute; top: 15px; right: 15px; }
+
+/* Two-column layout for Other Symptoms */
+.symptom-group.other-symptoms .symptom-card { width: 48%; display: inline-flex; margin-right: 2%; margin-bottom: 4px; }
+.symptom-group.other-symptoms .symptom-card:nth-child(2n) { margin-right: 0; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .symptom-group.other-symptoms .symptom-card { width: 100%; margin-right: 0; }
+}
 </style>
 {% endblock %}
 
@@ -56,10 +42,10 @@
     </div>
 
     <div class="row">
-        <!-- Location Section -->
-        <div class="col-lg-4">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-info text-white">
+        <!-- Location Card -->
+        <div class="col-lg-4 mb-3 d-flex justify-content-center">
+            <div class="card card-hover w-100 h-100">
+                <div class="card-header">
                     <i class="bi bi-geo-alt"></i> {% if lang == 'bn' %}অবস্থান তথ্য{% else %}Location Information{% endif %}
                 </div>
                 <div class="card-body">
@@ -72,7 +58,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="btn btn-outline-primary w-100" id="useLocationBtn">
+                    <button class="btn btn-accent w-100" id="useLocationBtn">
                         <i class="bi bi-geo-alt"></i> {% if lang == 'bn' %}আমার অবস্থান ব্যবহার করুন{% else %}Use My Location{% endif %}
                     </button>
                     <div id="locationStatus" class="text-muted small mt-2"></div>
@@ -80,40 +66,31 @@
             </div>
         </div>
 
-        <!-- Symptoms Section -->
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+        <!-- Symptoms Card -->
+        <div class="col-lg-8 mb-3 d-flex justify-content-center">
+            <div class="card card-hover w-100 h-100">
+                <div class="card-header">
                     <i class="bi bi-clipboard-pulse"></i> {% if lang == 'bn' %}আপনার লক্ষণ নির্বাচন করুন{% else %}Select Your Symptoms{% endif %}
                 </div>
                 <div class="card-body">
                     <div class="row" id="symptomContainer">
                         {% for group, symptoms in symptom_groups.items() %}
-                        <div class="col-md-6 symptom-group">
-                            <h5>
-                                {% if lang == 'bn' %}
-                                    {{ group_bn_mapping[group] }}
-                                {% else %}
-                                    {{ group }}
-                                {% endif %}
+                        <div class="col-md-6 symptom-group {% if group == 'Other' %}other-symptoms{% endif %}">
+                            <h5 class="section-title">
+                                {% if lang == 'bn' %}{{ group_bn_mapping[group] }}{% else %}{{ group }}{% endif %}
                             </h5>
                             {% for symptom in symptoms %}
                             <div class="symptom-card" data-symptom="{{ symptom }}">
                                 <input type="checkbox" class="symptom-check" value="{{ symptom }}">
                                 <span class="symptom-text">
-                                    {% if lang == 'bn' %}
-                                        {{ symptom_bn_mapping[symptom] }}
-                                    {% else %}
-                                        {{ symptom.replace('_', ' ')|title }}
-                                    {% endif %}
+                                    {% if lang == 'bn' %}{{ symptom_bn_mapping[symptom] }}{% else %}{{ symptom.replace('_',' ')|title }}{% endif %}
                                 </span>
                             </div>
                             {% endfor %}
                         </div>
                         {% endfor %}
                     </div>
-
-                    <button class="btn btn-primary btn-lg w-100 mt-3" id="predictBtn">
+                    <button class="btn btn-accent btn-lg w-100 mt-3" id="predictBtn">
                         <i class="bi bi-heart-pulse"></i> {% if lang == 'bn' %}লক্ষণ পরীক্ষা করুন{% else %}Check Symptoms{% endif %}
                     </button>
                 </div>
@@ -126,131 +103,96 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Language management
-    function setLanguage(lang) {
-        document.cookie = `lang=${lang};path=/`;
-        window.location.reload();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    const lang = document.documentElement.lang || 'en';
+    const translations = {
+        locationFound: lang === 'bn' ? 'অবস্থান পাওয়া গেছে' : 'Location found',
+        noGeolocation: lang === 'bn' ? 'আপনার ব্রাউজার লোকেশন সাপোর্ট করে না' : 'Geolocation not supported',
+        selectSymptom: lang === 'bn' ? 'অন্তত একটি লক্ষণ নির্বাচন করুন' : 'Please select at least one symptom',
+        selectDivision: lang === 'bn' ? 'আপনার বিভাগ নির্বাচন করুন' : 'Please select your division',
+        processing: lang === 'bn' ? 'প্রসেসিং...' : 'Processing...',
+        resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results',
+        possibleDiseases: lang === 'bn' ? 'সম্ভাব্য রোগসমূহ' : 'Possible Diseases',
+        close: lang === 'bn' ? 'বন্ধ' : 'Close'
+    };
+
+    let userLocation = { lat: null, long: null };
 
     // Symptom card selection
-    document.addEventListener('DOMContentLoaded', function() {
-        const lang = document.documentElement.lang || 'en';
+    document.querySelectorAll('.symptom-card').forEach(card => {
+        const checkbox = card.querySelector('.symptom-check');
+        card.addEventListener('click', function() {
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('selected', checkbox.checked);
+        });
+    });
 
-        // Translation dictionary
-        const translations = {
-            locationFound: lang === 'bn' ? 'অবস্থান পাওয়া গেছে' : 'Location found',
-            noGeolocation: lang === 'bn' ? 'আপনার ব্রাউজার লোকেশন সাপোর্ট করে না' : 'Geolocation not supported',
-            selectSymptom: lang === 'bn' ? 'অন্তত একটি লক্ষণ নির্বাচন করুন' : 'Please select at least one symptom',
-            selectDivision: lang === 'bn' ? 'আপনার বিভাগ নির্বাচন করুন' : 'Please select your division',
-            processing: lang === 'bn' ? 'প্রসেসিং...' : 'Processing...',
-            resultsTitle: lang === 'bn' ? 'ফলাফল' : 'Prediction Results',
-            possibleDiseases: lang === 'bn' ? 'সম্ভাব্য রোগসমূহ' : 'Possible Diseases',
-            close: lang === 'bn' ? 'বন্ধ' : 'Close'
-        };
+    // Geolocation
+    const useLocationBtn = document.getElementById('useLocationBtn');
+    const locationStatus = document.getElementById('locationStatus');
+    useLocationBtn.addEventListener('click', function() {
+        if (!navigator.geolocation) { locationStatus.innerText = translations.noGeolocation; return; }
+        navigator.geolocation.getCurrentPosition(
+            pos => { userLocation.lat = pos.coords.latitude; userLocation.long = pos.coords.longitude; locationStatus.innerText = translations.locationFound; },
+            err => { locationStatus.innerText = err.message; }
+        );
+    });
 
-        // Original prediction.js functionality
-        let userLocation = { lat: null, long: null };
+    // Predict button
+    document.getElementById('predictBtn').addEventListener('click', async function() {
+        const symptoms = Array.from(document.querySelectorAll('.symptom-check:checked')).map(e => e.value);
+        const division = document.getElementById('division').value;
+        if (!symptoms.length) { alert(translations.selectSymptom); return; }
+        if (!division) { alert(translations.selectDivision); return; }
 
-        document.querySelectorAll('.symptom-card').forEach(card => {
-            const checkbox = card.querySelector('.symptom-check');
-            card.addEventListener('click', function() {
-                checkbox.checked = !checkbox.checked;
-                this.classList.toggle('selected', checkbox.checked);
+        this.disabled = true;
+        this.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${translations.processing}`;
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symptoms, division, lat: userLocation.lat, long: userLocation.long })
             });
-        });
-
-        // Geolocation handler
-        const useLocationBtn = document.getElementById('useLocationBtn');
-        const locationStatus = document.getElementById('locationStatus');
-
-        useLocationBtn.addEventListener('click', function() {
-            // ... keep your existing geolocation code ...
-        });
-
-        // Prediction submission
-        document.getElementById('predictBtn').addEventListener('click', async function() {
-            const symptoms = Array.from(document.querySelectorAll('.symptom-check:checked'))
-                .map(el => el.value);
-
-            if (symptoms.length === 0) {
-                alert(translations.selectSymptom);
-                return;
-            }
-
-            const division = document.getElementById('division').value;
-            if (!division) {
-                alert(translations.selectDivision);
-                return;
-            }
-
-            const btn = this;
-            btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> ${translations.processing}`;
-
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        symptoms: symptoms,
-                        division: division,
-                        lat: userLocation.lat,
-                        long: userLocation.long
-                    })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    showResultsModal(data.predictions, translations);
-                } else {
-                    throw new Error(data.error || 'Prediction failed');
-                }
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="bi bi-heart-pulse"></i> ${lang === 'bn' ? 'লক্ষণ পরীক্ষা করুন' : 'Check Symptoms'}`;
-            }
-        });
-
-        function showResultsModal(predictions, translations) {
-            const modalHtml = `
-                <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title">${translations.resultsTitle}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <h5>${translations.possibleDiseases}:</h5>
-                                <ul class="list-group">
-                                    ${predictions.map(pred => `
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <span>${pred.disease}</span>
-                                            <span class="badge bg-primary rounded-pill">${pred.probability}</span>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                    ${translations.close}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-            modal.show();
-
-            document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
-                this.remove();
-            });
+            const data = await response.json();
+            if (data.success) { showResultsModal(data.predictions); }
+            else { throw new Error(data.error || 'Prediction failed'); }
+        } catch(err) { alert(`Error: ${err.message}`); }
+        finally {
+            this.disabled = false;
+            this.innerHTML = `<i class="bi bi-heart-pulse"></i> ${lang==='bn'?'লক্ষণ পরীক্ষা করুন':'Check Symptoms'}`;
         }
     });
+
+    function showResultsModal(predictions){
+        const modalHtml = `
+        <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">${translations.resultsTitle}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>${translations.possibleDiseases}:</h5>
+                        <ul class="list-group">
+                            ${predictions.map(p => `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>${p.disease}</span>
+                                <span class="badge bg-primary rounded-pill">${p.probability}</span>
+                            </li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${translations.close}</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        modal.show();
+        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function(){ this.remove(); });
+    }
+});
 </script>
 {% endblock %}
