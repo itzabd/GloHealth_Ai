@@ -508,13 +508,12 @@ def calculate_location_boost(division: str, disease: str) -> float:
 @login_required
 def geo_insights():
     try:
-        # GET DATA FROM location_insights TABLE (NOT predictions)
+        # GET DATA FROM location_insights TABLE
         response = supabase.from_('location_insights') \
             .select('*') \
             .order('last_updated', desc=True) \
             .execute()
 
-        # Check if we got valid data
         if not hasattr(response, 'data') or not response.data:
             return render_template('geo_insights.html',
                                    current_user=current_user,
@@ -522,31 +521,23 @@ def geo_insights():
 
         df = pd.DataFrame(response.data)
 
-        # Create Bangladesh map with better interactivity
-        bd_center = [23.8103, 90.4125]  # Centered on Dhaka
+        # Create Bangladesh map
+        bd_center = [23.6850, 90.3563]
         bd_map = folium.Map(location=bd_center, zoom_start=7, tiles='cartodbpositron')
 
-        # Add Bangladesh boundary with better styling
+        # Add Bangladesh boundary
         bd_bounds = [[20.5, 88.0], [26.5, 92.5]]
         folium.Rectangle(
             bounds=bd_bounds,
-            color='#ff0000',
-            weight=3,
+            color='#000000',
+            weight=2,
             fill=True,
             fillColor='#ffff00',
             fillOpacity=0.1,
-            popup='<b>Bangladesh</b><br>Disease Monitoring Area',
-            tooltip='Click for info'
+            popup='Bangladesh'
         ).add_to(bd_map)
 
-        # Create feature groups for different diseases for filtering
-        feature_groups = {}
-        unique_diseases = df['disease'].unique() if 'disease' in df.columns else []
-
-        for disease in unique_diseases:
-            feature_groups[disease] = folium.FeatureGroup(name=f'{disease} Cases', show=False)
-
-        # Prepare data for interactive heatmap
+        # Prepare data for heatmap
         heat_data = []
         for _, row in df.iterrows():
             if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
@@ -556,107 +547,64 @@ def geo_insights():
                     float(row.get('case_count', 1))
                 ])
 
-        # Add interactive heatmap
         if heat_data:
             HeatMap(
                 heat_data,
-                name="📊 Case Density Heatmap",
-                radius=25,
-                blur=20,
-                max_zoom=12,
-                gradient={0.0: 'blue', 0.5: 'lime', 1.0: 'red'},
-                min_opacity=0.5
+                name="Case Density",
+                radius=20,
+                blur=15,
+                max_zoom=1,
+                gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
             ).add_to(bd_map)
 
-        # Add interactive markers with custom icons and animations
+        # Add clustered markers
+        marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
         for _, row in df.iterrows():
             if pd.notna(row.get('latitude')) and pd.notna(row.get('longitude')):
-                disease = row.get('disease', 'Unknown')
-                cases = row.get('case_count', 1)
-                confidence = row.get('confidence_score', 0)
-                division = row.get('division', 'Unknown')
-
-                # Create custom popup with HTML
-                popup_html = f"""
-                <div style='min-width: 250px;'>
-                    <h4 style='color: {get_disease_color(disease)}; margin-bottom: 10px;'>
-                        ⚕️ {disease}
-                    </h4>
-                    <p><b>📍 Division:</b> {division}</p>
-                    <p><b>📊 Cases:</b> {cases}</p>
-                    <p><b>🎯 Confidence:</b> {confidence:.1%}</p>
-                    <p><b>📅 Last Updated:</b> {row.get('last_updated', 'N/A')}</p>
-                    <hr style='margin: 10px 0;'>
-                    <div style='text-align: center;'>
-                        <button onclick='alert("Showing more details for {disease}")' 
-                                style='background: {get_disease_color(disease)}; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;'>
-                            📈 View Trends
-                        </button>
-                    </div>
-                </div>
+                popup = f"""
+                <b>{row.get('disease', 'N/A')}</b><br>
+                Cases: {row.get('case_count', 0)}<br>
+                Division: {row.get('division', 'Unknown')}<br>
+                Confidence: {row.get('confidence_score', 0):.1%}
                 """
-
-                popup = folium.Popup(popup_html, max_width=300)
-
-                # Create custom icon based on disease and case count
-                icon_color = get_disease_color(disease)
-                icon_size = 'large' if cases > 10 else 'medium' if cases > 5 else 'small'
-
-                marker = folium.Marker(
+                folium.Marker(
                     location=[float(row['latitude']), float(row['longitude'])],
                     popup=popup,
                     icon=folium.Icon(
-                        color=icon_color,
-                        icon='medkit',
-                        prefix='fa',
-                        icon_color='white',
-                        icon_size=(18, 18) if cases > 5 else (15, 15)
-                    ),
-                    tooltip=f"Click for {disease} info ({cases} cases)"
-                )
+                        color='red' if row.get('case_count', 0) > 10
+                        else 'orange' if row.get('case_count', 0) > 5
+                        else 'green'
+                    )
+                ).add_to(marker_cluster)
 
-                # Add to both main map and disease-specific group
-                marker.add_to(bd_map)
-                if disease in feature_groups:
-                    marker.add_to(feature_groups[disease])
-
-        # Add all feature groups to map
-        for disease, group in feature_groups.items():
-            group.add_to(bd_map)
-
-        # Add advanced layer control
-        folium.LayerControl(
-            position='topright',
-            collapsed=False,
-            autoZIndex=True
-        ).add_to(bd_map)
-
-        # Add measure control for distance
-        folium.plugins.MeasureControl(
-            position='bottomleft',
-            primary_length_unit='kilometers',
-            secondary_length_unit='miles'
-        ).add_to(bd_map)
-
-        # Add fullscreen button
-        folium.plugins.Fullscreen(
-            position='topright',
-            title='Expand me',
-            title_cancel='Exit me',
-            force_separate_button=True
-        ).add_to(bd_map)
-
-        # Add minimap for navigation
-        folium.plugins.MiniMap(
-            tile_layer='cartodbpositron',
-            position='bottomright',
-            width=150,
-            height=150,
-            collapsed_width=25,
-            collapsed_height=25
-        ).add_to(bd_map)
-
+        folium.LayerControl().add_to(bd_map)
         map_html = bd_map._repr_html_() if bd_map else None
+
+        # Process division statistics
+        division_counts_dict = {}
+        disease_totals = {}
+        top_diseases = []
+
+        if not df.empty and 'division' in df.columns and 'disease' in df.columns:
+            division_counts = df.pivot_table(
+                index='division',
+                columns='disease',
+                values='case_count',
+                aggfunc='sum',
+                fill_value=0
+            )
+
+            division_counts_dict = division_counts.to_dict('index')
+            disease_totals = division_counts.sum().to_dict()
+            top_diseases = division_counts.sum().nlargest(5).index.tolist()
+
+        # RETURN THE RESPONSE (THIS WAS MISSING)
+        return render_template('geo_insights.html',
+                               current_user=current_user,
+                               map_html=map_html,
+                               division_counts=division_counts_dict,
+                               disease_totals=disease_totals,
+                               top_diseases=top_diseases)
 
     except Exception as e:
         print(f"Geo insights error: {str(e)}")
