@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Premium Plan Features{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <h2>Premium Plan Features</h2>
+    <ul>
+        <li>Includes specialist consultation</li>
+        <li>Detailed health reports</li>
+        <li>2 checkups per month</li>
+        <li>Priority appointment scheduling</li>
+    </ul>
+    <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
+</div>
+{% endblock %}

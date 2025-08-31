@@ -23,7 +23,7 @@ body {
     box-shadow: 0 12px 32px rgba(0,0,0,0.25);
 }
 
-/* Accent Button */
+/* Buttons */
 .btn-accent {
     background: linear-gradient(90deg, #FF9149, #FF6B6B);
     border: none;
@@ -38,7 +38,6 @@ body {
     transform: scale(1.03);
 }
 
-/* Details Button */
 .btn-outline-primary {
     border-radius: 10px;
     padding: 0.45rem 1.2rem;
@@ -68,11 +67,34 @@ body {
 
 {% block content %}
 <div class="dashboard-wrapper">
+
     <div class="row mb-4 justify-content-center">
         <div class="col-md-8 text-center">
             <h2 class="section-header">Available Plans</h2>
         </div>
     </div>
+
+    {% if user_subscriptions %}
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+            <h4 class="section-header" style="font-size:1.3rem;">Your Active Subscriptions</h4>
+            <ul class="list-group mb-3">
+                {% for sub in user_subscriptions %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ sub.plan_name }}</strong>
+                        (Ends: {{ sub.end_date[:10] if sub.end_date else 'N/A' }})
+                    </div>
+                    <form action="{{ url_for('cancel_subscription', sub_id=sub.id) }}" method="POST">
+                        <button class="btn btn-sm btn-danger">Cancel</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="row g-4 justify-content-center">
         {% for plan in plans %}
         <div class="col-md-4">
@@ -80,9 +102,19 @@ body {
                 <h5>{{ plan.name }}</h5>
                 <p>{{ plan.details }}</p>
                 <h6>{{ plan.price }}</h6>
-                <!-- Subscribe goes to mock payment page -->
-                <a href="{{ url_for('subscribe_plan', plan_name=plan.name) }}" class="btn btn-accent mt-2">Subscribe</a>
-                <!-- Details goes to plan details page -->
+
+                {% set subscribed = user_subscriptions | selectattr("plan_name", "equalto", plan.name) | list %}
+
+                {% if subscribed %}
+                    <button class="btn btn-secondary mt-2" disabled>Subscribed</button>
+                    <a href="{{ url_for('features', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Features</a>
+                {% else %}
+                    <form action="{{ url_for('subscribe_plan', plan_name=plan.name) }}" method="POST">
+                        <button type="submit" class="btn btn-accent mt-2">Subscribe</button>
+                    </form>
+                    <button class="btn btn-secondary mt-2" disabled>Features locked</button>
+                {% endif %}
+
                 <a href="{{ url_for('plan_details', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Details</a>
             </div>
         </div>

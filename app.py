@@ -1,6 +1,5 @@
 import os
 from collections import defaultdict
-from datetime import datetime
 from flask import Flask, render_template, redirect, url_for, request, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from supabase import create_client
@@ -9,6 +8,9 @@ import pandas as pd
 import numpy as np
 import folium
 from folium.plugins import HeatMap, MarkerCluster
+from flask import Flask, render_template, redirect, url_for, request, flash
+from datetime import datetime, timedelta
+
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or 'dev-secret-key-change-me'
@@ -697,25 +699,85 @@ def appointments():
                                error="Unable to load appointments")
 
 # app.py
-
+# Plans page
 @app.route('/plans')
 @login_required
 def plans():
-    # You can fetch plan data from database if needed
+    # Mock plans data
     plans_data = [
         {"name": "Basic Plan", "price": "500 BDT", "details": "Access to general consultation."},
         {"name": "Premium Plan", "price": "1200 BDT", "details": "Includes specialist consultation and reports."},
         {"name": "Ultimate Plan", "price": "2500 BDT", "details": "All-inclusive consultation, priority support."}
     ]
-    return render_template("plans.html", plans=plans_data)
-@app.route('/subscribe/<plan_name>', methods=['GET', 'POST'])
+
+    # Fetch current user's active subscriptions from Supabase
+    user_subscriptions = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", str(current_user.id))\
+        .eq("active", True)\
+        .execute().data
+
+    return render_template("plans.html", plans=plans_data, user_subscriptions=user_subscriptions)
+# Subscribe to a plan (mock payment)
+@app.route('/subscribe/<plan_name>', methods=['POST'])
 @login_required
 def subscribe_plan(plan_name):
-    # Mock plan data (in real scenario, fetch from DB)
+    # Check if already subscribed
+    existing = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", str(current_user.id))\
+        .eq("plan_name", plan_name)\
+        .eq("active", True)\
+        .execute().data
+
+    if existing:
+        flash("You are already subscribed to this plan.", "warning")
+        return redirect(url_for('plans'))
+
+    # Save subscription
+    start_date = datetime.now()
+    end_date = start_date + timedelta(days=30)  # Example: 30-day subscription
+
+    supabase.table("user_subscriptions").insert({
+        "user_id": str(current_user.id),
+        "plan_name": plan_name,
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
+        "active": True
+    }).execute()
+
+    flash(f"Subscribed to {plan_name} successfully!", "success")
+    return redirect(url_for('plans'))
+
+# Cancel subscription
+@app.route('/cancel_subscription/<sub_id>', methods=['POST'])
+@login_required
+def cancel_subscription(sub_id):
+    # Update subscription to inactive
+    response = supabase.table("user_subscriptions")\
+        .update({
+            "active": False,
+            "end_date": datetime.now().isoformat()
+        })\
+        .eq("id", sub_id)\
+        .eq("user_id", str(current_user.id))\
+        .execute()
+
+    if response.data:  # If data is returned, the update succeeded
+        flash("Subscription canceled successfully.", "success")
+    else:
+        flash("Failed to cancel subscription.", "danger")
+
+    return redirect(url_for('plans'))
+
+# Plan details (optional for details button)
+@app.route('/plan/<plan_name>')
+@login_required
+def plan_details(plan_name):
     plans_data = {
-        "Basic Plan": {"price": "500 BDT"},
-        "Premium Plan": {"price": "1200 BDT"},
-        "Ultimate Plan": {"price": "2500 BDT"}
+        "Basic Plan": {"price": "500 BDT", "features": ["Feature A", "Feature B"]},
+        "Premium Plan": {"price": "1200 BDT", "features": ["Feature C", "Feature D"]},
+        "Ultimate Plan": {"price": "2500 BDT", "features": ["Feature E", "Feature F"]}
     }
 
     plan = plans_data.get(plan_name)
@@ -723,12 +785,60 @@ def subscribe_plan(plan_name):
         flash("Plan not found!", "danger")
         return redirect(url_for('plans'))
 
-    if request.method == 'POST':
-        # For mock, just flash a success message
-        flash(f"Payment for {plan_name} successful!", "success")
+    return render_template("plan_details.html", plan_name=plan_name, plan=plan)
+
+
+# Feature page for subscribed plans
+@app.route('/features/<plan_name>')
+@login_required
+def plan_feature(plan_name):
+    # You can also fetch subscription to ensure user is active
+    subscription = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", current_user.id)\
+        .eq("plan_name", plan_name)\
+        .eq("active", True)\
+        .execute().data
+
+    if not subscription:
+        flash("You are not subscribed to this plan!", "danger")
         return redirect(url_for('plans'))
 
-    return render_template("subscribe.html", plan_name=plan_name, plan=plan)
+    # Mock features per plan
+    features_data = {
+        "Basic Plan": ["Feature A", "Feature B", "Feature C"],
+        "Premium Plan": ["Feature D", "Feature E", "Feature F"],
+        "Ultimate Plan": ["Feature G", "Feature H", "Feature I"]
+    }
 
+    features = features_data.get(plan_name, [])
+    return render_template("features.html", plan_name=plan_name, features=features)
+from flask import abort
+
+# Feature page access based on subscription
+@app.route('/features/<plan_name>')
+@login_required
+def features(plan_name):
+    # Check if user has active subscription
+    subscription = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", str(current_user.id))\
+        .eq("plan_name", plan_name)\
+        .eq("active", True)\
+        .execute().data
+
+    if not subscription:
+        flash("You need to subscribe to access this feature page.", "danger")
+        return redirect(url_for('plans'))
+
+    # Render the appropriate feature page
+    if plan_name == "Basic Plan":
+        return render_template("feature_basic.html")
+    elif plan_name == "Premium Plan":
+        return render_template("feature_premium.html")
+    elif plan_name == "Ultimate Plan":
+        return render_template("feature_ultimate.html")
+    else:
+        abort(404)
 if __name__ == '__main__':
     app.run(debug=True)

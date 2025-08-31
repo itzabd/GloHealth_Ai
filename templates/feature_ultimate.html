@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Ultimate Plan Features{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <h2>Ultimate Plan Features</h2>
+    <ul>
+        <li>All-inclusive consultation</li>
+        <li>Priority support and appointments</li>
+        <li>Unlimited checkups</li>
+        <li>Comprehensive health reports</li>
+    </ul>
+    <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
+</div>
+{% endblock %}

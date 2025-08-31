@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Basic Plan Features{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <h2>Basic Plan Features</h2>
+    <ul>
+        <li>Access to general consultation</li>
+        <li>Basic health reports</li>
+        <li>1 general checkup per month</li>
+    </ul>
+    <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
+</div>
+{% endblock %}
