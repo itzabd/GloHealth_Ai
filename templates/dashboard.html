@@ -86,7 +86,24 @@
 {% endblock %}
 
 {% block content %}
+<div class="row mb-5">
+    <div class="col text-center">
+        <h2 class="section-header">
+            <span class="lang-bn">ড্যাশবোর্ড</span>
+            <span class="lang-en">Dashboard</span>
+        </h2>
+    </div>
+</div>
 
+<div class="row mb-4 justify-content-center">
+    <!-- User Info Card -->
+    <div class="col-md-4 mb-3 d-flex justify-content-center">
+        <div class="card card-hover w-100 card-centered border-primary">
+            <div class="card-body">
+                <h5 class="section-title">
+                <span class="lang-bn">ব্যবহারকারী তথ্য</span>
+                <span class="lang-en">User Info</span>
+            </h5></div>
             <div class="card-body">
                 <h5>{{ current_user.name }}</h5>
                 <p>
@@ -97,7 +114,15 @@
         </div>
     </div>
 
-
+    <!-- Geographic Insights Card -->
+    <div class="col-md-4 mb-3 d-flex justify-content-center">
+        <div class="card card-hover w-100 card-centered border-primary">
+            <div class="card-body">
+                <h5 class="section-title">
+                    <span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
+                    <span class="lang-en">Geographic Insights</span>
+                </h5>
+                <p>
                     <span class="lang-bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
                     <span class="lang-en">View disease spread across Bangladesh</span>
                 </p>
@@ -108,10 +133,53 @@
             </div>
         </div>
     </div>
+</div>
 
+<!-- Recent Tests Table -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-8 mb-3">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <h6 class="section-title text-center">
+                    <span class="lang-bn">সাম্প্রতিক পরীক্ষা</span>
+                    <span class="lang-en">Recent Tests</span>
+                </h6>
+                <div class="table-container">
+                    <div class="table-scroll-wrapper">
+                        <table class="table table-compact">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>
+                                        <span class="lang-bn">লক্ষণ</span>
+                                        <span class="lang-en">Symptoms</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-bn">রোগ</span>
+                                        <span class="lang-en">Disease</span>
+                                    </th>
+                                    <th>
+                                        <span class="lang-bn">নিশ্চিততা</span>
+                                        <span class="lang-en">Percentage</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pred in predictions %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ pred.symptoms|join(', ') }}</td>
+                                    <td class="bangla">{{ pred.top_prediction }}</td>
+                                    <td>{{ (pred.confidence * 100)|round(1) }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
