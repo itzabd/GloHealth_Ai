@@ -47,7 +47,6 @@
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
-    /* IMPROVED TABLE STYLING */
     .table-container {
         max-height: 400px;
         overflow: hidden;
@@ -123,63 +122,25 @@
         padding-bottom: 0.5rem;
     }
 
-    /* Responsive design */
     @media (max-width: 768px) {
-        .map-container {
-            height: 300px;
-            margin-bottom: 1rem;
-        }
-
-        .data-placeholder {
-            height: 300px;
-        }
-
-        .stats-container {
-            padding: 1rem;
-        }
-
-        .section-title {
-            font-size: 1rem;
-        }
-
-        .table-scroll-wrapper {
-            max-height: 300px;
-            font-size: 0.8rem;
-        }
+        .map-container { height: 300px; margin-bottom: 1rem; }
+        .data-placeholder { height: 300px; }
+        .stats-container { padding: 1rem; }
+        .section-title { font-size: 1rem; }
+        .table-scroll-wrapper { max-height: 300px; font-size: 0.8rem; }
     }
 
-    .leaflet-control-container {
-        z-index: 1000;
-    }
+    .leaflet-control-container { z-index: 1000; }
 
-    .card-hover {
-        transition: all 0.3s ease;
-    }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
 
-    .card-hover:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    }
-
-    /* Scrollbar styling */
     .table-scroll-wrapper::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 8px; height: 8px;
     }
-
-    .table-scroll-wrapper::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-
-    .table-scroll-wrapper::-webkit-scrollbar-thumb {
-        background: #60B5FF;
-        border-radius: 4px;
-    }
-
-    .table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
-        background: #4a9de6;
-    }
+    .table-scroll-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .table-scroll-wrapper::-webkit-scrollbar-thumb { background: #60B5FF; border-radius: 4px; }
+    .table-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: #4a9de6; }
 </style>
 {% endblock %}
 
@@ -192,7 +153,6 @@
         </h2>
     </div>
 </div>
-
 
 {% if error %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -249,7 +209,7 @@
                                         <span class="lang-bn">বিভাগ</span>
                                         <span class="lang-en">Division</span>
                                     </th>
-                                    {% for disease in top_diseases|sort %}
+                                    {% for disease in all_diseases|sort %}
                                     <th>{{ disease }}</th>
                                     {% endfor %}
                                 </tr>
@@ -258,7 +218,7 @@
                                 {% for division, diseases in division_counts.items()|sort %}
                                 <tr>
                                     <td><strong>{{ division }}</strong></td>
-                                    {% for disease in top_diseases|sort %}
+                                    {% for disease in all_diseases|sort %}
                                     <td class="text-center">{{ diseases.get(disease, 0) }}</td>
                                     {% endfor %}
                                 </tr>

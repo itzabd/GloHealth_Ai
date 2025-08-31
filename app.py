@@ -502,8 +502,6 @@ def calculate_location_boost(division: str, disease: str) -> float:
         print(f"Error calculating location boost: {str(e)}")
 
     return 1.0  # Default no boost
-
-
 @app.route('/geo_insights')
 @login_required
 def geo_insights():
@@ -525,7 +523,7 @@ def geo_insights():
         bd_center = [23.6850, 90.3563]
         bd_map = folium.Map(location=bd_center, zoom_start=7, tiles='cartodbpositron')
 
-        # Add Bangladesh boundary
+        # Bangladesh boundary
         bd_bounds = [[20.5, 88.0], [26.5, 92.5]]
         folium.Rectangle(
             bounds=bd_bounds,
@@ -537,7 +535,7 @@ def geo_insights():
             popup='Bangladesh'
         ).add_to(bd_map)
 
-        # Division coordinates (approximate centers of each division)
+        # Division coordinates (approximate centers)
         division_coordinates = {
             'Dhaka': [23.8103, 90.4125],
             'Chittagong': [22.3569, 91.7832],
@@ -549,7 +547,7 @@ def geo_insights():
             'Mymensingh': [24.7471, 90.4203]
         }
 
-        # Prepare data for heatmap and markers using division coordinates
+        # Heatmap and marker cluster
         heat_data = []
         marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
 
@@ -558,15 +556,8 @@ def geo_insights():
             if division and division in division_coordinates:
                 lat, lon = division_coordinates[division]
                 case_count = row.get('case_count', 1)
-
-                # VALIDATE DATA BEFORE ADDING TO HEATMAP
-                if (pd.notna(lat) and pd.notna(lon) and pd.notna(case_count) and
-                        isinstance(lat, (int, float)) and isinstance(lon, (int, float)) and
-                        isinstance(case_count, (int, float))):
-                    # Add to heatmap
+                if pd.notna(lat) and pd.notna(lon) and pd.notna(case_count):
                     heat_data.append([float(lat), float(lon), float(case_count)])
-
-                    # Add marker for this division
                     popup = f"""
                     <b>{row.get('disease', 'N/A')}</b><br>
                     Cases: {case_count}<br>
@@ -583,36 +574,27 @@ def geo_insights():
                         )
                     ).add_to(marker_cluster)
 
-        # Add heatmap if we have valid data
         if heat_data:
-            # CONVERT TO NUMPY ARRAY AND REMOVE ANY REMAINING NaNs
-            heat_array = np.array(heat_data)
-            valid_indices = ~np.isnan(heat_array).any(axis=1)
-            clean_heat_data = heat_array[valid_indices].tolist()
-
-            if clean_heat_data:
-                HeatMap(
-                    clean_heat_data,
-                    name="Case Density",
-                    radius=25,
-                    blur=20,
-                    max_zoom=1,
-                    gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
-                ).add_to(bd_map)
-            else:
-                print("No valid heatmap data after cleaning")
-        else:
-            print("No heatmap data available")
+            HeatMap(
+                heat_data,
+                name="Case Density",
+                radius=25,
+                blur=20,
+                max_zoom=1,
+                gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
+            ).add_to(bd_map)
 
         folium.LayerControl().add_to(bd_map)
         map_html = bd_map._repr_html_() if bd_map else None
 
-        # Process division statistics
+        # Prepare statistics
         division_counts_dict = {}
         disease_totals = {}
         top_diseases = []
+        all_diseases = []
 
         if not df.empty and 'division' in df.columns and 'disease' in df.columns:
+            # Pivot table for counts
             division_counts = df.pivot_table(
                 index='division',
                 columns='disease',
@@ -620,17 +602,18 @@ def geo_insights():
                 aggfunc='sum',
                 fill_value=0
             )
-
             division_counts_dict = division_counts.to_dict('index')
             disease_totals = division_counts.sum().to_dict()
             top_diseases = division_counts.sum().nlargest(5).index.tolist()
+            all_diseases = df['disease'].unique().tolist()
 
         return render_template('geo_insights.html',
                                current_user=current_user,
                                map_html=map_html,
                                division_counts=division_counts_dict,
                                disease_totals=disease_totals,
-                               top_diseases=top_diseases)
+                               top_diseases=top_diseases,
+                               all_diseases=all_diseases)
 
     except Exception as e:
         print(f"Geo insights error: {str(e)}")
@@ -639,6 +622,7 @@ def geo_insights():
         return render_template('geo_insights.html',
                                current_user=current_user,
                                error=str(e))
+
 # THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
 @app.template_filter('get_disease_color')
 def get_disease_color_filter(disease):
