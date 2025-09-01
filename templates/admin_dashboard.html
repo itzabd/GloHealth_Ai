@@ -99,7 +99,7 @@
                         <span class="lang-en" lang="en">Manage Doctors</span>
                     </h5>
                     <p>Add, edit, or remove doctors.</p>
-                    <a href="{{ url_for('doctors') }}" class="btn btn-accent">
+                    <a href="{{ url_for('admin_doctors') }}" class="btn btn-accent">
                         <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
                         <span class="lang-en" lang="en">Manage</span>
                     </a>
@@ -124,22 +124,7 @@
             </div>
         </div>
 
-        <!-- System Settings -->
-        <div class="col-md-3 d-flex">
-            <div class="card card-hover w-100 card-centered h-100">
-                <div class="card-body">
-                    <h5 class="section-title">
-                        <span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
-                        <span class="lang-en" lang="en">System Settings</span>
-                    </h5>
-                    <p>Configure system-wide settings.</p>
-                    <a href="{{ url_for('admin_users') }}" class="btn btn-accent">
-                        <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
-                        <span class="lang-en" lang="en">Manage</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
 {% endblock %}

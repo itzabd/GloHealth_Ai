@@ -112,21 +112,104 @@ def admin_users():
         flash("Error fetching users", "danger")
         return redirect(url_for("admin_dashboard"))
 
-
-@app.route('/admin/doctors')
+# View all doctors
+@app.route("/admin/doctors")
 @login_required
 def admin_doctors():
-    if not getattr(current_user, 'is_admin', False):
+    if not getattr(current_user, "is_admin", False):
         flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for("dashboard"))
 
     try:
-        doctors_resp = supabase.from_('doctors').select('*').execute()
-        doctors = doctors_resp.data if hasattr(doctors_resp, 'data') else []
-        return render_template('admin_doctors.html', doctors=doctors)
+        resp = supabase.from_("doctors").select("*").execute()
+        doctors = resp.data if hasattr(resp, "data") else []
+        return render_template("admin_doctors.html", doctors=doctors)
     except Exception as e:
-        print(f"Admin Doctors error: {str(e)}")
-        return redirect(url_for('admin_dashboard'))
+        flash(f"Error fetching doctors: {str(e)}", "danger")
+        return redirect(url_for("admin_dashboard"))
+
+
+# Add doctor page
+@app.route("/admin/doctors/add", methods=["GET", "POST"])
+@login_required
+def add_doctor_page():
+    if not getattr(current_user, "is_admin", False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for("admin_doctors"))
+
+    if request.method == "POST":
+        try:
+            data = request.form
+            supabase.from_("doctors").insert({
+                "name": data["name"],
+                "specialty": data["specialty"],
+                "division": data.get("division"),
+                "district": data.get("district"),
+                "hospital": data.get("hospital"),
+                "consultation_fee": data["consultation_fee"],
+                "availability": data.get("availability"),
+                "contact": data.get("contact")
+            }).execute()
+            flash("Doctor added successfully!", "success")
+            return redirect(url_for("admin_doctors"))
+        except Exception as e:
+            flash(f"Error adding doctor: {str(e)}", "danger")
+
+    return render_template("add_doctor.html")
+
+
+# Edit doctor page
+@app.route("/admin/doctors/edit/<doctor_id>", methods=["GET", "POST"])
+@login_required
+def edit_doctor_page(doctor_id):
+    if not getattr(current_user, "is_admin", False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for("admin_doctors"))
+
+    try:
+        resp = supabase.from_("doctors").select("*").eq("id", doctor_id).single().execute()
+        doctor = resp.data
+    except Exception as e:
+        flash(f"Error fetching doctor: {str(e)}", "danger")
+        return redirect(url_for("admin_doctors"))
+
+    if request.method == "POST":
+        try:
+            data = request.form
+            supabase.from_("doctors").update({
+                "name": data["name"],
+                "specialty": data["specialty"],
+                "division": data.get("division"),
+                "district": data.get("district"),
+                "hospital": data.get("hospital"),
+                "consultation_fee": data["consultation_fee"],
+                "availability": data.get("availability"),
+                "contact": data.get("contact")
+            }).eq("id", doctor_id).execute()
+            flash("Doctor updated successfully!", "success")
+            return redirect(url_for("admin_doctors"))
+        except Exception as e:
+            flash(f"Error updating doctor: {str(e)}", "danger")
+
+    return render_template("edit_doctor.html", doctor=doctor)
+
+
+# Delete doctor page
+@app.route("/admin/doctors/delete/<doctor_id>", methods=["POST"])
+@login_required
+def delete_doctor_page(doctor_id):
+    if not getattr(current_user, "is_admin", False):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for("admin_doctors"))
+
+    try:
+        supabase.from_("doctors").delete().eq("id", doctor_id).execute()
+        flash("Doctor deleted successfully!", "success")
+    except Exception as e:
+        flash(f"Error deleting doctor: {str(e)}", "danger")
+
+    return redirect(url_for("admin_doctors"))
+
 @app.route('/admin/appointments')
 @login_required
 def admin_appointments():
@@ -185,77 +268,7 @@ def delete_user(user_id):
     return redirect(url_for("admin_users"))
 
 # Add Doctor
-@app.route('/admin/doctors/add', methods=['GET', 'POST'])
-@login_required
-def add_doctor():
-    if not getattr(current_user, 'is_admin', False):
-        flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
 
-    if request.method == 'POST':
-        try:
-            data = {
-                "name": request.form.get("name"),
-                "specialization": request.form.get("specialization"),
-                "email": request.form.get("email"),
-                "phone": request.form.get("phone")
-            }
-            supabase.from_('doctors').insert(data).execute()
-            flash("Doctor added successfully", "success")
-            return redirect(url_for('admin_doctors'))
-        except Exception as e:
-            print(f"Add doctor error: {str(e)}")
-            flash("Error adding doctor", "danger")
-            return redirect(url_for('admin_doctors'))
-
-    return render_template('add_doctor.html')
-
-
-# Edit Doctor
-@app.route('/admin/doctors/edit/<doctor_id>', methods=['GET', 'POST'])
-@login_required
-def edit_doctor(doctor_id):
-    if not getattr(current_user, 'is_admin', False):
-        flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
-
-    try:
-        doctor_resp = supabase.from_('doctors').select('*').eq('id', doctor_id).maybe_single().execute()
-        doctor = doctor_resp.data
-
-        if request.method == 'POST':
-            updated_data = {
-                "name": request.form.get("name"),
-                "specialization": request.form.get("specialization"),
-                "email": request.form.get("email"),
-                "phone": request.form.get("phone")
-            }
-            supabase.from_('doctors').update(updated_data).eq('id', doctor_id).execute()
-            flash("Doctor updated successfully", "success")
-            return redirect(url_for('admin_doctors'))
-
-        return render_template('edit_doctor.html', doctor=doctor)
-    except Exception as e:
-        print(f"Edit doctor error: {str(e)}")
-        flash("Error editing doctor", "danger")
-        return redirect(url_for('admin_doctors'))
-
-
-# Delete Doctor
-@app.route('/admin/doctors/delete/<doctor_id>', methods=['POST'])
-@login_required
-def delete_doctor(doctor_id):
-    if not getattr(current_user, 'is_admin', False):
-        flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
-
-    try:
-        supabase.from_('doctors').delete().eq('id', doctor_id).execute()
-        flash("Doctor deleted successfully", "success")
-    except Exception as e:
-        print(f"Delete doctor error: {str(e)}")
-        flash("Error deleting doctor", "danger")
-    return redirect(url_for('admin_doctors'))
 # Edit Appointment
 @app.route('/admin/appointments/edit/<appointment_id>', methods=['GET', 'POST'])
 @login_required
