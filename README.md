@@ -1,3 +1,5 @@
+# AI-Powered Health Symptom Reporting System
+
 ## Project Overview / Motivation
 
 Accurate disease identification at an early stage is critical for timely treatment and improved health outcomes. However, many individuals lack access to quick medical consultation or rely on inconsistent information sources when interpreting symptoms. This raises a primary research question: 
@@ -16,3 +18,41 @@ Advances in machine learning have enabled the development of systems that can pr
 - Integrates **geographical and temporal data** to improve prediction accuracy and highlight seasonal or regional disease trends.  
 
 By combining predictive accuracy with transparency and trend analysis, this system benefits both **individuals seeking quick guidance** and **public health authorities** monitoring evolving health challenges.
+
+---
+
+## Features
+
+- **User-Facing:**
+  - Submit symptoms to receive instant disease predictions.
+  - View feature importance visualizations for transparency.
+  - Explore seasonal and regional disease trends.
+
+- **Admin Dashboard:**
+  - Manage users, doctors, and appointments.
+  - View aggregated disease trends and analytics.
+  - Monitor system usage and predictive performance.
+
+- **AI & Analytics:**
+  - Model evaluation: Random Forest, XGBoost, SVM.
+  - Predictive explanations using feature importance.
+  - Geotemporal disease trend analysis.
+
+---
+
+## Tech Stack
+
+- **Backend:** Python Flask
+- **Database:** Supabase (PostgreSQL)
+- **Machine Learning:** scikit-learn, XGBoost
+- **Frontend:** HTML, CSS, Bootstrap
+- **Deployment:** Render / Local Server
+
+---
+
+## Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/ai-health-symptom-system.git
+cd ai-health-symptom-system
