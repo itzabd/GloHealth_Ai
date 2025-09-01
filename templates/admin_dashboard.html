@@ -55,11 +55,11 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
-    <!-- Language Toggle -->
-    <div class="text-end mb-3">
-        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleLanguage('bn')">বাংলা</button>
-        <button class="btn btn-sm btn-outline-primary" onclick="toggleLanguage('en')">English</button>
-    </div>
+<!--    &lt;!&ndash; Language Toggle &ndash;&gt;-->
+<!--    <div class="text-end mb-3">-->
+<!--        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleLanguage('bn')">বাংলা</button>-->
+<!--        <button class="btn btn-sm btn-outline-primary" onclick="toggleLanguage('en')">English</button>-->
+<!--    </div>-->
 
     <!-- Page Header -->
     <div class="row mb-5">
@@ -116,7 +116,7 @@
                         <span class="lang-en" lang="en">Manage Appointments</span>
                     </h5>
                     <p>View all bookings and update status.</p>
-                    <a href="{{ url_for('appointments') }}" class="btn btn-accent">
+                    <a href="{{ url_for('admin_appointments') }}" class="btn btn-accent">
                         <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
                         <span class="lang-en" lang="en">Manage</span>
                     </a>

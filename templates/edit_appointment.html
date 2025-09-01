@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Appointment{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h4 class="mb-4">Edit Appointment</h4>
+        <form method="POST">
+
+          <label>User</label>
+          <select name="user_id" class="form-control mb-2" required>
+            {% for u in users %}
+              <option value="{{ u.id }}" {% if u.id == appointment.user_id %}selected{% endif %}>{{ u.full_name }} ({{ u.email }})</option>
+            {% endfor %}
+          </select>
+
+          <label>Doctor</label>
+          <select name="doctor_id" class="form-control mb-2" required>
+            {% for d in doctors %}
+              <option value="{{ d.id }}" {% if d.id == appointment.doctor_id %}selected{% endif %}>{{ d.name }} - {{ d.specialty }}</option>
+            {% endfor %}
+          </select>
+
+          <label>Scheduled Time</label>
+          <input type="datetime-local" name="scheduled_time" class="form-control mb-2" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required>
+
+          <label>Status</label>
+          <select name="status" class="form-control mb-2">
+            <option value="pending" {% if appointment.status=='pending' %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="completed" {% if appointment.status=='completed' %}selected{% endif %}>Completed</option>
+            <option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+
+          <label>Payment Status</label>
+          <select name="payment_status" class="form-control mb-2">
+            <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %}>Unpaid</option>
+            <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %}>Paid</option>
+          </select>
+
+          <button type="submit" class="btn btn-accent">Save Changes</button>
+          <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
