@@ -40,7 +40,7 @@ body {
     font-weight: 600;
     margin-bottom: 0.5rem;
     color: #2A4365;
-    border-left: 4px solid #FF9149;
+    border-left: 4px solid #3d83d7;
     padding-left: 0.5rem;
 }
 
@@ -108,12 +108,12 @@ body {
 {% block content %}
 <div class="container-fluid position-relative py-4">
     <!-- Language Toggle -->
-    <div class="lang-toggle">
-        <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-primary {% if lang == 'en' %}active{% endif %}" onclick="setLanguage('en')">English</button>
-            <button class="btn btn-outline-primary {% if lang == 'bn' %}active{% endif %}" onclick="setLanguage('bn')">বাংলা</button>
-        </div>
-    </div>
+<!--    <div class="lang-toggle">-->
+<!--        <div class="btn-group btn-group-sm">-->
+<!--            <button class="btn btn-outline-primary {% if lang == 'en' %}active{% endif %}" onclick="setLanguage('en')">English</button>-->
+<!--            <button class="btn btn-outline-primary {% if lang == 'bn' %}active{% endif %}" onclick="setLanguage('bn')">বাংলা</button>-->
+<!--        </div>-->
+<!--    </div>-->
 
     <div class="row g-4">
         <!-- Location Card -->
@@ -255,14 +255,14 @@ function showResultsModal(predictions) {
         if (userPlan) {
             // If subscribed → go to that plan's features
             actionBtn = `<a href="/features/${userPlan}" class="btn btn-lg"
-                            style="background-color:#FF9149; color:white; border:none;">
+                            style="background-color:#3d83d7; color:white; border:none;">
                             View ${userPlan} Features
                          </a>`;
         } else {
             // If not subscribed → go to plans
             actionBtn = `<a href="/plans" class="btn btn-lg"
-                            style="background-color:#FF9149; color:white; border:none;">
-                            Subscribe to Unlock Features
+                            style="background-color:#3d83d7; color:white; border:none;">
+                            Consult with a Specialist
                          </a>`;
         }
 
@@ -278,12 +278,12 @@ function showResultsModal(predictions) {
                         <ul class="list-group mb-3">
                             ${predictions.map(p => `
                                 <li class="list-group-item d-flex flex-column"
-                                    style="border-left: 4px solid #FF9149; margin-bottom:6px;">
+                                    style="border-left: 4px solid #234b85; margin-bottom:6px;">
                                     <span style="font-weight:600; color:#2A4365;">
                                         ${p.disease} — Confidence: ${p.probability}
                                     </span>
                                     <small style="color:#555;">
-                                        ${comments[Math.floor(Math.random()*comments.length)]}
+                                        ${comments[Math.floor(Math.random() * comments.length)]}
                                     </small>
                                 </li>
                             `).join('')}
