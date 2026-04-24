@@ -504,7 +504,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## Support
 
-- **Author:** Abdus Samad (itzabd)
+- **Author:** Abdullah Hossien (itzabd)
 - **GitHub:** [@itzabd](https://github.com/itzabd)
 - **Issues:** [GitHub Issues](https://github.com/itzabd/GloHealth_Ai/issues)
 
