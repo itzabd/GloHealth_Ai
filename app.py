@@ -1,21 +1,38 @@
 import os
 from collections import defaultdict
-from flask import Flask, render_template, redirect, url_for, request, session, jsonify
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from supabase import create_client
-import joblib
-import pandas as pd
-import numpy as np
-import folium
-from folium.plugins import HeatMap, MarkerCluster
-from flask import Flask, render_template, redirect, url_for, request, flash
 from datetime import datetime, timedelta
-from flask import abort, flash, redirect, url_for, render_template
 from functools import wraps
-from flask import abort
+
+import folium
+import joblib
+import numpy as np
+import pandas as pd
+from dotenv import load_dotenv
+from flask import (
+    Flask,
+    abort,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
+from flask_login import LoginManager, UserMixin, current_user, login_required, login_user, logout_user
+from folium.plugins import HeatMap, MarkerCluster
+from supabase import create_client
+
+load_dotenv()
+
+
+def get_env_var(key: str, default: str | None = None) -> str | None:
+    return os.environ.get(key) or os.environ.get(key.lower()) or default
+
+
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY') or 'dev-secret-key-change-me'
+app.config["SECRET_KEY"] = get_env_var("FLASK_SECRET_KEY", "dev-secret-key-change-me")
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -23,8 +40,10 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # Supabase configuration
-SUPABASE_URL = "https://qmktyfkebpjtihxmfbgp.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFta3R5ZmtlYnBqdGloeG1mYmdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM2NzA3NTYsImV4cCI6MjA2OTI0Njc1Nn0.cAqokDfgN3PgHTQzyW-bPELgJlm3--a-O_Q97SFeTEk"
+SUPABASE_URL = get_env_var("SUPABASE_URL")
+SUPABASE_KEY = get_env_var("SUPABASE_KEY")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise RuntimeError("Missing SUPABASE_URL or SUPABASE_KEY environment variables.")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Load ML model
@@ -374,50 +393,6 @@ def delete_user(user_id):
 
 # Add Doctor
 
-# Edit Appointment
-@app.route('/admin/appointments/edit/<appointment_id>', methods=['GET', 'POST'])
-@login_required
-def edit_appointment(appointment_id):
-    if not getattr(current_user, 'is_admin', False):
-        flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
-
-    try:
-        resp = supabase.from_('appointments').select('*').eq('id', appointment_id).maybe_single().execute()
-        appointment = resp.data
-
-        if request.method == 'POST':
-            updated_data = {
-                "scheduled_time": request.form.get("scheduled_time"),
-                "status": request.form.get("status"),
-                "payment_status": request.form.get("payment_status")
-            }
-            supabase.from_('appointments').update(updated_data).eq('id', appointment_id).execute()
-            flash("Appointment updated successfully", "success")
-            return redirect(url_for('admin_appointments'))
-
-        return render_template('edit_appointment.html', appointment=appointment)
-    except Exception as e:
-        print(f"Edit appointment error: {str(e)}")
-        flash("Error editing appointment", "danger")
-        return redirect(url_for('admin_appointments'))
-
-
-# Delete Appointment
-@app.route('/admin/appointments/delete/<appointment_id>', methods=['POST'])
-@login_required
-def delete_appointment(appointment_id):
-    if not getattr(current_user, 'is_admin', False):
-        flash("Unauthorized access", "danger")
-        return redirect(url_for('dashboard'))
-
-    try:
-        supabase.from_('appointments').delete().eq('id', appointment_id).execute()
-        flash("Appointment deleted successfully", "success")
-    except Exception as e:
-        print(f"Delete appointment error: {str(e)}")
-        flash("Error deleting appointment", "danger")
-    return redirect(url_for('admin_appointments'))
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 def admin_settings():
@@ -1322,4 +1297,4 @@ def features(plan_name):
     elif plan_name == "Ultimate Plan":
         return render_template("feature_ultimate.html", doctors=doctors, subscription=subscription)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
