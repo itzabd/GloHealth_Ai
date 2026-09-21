@@ -44,6 +44,8 @@ SUPABASE_URL = get_env_var("SUPABASE_URL")
 SUPABASE_KEY = get_env_var("SUPABASE_KEY")
 if not SUPABASE_URL or not SUPABASE_KEY:
     raise RuntimeError("Missing SUPABASE_URL or SUPABASE_KEY environment variables.")
+SUPABASE_URL = SUPABASE_URL.strip().rstrip(",")
+SUPABASE_KEY = SUPABASE_KEY.strip()
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Load ML model
@@ -75,7 +77,7 @@ def load_user(user_id):
 
         # Get user data
         user_response = supabase.auth.get_user(access_token)
-        if not user_response.user:
+        if not user_response or not user_response.user:
             return None
 
         # Get profile data
@@ -84,15 +86,18 @@ def load_user(user_id):
             .eq('id', user_id) \
             .maybe_single() \
             .execute()
-        profile = profile_resp.data if hasattr(profile_resp, 'data') else {}
+        profile = (profile_resp.data if hasattr(profile_resp, 'data') and profile_resp.data else {}) or {}
+
+        user_metadata = user_response.user.user_metadata or {}
+        name = user_metadata.get('full_name') or user_metadata.get('name') or (profile.get('full_name', '') if isinstance(profile, dict) else '')
 
         # Return User instance with is_admin
         return User(
             id=user_id,
             email=user_response.user.email,
-            name=user_response.user.user_metadata.get('name', ''),
+            name=name,
             address=profile,
-            is_admin=profile.get('is_admin', False)  # Fetch admin flag
+            is_admin=profile.get('is_admin', False) if isinstance(profile, dict) else False
         )
 
     except Exception as e:
@@ -451,12 +456,19 @@ def home():
 def login():
     if request.method == 'POST':
         try:
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '').strip()
+
+            if not email or not password:
+                flash("Email and password are required.", "danger")
+                return render_template('auth/login.html')
+
             response = supabase.auth.sign_in_with_password({
-                "email": request.form['email'],
-                "password": request.form['password']
+                "email": email,
+                "password": password
             })
 
-            if response.session:
+            if response and response.session:
                 session.update({
                     'supabase_access_token': response.session.access_token,
                     'supabase_refresh_token': response.session.refresh_token
@@ -467,9 +479,12 @@ def login():
                     login_user(user)
                     return redirect(url_for('dashboard'))
 
+            flash("Invalid email or password. Please try again.", "danger")
+
         except Exception as e:
             print(f"Login error: {str(e)}")
-            return render_template('auth/login.html', error="Login failed")
+            flash("Invalid email or password. Please try again.", "danger")
+            return render_template('auth/login.html')
 
     return render_template('auth/login.html')
 
@@ -478,50 +493,92 @@ def login():
 def signup():
     if request.method == 'POST':
         try:
+            name = request.form.get('name', '').strip()
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '').strip()
+            address_line1 = request.form.get('address_line1', '').strip()
+            address_line2 = request.form.get('address_line2', '').strip()
+            city = request.form.get('city', '').strip()
+            division = request.form.get('division', '').strip()
+            postal_code = request.form.get('postal_code', '').strip()
+
+            if not name or not email or not password:
+                flash("Full name, email, and password are required.", "danger")
+                return render_template('auth/signup.html')
+
+            if len(password) < 6:
+                flash("Password must be at least 6 characters long.", "danger")
+                return render_template('auth/signup.html')
+
             auth_response = supabase.auth.sign_up({
-                "email": request.form['email'],
-                "password": request.form['password'],
+                "email": email,
+                "password": password,
                 "options": {
                     "data": {
-                        "full_name": request.form['name'],  # 👈 use full_name consistently
-                        "division": request.form['division']
-                    },
-                    "email_confirm": False
+                        "full_name": name,
+                        "division": division
+                    }
                 }
             })
 
-            if auth_response.user:
-                user = auth_response.user  # shortcut
+            if not auth_response or not auth_response.user:
+                flash("Failed to create account. Please try again.", "danger")
+                return render_template('auth/signup.html')
 
-                profile_response = supabase.from_("user_profiles").insert({
-                    "id": user.id,
-                    "address_line1": request.form['address_line1'],
-                    "city": request.form['city'],
-                    "division": request.form['division'],
-                    "postal_code": request.form['postal_code'],
-                    "full_name": user.user_metadata.get("full_name"),  # 👈 now matches
-                    "email": user.email
-                }).execute()
+            user = auth_response.user
 
-                # Sign in the user
-                response = supabase.auth.sign_in_with_password({
-                    "email": request.form['email'],
-                    "password": request.form['password']
-                })
+            # Insert profile data
+            profile_data = {
+                "id": user.id,
+                "address_line1": address_line1,
+                "address_line2": address_line2 or None,
+                "city": city,
+                "division": division,
+                "postal_code": postal_code,
+                "full_name": name,
+                "email": user.email
+            }
+            supabase.from_("user_profiles").insert(profile_data).execute()
 
+            # Handle session / auto-login
+            session_obj = auth_response.session
+            if not session_obj:
+                try:
+                    sign_in_resp = supabase.auth.sign_in_with_password({
+                        "email": email,
+                        "password": password
+                    })
+                    if sign_in_resp:
+                        session_obj = sign_in_resp.session
+                except Exception as sign_in_err:
+                    print(f"Auto-login notice after signup: {sign_in_err}")
+
+            if session_obj:
                 session.update({
-                    'supabase_access_token': response.session.access_token,
-                    'supabase_refresh_token': response.session.refresh_token
+                    'supabase_access_token': session_obj.access_token,
+                    'supabase_refresh_token': session_obj.refresh_token
                 })
 
-                user = load_user(response.user.id)
-                if user:
-                    login_user(user)
+                app_user = load_user(user.id)
+                if app_user:
+                    login_user(app_user)
+                    flash("Account created successfully! Welcome to GloHealth AI.", "success")
                     return redirect(url_for('dashboard'))
 
+            flash("Account created successfully! Please log in.", "success")
+            return redirect(url_for('login'))
+
         except Exception as e:
-            print(f"Signup error: {str(e)}")
-            return render_template('auth/signup.html', error=str(e))
+            error_msg = str(e)
+            print(f"Signup error: {error_msg}")
+            if "User already registered" in error_msg or "user_already_exists" in error_msg:
+                flash("An account with this email already exists. Please log in.", "warning")
+                return redirect(url_for('login'))
+            elif "Password should be at least 6 characters" in error_msg or "weak_password" in error_msg:
+                flash("Password must be at least 6 characters long.", "danger")
+            else:
+                flash(f"Signup error: {error_msg}", "danger")
+            return render_template('auth/signup.html')
 
     return render_template('auth/signup.html')
 
