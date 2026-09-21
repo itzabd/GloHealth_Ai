@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}My Appointments{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #0a3e61, #4b72e6);
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+    }
+
+    .glass-card {
+        background: rgba(15, 76, 117, 0.25);
+        border-radius: 16px;
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        color: #e0f7fa;
+        margin-top: 2rem;
+    }
+
+    .glass-card h2 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        color: #b2ebf2;
+    }
+
+    .table {
+        background: rgba(10, 46, 80, 0.25);
+        border-radius: 12px;
+        overflow: hidden;
+        color: #e0f7fa;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid rgba(178, 235, 242, 0.4);
+        color: #0088ff;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .table tbody td {
+        color: #000000;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .table tbody tr {
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        transform: translateY(-3px);
+        background: rgba(0, 105, 148, 0.3);
+    }
+
+    .status-completed {
+        color: #4dd0e1;
+        font-weight: 500;
+    }
+
+    .status-pending {
+        color: #00acc1;
+        font-weight: 500;
+    }
+
+    .payment-done {
+        color: #26c6da;
+        font-weight: 500;
+    }
+
+    .payment-pending {
+        color: #00bcd4;
+        font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+        .table thead th, .table tbody td {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="glass-card">
+        <h2>My Appointments</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Specialty</th>
+                        <th>Hospital</th>
+                        <th>Scheduled Time</th>
+                        <th>Status</th>
+                        <th>Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if appointments %}
+                        {% for appt in appointments %}
+                        <tr>
+                            <td>{{ appt.doctors.name }}</td>
+                            <td>{{ appt.doctors.specialty }}</td>
+                            <td>{{ appt.doctors.hospital }}</td>
+                            <td>{{ appt.scheduled_time }}</td>
+                            <td class="{{ 'status-completed' if appt.status=='Completed' else 'status-pending' }}">
+                                {{ appt.status }}
+                            </td>
+                            <td class="{{ 'payment-done' if appt.payment_status=='Done' else 'payment-pending' }}">
+                                {{ appt.payment_status }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No appointments found.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

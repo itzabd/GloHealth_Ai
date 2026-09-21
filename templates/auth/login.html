@@ -1,96 +1,209 @@
+{% set hide_nav = true %}
 {% extends "base.html" %}
-{% block title %}লগইন/Login{% endblock %}
 
-{% block extra_css %}
-<style>
-  /* 🌈 Gradient background for full page */
-  body {
-    background: linear-gradient(135deg, #0187ee, #7996e3) !important;
-    min-height: 100vh;
-    margin: 0;
-  }
-
-  /* Remove Bootstrap’s white background if applied */
-  .container, .row, .col-md-6 {
-    background: transparent !important;
-  }
-
-  /* Bengali font fix */
-  .lang-bn {
-    font-family: 'Hind Siliguri', 'SolaimanLipi', 'Noto Sans Bengali', Arial, sans-serif;
-    color: black !important;
-  }
-
-  /* 🌈 Gradient card header */
-  .card-header {
-    background: linear-gradient(135deg, #0187ee, #4cb8c4) !important;
-    color: rgb(224, 226, 228) !important;
-    font-weight: bold;
-    border-radius: 8px 8px 0 0;
-  }
-
-  /* 🌈 Gradient login button */
-  .btn-login {
-    background: linear-gradient(135deg, #4cb8c4, #3cd3ad) !important;
-    border: none !important;
-    color: white !important;
-    font-weight: 600;
-    transition: 0.3s ease-in-out;
-  }
-  .btn-login:hover {
-    background: linear-gradient(135deg, #3cd3ad, #4cb8c4) !important;
-    transform: translateY(-2px);
-    color: white !important;
-  }
-
-  /* Card styling */
-  .card {
-    border-radius: 12px;
-    overflow: hidden;
-  }
-</style>
-{% endblock %}
-
+{% block title %}Sign In · GloHealth AI{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    <div class="card shadow">
-      <div class="card-header text-center">
-        <h4 class="mb-0">
-          <span class="lang-en"><i class="bi bi-box-arrow-in-right"></i> Login to your account</span>
-          <span class="lang-bn" style="display:none;"><i class="bi bi-box-arrow-in-right"></i> অ্যাকাউন্টে লগইন করুন</span>
-        </h4>
-      </div>
-      <div class="card-body">
-        <form method="POST" action="/login" id="loginForm">
-          <div class="mb-3">
-            <label for="email" class="form-label">
-              <span class="lang-en">Email address</span>
-              <span class="lang-bn" style="display:none;">ইমেইল ঠিকানা</span>
-            </label>
-            <input type="email" id="email" name="email" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">
-              <span class="lang-en">Password</span>
-              <span class="lang-bn" style="display:none;">পাসওয়ার্ড</span>
-            </label>
-            <input type="password" id="password" name="password" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-login w-100">
-            <span class="lang-en"><i class="bi bi-box-arrow-in-right"></i> Login</span>
-            <span class="lang-bn" style="display:none;"><i class="bi bi-box-arrow-in-right"></i> লগইন</span>
-          </button>
-        </form>
-        <div class="text-center mt-3">
-          <a href="/signup" class="fw-bold">
-            <span class="lang-en">Create a new account</span>
-            <span class="lang-bn" style="display:none;">নতুন অ্যাকাউন্ট তৈরি করুন</span>
-          </a>
+<div class="gh-auth">
+    <!-- LEFT COLUMN: Brand & Clinical Telemetry Intro (55%) -->
+    <div class="gh-auth__brand">
+        <div>
+            <a href="{{ url_for('index') }}" class="gh-nav__brand" style="margin-bottom: 48px; display: inline-flex; text-decoration: none; align-items: center; gap: 8px;">
+                <span class="gh-nav__brand-name" style="font-size: 24px;">GloHealth</span>
+                <span class="gh-nav__brand-badge" style="font-size: 13px;">AI</span>
+            </a>
+
+            <h1 class="gh-auth__title">Welcome back.</h1>
+            <p class="gh-auth__sub">Sign in to access your symptom history, appointments, and regional insights.</p>
+
+            <ul class="gh-modal__precautions" style="margin-top: 36px; padding: 0; list-style: none;">
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">stethoscope</span>
+                    <span>AI Diagnostic Screening with clinical-grade accuracy</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">event</span>
+                    <span>Manage and track appointments with verified specialists</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">map</span>
+                    <span>Real-time epidemiological telemetry and regional outbreak tracking</span>
+                </li>
+            </ul>
         </div>
-      </div>
+
+        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;">
+            HIPAA compliant · ISO-27799 encrypted
+        </div>
     </div>
-  </div>
+
+    <!-- RIGHT COLUMN: Sign In Form (45%) -->
+    <div class="gh-auth__form-col">
+        <div class="gh-auth__card">
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Sign In</h2>
+            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;">Use your GloHealth account</p>
+
+            <!-- Flashed Alerts inside auth card -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert" style="border-radius: var(--gh-radius-sm); font-size: 13px; padding: 10px 14px; margin-bottom: 16px;">
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 12px;"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST" id="loginForm">
+                <div style="margin-bottom: 16px;">
+                    <label for="email" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Email address</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="email" id="email" name="email" required placeholder="name@example.com" class="gh-auth__input" autofocus autocomplete="email">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label for="password" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Password</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="password" id="password" name="password" required placeholder="••••••••" class="gh-auth__input" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div class="gh-row gh-row--between" style="font-size: 13px; margin-bottom: 24px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--gh-text);">
+                        <input type="checkbox" name="remember" style="accent-color: var(--gh-primary); width: 15px; height: 15px; border-radius: 4px;">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" style="color: var(--gh-primary); font-weight: 500;">Forgot?</a>
+                </div>
+
+                <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" style="width: 100%; justify-content: center; padding: 11px; font-size: 14px; font-weight: 600;">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="gh-auth__divider">
+                <span>or continue with</span>
+            </div>
+
+            <div class="gh-grid gh-grid--2" style="gap: 12px; margin-bottom: 24px;">
+                <button type="button" class="gh-btn gh-btn--ghost" style="border: 1px solid var(--gh-border); justify-content: center; font-size: 13px; padding: 8px;">
+                    Google
+                </button>
+                <button type="button" class="gh-btn gh-btn--ghost" style="border: 1px solid var(--gh-border); justify-content: center; font-size: 13px; padding: 8px;">
+                    Apple
+                </button>
+            </div>
+
+            <div style="text-align: center; font-size: 13px; color: var(--gh-text-muted);">
+                New to GloHealth? <a href="{{ url_for('signup') }}" style="color: var(--gh-primary); font-weight: 600;">Create an account</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+.gh-auth {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    min-height: 100vh;
+    background-color: var(--gh-surface);
+}
+
+.gh-auth__brand {
+    background-color: var(--gh-bg);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid var(--gh-border);
+}
+
+.gh-auth__title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--gh-text);
+    margin: 0 0 12px 0;
+}
+
+.gh-auth__sub {
+    font-size: 15px;
+    color: var(--gh-text-muted);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 440px;
+}
+
+.gh-auth__form-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background-color: #ffffff;
+}
+
+.gh-auth__card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.gh-auth__input-wrap {
+    background-color: #ffffff;
+    border: 1px solid var(--gh-border);
+    border-radius: 8px;
+    padding: 2px 4px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gh-auth__input-wrap:focus-within {
+    border-color: var(--gh-primary);
+    box-shadow: 0 0 0 3px var(--gh-primary-tint);
+}
+
+.gh-auth__input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--gh-text);
+    background: transparent;
+}
+
+.gh-auth__divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+    color: var(--gh-text-faint);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.gh-auth__divider::before,
+.gh-auth__divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--gh-border);
+}
+
+.gh-auth__divider span {
+    padding: 0 12px;
+}
+
+@media (max-width: 900px) {
+    .gh-auth {
+        grid-template-columns: 1fr;
+    }
+    .gh-auth__brand {
+        display: none;
+    }
+    .gh-auth__form-col {
+        padding: 48px 20px;
+    }
+}
+</style>
 {% endblock %}

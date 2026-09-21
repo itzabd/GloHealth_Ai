@@ -33,8 +33,6 @@ def get_env_var(key: str, default: str | None = None) -> str | None:
 # Initialize Flask app
 app = Flask(__name__)
 app.config["SECRET_KEY"] = get_env_var("FLASK_SECRET_KEY", "dev-secret-key-change-me")
-app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.jinja_env.auto_reload = True
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -54,104 +52,6 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 model = joblib.load('results/production_model.joblib')
 le = joblib.load('results/label_encoder.joblib')
 feature_cols = joblib.load('results/feature_columns.joblib')
-
-# ---- SYMPTOM LABELS ----
-SYMPTOM_OVERRIDES = {
-    'high_fever': 'High fever',
-    'mild_fever': 'Mild fever',
-    'skin_rash': 'Skin rash',
-    'nodal_skin_eruptions': 'Nodal skin eruptions',
-    'breathlessness': 'Shortness of breath',
-    'loss_of_appetite': 'Loss of appetite',
-    'abdominal_pain': 'Abdominal pain',
-    'yellowish_skin': 'Yellowish skin',
-    'yellowing_of_eyes': 'Yellowing of eyes',
-    'receiving_blood_transfusion': 'Recent blood transfusion',
-    'receiving_unsterile_injections': 'Recent unsterile injections',
-    'acute_liver_failure': 'Acute liver failure',
-    'swelling_of_stomach': 'Swelling of stomach',
-    'swelled_lymph_nodes': 'Swelled lymph nodes',
-    'malaise': 'Malaise / general discomfort',
-    'blurred_and_distorted_vision': 'Blurred or distorted vision',
-    'throat_irritation': 'Throat irritation',
-    'redness_of_eyes': 'Redness of eyes',
-    'sinus_pressure': 'Sinus pressure',
-    'runny_nose': 'Runny nose',
-    'congestion': 'Nasal congestion',
-    'chest_pain': 'Chest pain',
-    'weakness_in_limbs': 'Weakness in limbs',
-    'fast_heart_rate': 'Fast heart rate',
-    'pain_during_bowel_movements': 'Pain during bowel movements',
-    'pain_in_anal_region': 'Pain in anal region',
-    'bloody_stool': 'Bloody stool',
-    'irritation_in_anus': 'Irritation in anus',
-    'neck_pain': 'Neck pain',
-    'dizziness': 'Dizziness',
-    'cramps': 'Cramps',
-    'bruising': 'Bruising',
-    'obesity': 'Obesity',
-    'swollen_legs': 'Swollen legs',
-    'swollen_blood_vessels': 'Swollen blood vessels',
-    'puffy_face_and_eyes': 'Puffy face and eyes',
-    'enlarged_thyroid': 'Enlarged thyroid',
-    'brittle_nails': 'Brittle nails',
-    'swollen_extremeties': 'Swollen extremities',
-    'excessive_hunger': 'Excessive hunger',
-    'extra_marital_contacts': 'Recent extra-marital contact',
-    'drying_and_tingling_lips': 'Drying and tingling lips',
-    'slurred_speech': 'Slurred speech',
-    'knee_pain': 'Knee pain',
-    'hip_joint_pain': 'Hip joint pain',
-    'muscle_weakness': 'Muscle weakness',
-    'stiff_neck': 'Stiff neck',
-    'swelling_joints': 'Swelling joints',
-    'movement_stiffness': 'Movement stiffness',
-    'spinning_movements': 'Spinning movements',
-    'loss_of_balance': 'Loss of balance',
-    'unsteadiness': 'Unsteadiness',
-    'weakness_of_one_body_side': 'Weakness of one body side',
-    'loss_of_smell': 'Loss of smell',
-    'bladder_discomfort': 'Bladder discomfort',
-    'continuous_feel_of_urine': 'Continuous feel of urine',
-    'passage_of_gases': 'Passage of gases',
-    'internal_itching': 'Internal itching',
-    'depression': 'Depression',
-    'irritability': 'Irritability',
-    'muscle_pain': 'Muscle pain',
-    'altered_sensorium': 'Altered sensorium',
-    'red_spots_over_body': 'Red spots over body',
-    'belly_pain': 'Belly pain',
-    'abnormal_menstruation': 'Abnormal menstruation',
-    'dischromic_patches': 'Discolored patches',
-    'watering_from_eyes': 'Watering from eyes',
-    'increased_appetite': 'Increased appetite',
-    'polyuria': 'Polyuria',
-    'family_history': 'Family history',
-    'mucoid_sputum': 'Mucoid sputum',
-    'rusty_sputum': 'Rusty sputum',
-    'lack_of_concentration': 'Lack of concentration',
-    'visual_disturbances': 'Visual disturbances',
-    'blood_in_sputum': 'Blood in sputum',
-    'prominent_veins_on_calf': 'Prominent veins on calf',
-    'palpitations': 'Palpitations',
-    'painful_walking': 'Painful walking',
-    'pus_filled_pimples': 'Pus-filled pimples',
-    'blackheads': 'Blackheads',
-    'scurring': 'Scarring',
-    'skin_peeling': 'Skin peeling',
-    'silver_like_dusting': 'Silver-like dusting',
-    'small_dents_in_nails': 'Small dents in nails',
-    'inflammatory_nails': 'Inflammatory nails',
-    'blister': 'Blister',
-    'red_sore_around_nose': 'Red sore around nose',
-    'yellow_crust_ooze': 'Yellow crust ooze',
-}
-
-def symptom_label(s):
-    if s in SYMPTOM_OVERRIDES:
-        return SYMPTOM_OVERRIDES[s]
-    return s.replace('_', ' ').strip().capitalize()
-
 
 
 # User class
@@ -217,7 +117,7 @@ def admin_dashboard():
     # Example: show system stats, user management, etc.
     users = supabase.from_('user_profiles').select('*').execute().data
     appointments = supabase.from_('appointments').select('*').execute().data
-    return render_template('admin_dashboard.html', users=users, appointments=appointments, hide_nav=True)
+    return render_template('admin_dashboard.html', users=users, appointments=appointments)
 
 
 @app.route('/admin/users')
@@ -546,10 +446,10 @@ def format_datetime(value, format="%Y-%m-%d %H:%M"):
 
 # Routes
 @app.route('/')
-def index():
+def home():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    return render_template('landing.html', current_user=current_user)
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -705,58 +605,10 @@ def dashboard():
             .execute()
         appointments = appointments_resp.data if hasattr(appointments_resp, 'data') else []
 
-        from datetime import datetime, timezone
-
-        total_predictions = len(predictions)
-        predictions_delta = ""
-        if len(predictions) >= 2:
-            try:
-                one_week = 7 * 24 * 3600
-                now = datetime.now(timezone.utc).timestamp()
-                recent = sum(1 for p in predictions
-                             if p.get('timestamp') and
-                             now - datetime.fromisoformat(p['timestamp'].replace('Z', '+00:00')).timestamp() < one_week)
-                predictions_delta = f"+{recent} this week" if recent else ""
-            except Exception:
-                predictions_delta = ""
-
-        upcoming = [a for a in appointments if a.get('status') in ('confirmed', 'pending')]
-        next_appointment = upcoming[0] if upcoming else None
-
-        plan_resp = supabase.table("user_subscriptions") \
-            .select("plan_name") \
-            .eq("user_id", str(current_user.id)) \
-            .eq("active", True) \
-            .order("start_date", desc=True) \
-            .limit(1) \
-            .execute()
-        plan_name = plan_resp.data[0]['plan_name'] if plan_resp.data else "Free"
-        health_score = 82 if total_predictions else 0
-
-        kpis = {
-            "total_predictions": total_predictions,
-            "predictions_delta": predictions_delta,
-            "upcoming_count": len(upcoming),
-            "next_appointment_label": (next_appointment.get('scheduled_time', '')[:16]
-                                       if next_appointment else "None scheduled"),
-            "plan_name": plan_name,
-            "plan_status": "active" if plan_name != "Free" else "inactive",
-            "health_score": health_score,
-        }
-
-        health_tips = [
-            {"icon": "water_drop", "text": "Drink 2-3L water daily"},
-            {"icon": "directions_walk", "text": "30 min walk after meals"},
-            {"icon": "bedtime", "text": "Sleep 7-8 hours"},
-        ]
-
         return render_template('dashboard.html',
                                current_user=current_user,
                                predictions=predictions,
-                               appointments=appointments,
-                               kpis=kpis,
-                               next_appointment=next_appointment,
-                               health_tips=health_tips)
+                               appointments=appointments)
     except Exception as e:
         print(f"Dashboard error: {str(e)}")
         return redirect(url_for('login'))
@@ -787,17 +639,11 @@ def prediction():
         matched = False
         for key, category in category_map.items():
             if key in symptom.lower():
-                symptom_groups[category].append({
-                    "key": symptom,
-                    "label": symptom_label(symptom),
-                })
+                symptom_groups[category].append(symptom)
                 matched = True
                 break
         if not matched:
-            symptom_groups['Other'].append({
-                "key": symptom,
-                "label": symptom_label(symptom),
-            })
+            symptom_groups['Other'].append(symptom)
 
     # Fetch active subscription for current user from Supabase
     response = supabase.table("user_subscriptions") \
@@ -1069,110 +915,123 @@ def calculate_location_boost(division: str, disease: str) -> float:
 @app.route('/geo_insights')
 @login_required
 def geo_insights():
-    DIVISION_COORDS = {
-        'Dhaka': [23.8103, 90.4125],
-        'Chattogram': [22.3569, 91.7832],
-        'Chittagong': [22.3569, 91.7832],
-        'Khulna': [22.8456, 89.5403],
-        'Rajshahi': [24.3745, 88.6042],
-        'Barishal': [22.7010, 90.3535],
-        'Barisal': [22.7010, 90.3535],
-        'Sylhet': [24.8910, 91.8710],
-        'Rangpur': [25.7439, 89.2752],
-        'Mymensingh': [24.7471, 90.4203]
-    }
-
-    division_counts = {}
-    division_diseases = {}
-    disease_counts = {}
-
     try:
-        response = supabase.from_('location_insights').select('*').execute()
-        rows = response.data if (response and hasattr(response, 'data') and response.data) else []
-        for r in rows:
-            div = r.get('division')
-            if not div:
-                continue
-            div = 'Chattogram' if div == 'Chittagong' else ('Barishal' if div == 'Barisal' else div)
-            cnt = r.get('case_count', 1) or 1
-            dis = r.get('disease', 'Unspecified')
+        # GET DATA FROM location_insights TABLE
+        response = supabase.from_('location_insights') \
+            .select('*') \
+            .order('last_updated', desc=True) \
+            .execute()
 
-            division_counts[div] = division_counts.get(div, 0) + cnt
-            if div not in division_diseases:
-                division_diseases[div] = {}
-            division_diseases[div][dis] = division_diseases[div].get(dis, 0) + cnt
-            disease_counts[dis] = disease_counts.get(dis, 0) + cnt
+        if not hasattr(response, 'data') or not response.data:
+            return render_template('geo_insights.html',
+                                   current_user=current_user,
+                                   error="No location insights data available")
+
+        df = pd.DataFrame(response.data)
+
+        # Create Bangladesh map
+        bd_center = [23.6850, 90.3563]
+        bd_map = folium.Map(location=bd_center, zoom_start=7, tiles='cartodbpositron')
+
+        # Bangladesh boundary
+        bd_bounds = [[20.5, 88.0], [26.5, 92.5]]
+        folium.Rectangle(
+            bounds=bd_bounds,
+            color='#000000',
+            weight=2,
+            fill=True,
+            fillColor='#ffff00',
+            fillOpacity=0.1,
+            popup='Bangladesh'
+        ).add_to(bd_map)
+
+        # Division coordinates (approximate centers)
+        division_coordinates = {
+            'Dhaka': [23.8103, 90.4125],
+            'Chittagong': [22.3569, 91.7832],
+            'Rajshahi': [24.3745, 88.6042],
+            'Khulna': [22.8456, 89.5403],
+            'Barisal': [22.7010, 90.3535],
+            'Sylhet': [24.8910, 91.8710],
+            'Rangpur': [25.7439, 89.2752],
+            'Mymensingh': [24.7471, 90.4203]
+        }
+
+        # Heatmap and marker cluster
+        heat_data = []
+        marker_cluster = MarkerCluster(name="Cases").add_to(bd_map)
+
+        for _, row in df.iterrows():
+            division = row.get('division')
+            if division and division in division_coordinates:
+                lat, lon = division_coordinates[division]
+                case_count = row.get('case_count', 1)
+                if pd.notna(lat) and pd.notna(lon) and pd.notna(case_count):
+                    heat_data.append([float(lat), float(lon), float(case_count)])
+                    popup = f"""
+                    <b>{row.get('disease', 'N/A')}</b><br>
+                    Cases: {case_count}<br>
+                    Division: {division}<br>
+                    Confidence: {row.get('confidence_score', 0):.1%}
+                    """
+                    folium.Marker(
+                        location=[float(lat), float(lon)],
+                        popup=popup,
+                        icon=folium.Icon(
+                            color='red' if case_count > 10
+                            else 'orange' if case_count > 5
+                            else 'green'
+                        )
+                    ).add_to(marker_cluster)
+
+        if heat_data:
+            HeatMap(
+                heat_data,
+                name="Case Density",
+                radius=25,
+                blur=20,
+                max_zoom=1,
+                gradient={0.4: 'blue', 0.65: 'lime', 1: 'red'}
+            ).add_to(bd_map)
+
+        folium.LayerControl().add_to(bd_map)
+        map_html = bd_map._repr_html_() if bd_map else None
+
+        # Prepare statistics
+        division_counts_dict = {}
+        disease_totals = {}
+        top_diseases = []
+        all_diseases = []
+
+        if not df.empty and 'division' in df.columns and 'disease' in df.columns:
+            # Pivot table for counts
+            division_counts = df.pivot_table(
+                index='division',
+                columns='disease',
+                values='case_count',
+                aggfunc='sum',
+                fill_value=0
+            )
+            division_counts_dict = division_counts.to_dict('index')
+            disease_totals = division_counts.sum().to_dict()
+            top_diseases = division_counts.sum().nlargest(5).index.tolist()
+            all_diseases = df['disease'].unique().tolist()
+
+        return render_template('geo_insights.html',
+                               current_user=current_user,
+                               map_html=map_html,
+                               division_counts=division_counts_dict,
+                               disease_totals=disease_totals,
+                               top_diseases=top_diseases,
+                               all_diseases=all_diseases)
+
     except Exception as e:
-        print(f"Location insights query fallback: {e}")
-
-    # Fallback to sample data matching spec if empty
-    if not division_counts:
-        division_counts = {
-            'Dhaka': 5240, 'Chattogram': 3180, 'Khulna': 1420, 'Rajshahi': 1050,
-            'Barishal': 780, 'Sylhet': 620, 'Rangpur': 480, 'Mymensingh': 410
-        }
-        fallback_top_diseases = {
-            'Dhaka': 'Dengue Fever', 'Chattogram': 'Malaria', 'Khulna': 'Cholera',
-            'Rajshahi': 'Typhoid', 'Barishal': 'Diarrhea', 'Sylhet': 'Influenza',
-            'Rangpur': 'Pneumonia', 'Mymensingh': 'Hepatitis'
-        }
-        division_diseases = {k: {v: division_counts[k]} for k, v in fallback_top_diseases.items()}
-        disease_counts = {
-            'Dengue': 4120, 'Malaria': 2340, 'Typhoid': 1890, 'Influenza': 1420, 'Diarrhea': 980
-        }
-
-    total_cases = sum(division_counts.values()) or 1
-
-    # Build division_data list of dicts: {name, lat, lng, cases, top_disease, pct_of_total}
-    division_data = []
-    sorted_divisions = sorted(division_counts.items(), key=lambda x: x[1], reverse=True)
-    for div_name, count in sorted_divisions:
-        coords = DIVISION_COORDS.get(div_name, [23.6850, 90.3563])
-        div_dis_map = division_diseases.get(div_name, {})
-        top_d = max(div_dis_map.items(), key=lambda x: x[1])[0] if div_dis_map else 'Dengue'
-        pct = round((count / total_cases * 100), 1)
-        division_data.append({
-            'name': div_name,
-            'lat': coords[0],
-            'lng': coords[1],
-            'cases': count,
-            'top_disease': top_d,
-            'pct_of_total': pct
-        })
-
-    # Build top_diseases list: [{name, count}, ...] top 5
-    if disease_counts:
-        sorted_diseases = sorted(disease_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-        top_diseases = [{'name': d, 'count': c} for d, c in sorted_diseases]
-    else:
-        top_diseases = [
-            {'name': 'Dengue', 'count': 4120},
-            {'name': 'Malaria', 'count': 2340},
-            {'name': 'Typhoid', 'count': 1890},
-            {'name': 'Influenza', 'count': 1420},
-            {'name': 'Diarrhea', 'count': 980}
-        ]
-
-    # Build kpis dict: {total_cases, top_division, top_division_pct, top_disease, top_disease_count, active_outbreaks}
-    top_div = division_data[0] if division_data else {'name': 'Dhaka', 'pct_of_total': 42}
-    top_dis = top_diseases[0] if top_diseases else {'name': 'Dengue', 'count': 3120}
-
-    kpis = {
-        'total_cases': total_cases,
-        'top_division': top_div['name'],
-        'top_division_pct': top_div['pct_of_total'],
-        'top_disease': top_dis['name'],
-        'top_disease_count': top_dis['count'],
-        'active_outbreaks': 3
-    }
-
-    return render_template(
-        'geo_insights.html',
-        current_user=current_user,
-        kpis=kpis,
-        division_data=division_data,
-        top_diseases=top_diseases
-    )
+        print(f"Geo insights error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return render_template('geo_insights.html',
+                               current_user=current_user,
+                               error=str(e))
 
 # THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
 @app.template_filter('get_disease_color')
@@ -1495,4 +1354,4 @@ def features(plan_name):
     elif plan_name == "Ultimate Plan":
         return render_template("feature_ultimate.html", doctors=doctors, subscription=subscription)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)

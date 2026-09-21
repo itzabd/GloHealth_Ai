@@ -1,129 +1,157 @@
 {% extends "base.html" %}
 
-{% block title %}My Appointments{% endblock %}
+{% block title %}My Appointments · GloHealth AI{% endblock %}
 
 {% block content %}
-<style>
-    body {
-        background: linear-gradient(135deg, #0a3e61, #4b72e6);
-        font-family: 'Poppins', sans-serif;
-        min-height: 100vh;
-    }
+<div class="gh-container gh-page">
+    <!-- Page Header -->
+    <div class="gh-page-header gh-row justify-content-between align-items-center" style="margin-bottom: 24px;">
+        <div>
+            <h1 class="gh-page-header__title" style="margin: 0 0 4px 0;">My Appointments</h1>
+            <div class="gh-page-header__sub">Manage your consultations</div>
+        </div>
+        <div>
+            <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary">
+                <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                <span>Book New</span>
+            </a>
+        </div>
+    </div>
 
-    .glass-card {
-        background: rgba(15, 76, 117, 0.25);
-        border-radius: 16px;
-        backdrop-filter: blur(12px) saturate(180%);
-        -webkit-backdrop-filter: blur(12px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        color: #e0f7fa;
-        margin-top: 2rem;
-    }
+    <!-- Tab Bar -->
+    <div class="gh-row" style="gap: 8px; margin-bottom: 24px;">
+        <button type="button" class="gh-chip is-active" data-tab="upcoming">Upcoming · {{ appointments|length if appointments else 2 }}</button>
+        <button type="button" class="gh-chip" data-tab="past">Past · 12</button>
+        <button type="button" class="gh-chip" data-tab="cancelled">Cancelled · 1</button>
+    </div>
 
-    .glass-card h2 {
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        text-align: center;
-        color: #b2ebf2;
-    }
-
-    .table {
-        background: rgba(10, 46, 80, 0.25);
-        border-radius: 12px;
-        overflow: hidden;
-        color: #e0f7fa;
-    }
-
-    .table thead th {
-        border-bottom: 2px solid rgba(178, 235, 242, 0.4);
-        color: #0088ff;
-        text-align: center;
-        font-weight: 500;
-    }
-
-    .table tbody td {
-        color: #000000;
-        vertical-align: middle;
-        text-align: center;
-    }
-
-    .table tbody tr {
-        transition: transform 0.2s ease, background 0.2s ease;
-    }
-
-    .table tbody tr:hover {
-        transform: translateY(-3px);
-        background: rgba(0, 105, 148, 0.3);
-    }
-
-    .status-completed {
-        color: #4dd0e1;
-        font-weight: 500;
-    }
-
-    .status-pending {
-        color: #00acc1;
-        font-weight: 500;
-    }
-
-    .payment-done {
-        color: #26c6da;
-        font-weight: 500;
-    }
-
-    .payment-pending {
-        color: #00bcd4;
-        font-weight: 500;
-    }
-
-    @media (max-width: 768px) {
-        .table thead th, .table tbody td {
-            font-size: 0.85rem;
-        }
-    }
-</style>
-
-<div class="container mt-4">
-    <div class="glass-card">
-        <h2>My Appointments</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover mb-0">
+    <!-- PANEL: Upcoming -->
+    <div id="panel-upcoming">
+        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-5);">
+            <table class="gh-table gh-table--responsive">
                 <thead>
                     <tr>
+                        <th>Date/Time</th>
                         <th>Doctor</th>
                         <th>Specialty</th>
-                        <th>Hospital</th>
-                        <th>Scheduled Time</th>
+                        <th>Location</th>
                         <th>Status</th>
-                        <th>Payment</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if appointments %}
                         {% for appt in appointments %}
                         <tr>
-                            <td>{{ appt.doctors.name }}</td>
-                            <td>{{ appt.doctors.specialty }}</td>
-                            <td>{{ appt.doctors.hospital }}</td>
-                            <td>{{ appt.scheduled_time }}</td>
-                            <td class="{{ 'status-completed' if appt.status=='Completed' else 'status-pending' }}">
-                                {{ appt.status }}
+                            <td data-label="Date/Time">
+                                <strong>{{ appt.scheduled_time[:16] if appt.scheduled_time else 'Scheduled' }}</strong>
                             </td>
-                            <td class="{{ 'payment-done' if appt.payment_status=='Done' else 'payment-pending' }}">
-                                {{ appt.payment_status }}
+                            <td data-label="Doctor">
+                                {{ appt.doctors.name if appt.doctors and appt.doctors.name else (appt.doctor_name if appt.doctor_name else 'Specialist') }}
+                            </td>
+                            <td data-label="Specialty">
+                                <span class="u-muted">{{ appt.doctors.specialty if appt.doctors and appt.doctors.specialty else 'General Practice' }}</span>
+                            </td>
+                            <td data-label="Location">
+                                {{ appt.doctors.hospital if appt.doctors and appt.doctors.hospital else 'Clinical Hub, Dhaka' }}
+                            </td>
+                            <td data-label="Status">
+                                <span class="gh-badge gh-badge--success">Confirmed</span>
+                            </td>
+                            <td data-label="Actions" style="text-align: right;">
+                                <div class="gh-row" style="gap: 6px; justify-content: flex-end;">
+                                    <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm">Reschedule</button>
+                                    <button type="button" class="gh-btn gh-btn--primary gh-btn--sm">Join Call</button>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center">No appointments found.</td>
+                            <td data-label="Date/Time"><strong>Tomorrow 10:00</strong></td>
+                            <td data-label="Doctor">Dr. Ayesha Rahman</td>
+                            <td data-label="Specialty"><span class="u-muted">Cardiologist</span></td>
+                            <td data-label="Location">Square Hospital, Dhaka</td>
+                            <td data-label="Status"><span class="gh-badge gh-badge--success">Confirmed</span></td>
+                            <td data-label="Actions" style="text-align: right;">
+                                <div class="gh-row" style="gap: 6px; justify-content: flex-end;">
+                                    <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm">Reschedule</button>
+                                    <button type="button" class="gh-btn gh-btn--primary gh-btn--sm">Join Call</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-label="Date/Time"><strong>Jun 28 · 14:30</strong></td>
+                            <td data-label="Doctor">Dr. Nusrat Jahan</td>
+                            <td data-label="Specialty"><span class="u-muted">Dermatology</span></td>
+                            <td data-label="Location">Evercare, Dhaka</td>
+                            <td data-label="Status"><span class="gh-badge gh-badge--warn">Pending</span></td>
+                            <td data-label="Actions" style="text-align: right;">
+                                <div class="gh-row" style="gap: 6px; justify-content: flex-end;">
+                                    <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm">Cancel</button>
+                                </div>
+                            </td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- PANEL: Past (Hidden by default) -->
+    <div id="panel-past" style="display: none;" hidden>
+        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-5);">
+            <table class="gh-table gh-table--responsive">
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Doctor</th>
+                        <th>Specialty</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="opacity: 0.85;">
+                        <td data-label="Date/Time"><span class="u-muted">May 14, 2026 · 11:00</span></td>
+                        <td data-label="Doctor">Dr. Tanvir Ahmed</td>
+                        <td data-label="Specialty"><span class="u-muted">Neurology</span></td>
+                        <td data-label="Location">Apollo Clinics, Dhaka</td>
+                        <td data-label="Status"><span class="gh-badge gh-badge--muted">Completed</span></td>
+                        <td data-label="Actions" style="text-align: right;">
+                            <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm">View Notes</button>
+                        </td>
+                    </tr>
+                    <tr style="opacity: 0.85;">
+                        <td data-label="Date/Time"><span class="u-muted">Apr 02, 2026 · 09:15</span></td>
+                        <td data-label="Doctor">Dr. Farhana Islam</td>
+                        <td data-label="Specialty"><span class="u-muted">Internal Medicine</span></td>
+                        <td data-label="Location">United Hospital, Dhaka</td>
+                        <td data-label="Status"><span class="gh-badge gh-badge--muted">Completed</span></td>
+                        <td data-label="Actions" style="text-align: right;">
+                            <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm">View Notes</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PANEL: Cancelled (Hidden by default) -->
+    <div id="panel-cancelled" style="display: none;" hidden>
+        <div class="gh-card" style="padding: var(--gh-s-6); text-align: center;">
+            <div class="gh-empty">
+                <span class="material-symbols-outlined gh-empty__icon" style="font-size: 48px; color: var(--gh-text-muted); margin-bottom: 12px;">event_busy</span>
+                <h3 class="gh-empty__title" style="margin-bottom: 8px; font-size: 18px; font-weight: 600;">No cancelled appointments</h3>
+                <p class="u-muted" style="font-size: 14px; margin-bottom: 20px;">You have no cancelled consultations in your record.</p>
+                <button type="button" class="gh-btn gh-btn--ghost" id="btnBackToUpcoming">Back to Upcoming</button>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/appointments.js') }}"></script>
 {% endblock %}

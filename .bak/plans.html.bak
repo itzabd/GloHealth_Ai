@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Plans{% endblock %}
+
+{% block extra_css %}
+<style>
+body {
+    background: linear-gradient(135deg, #0a3e61, #4b72e6)!important;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    color: #e0f7fa;
+}
+
+/* Glass Cards */
+.card-hover {
+    background: rgba(15, 76, 117, 0.25);
+    border-radius: 16px;
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    padding: 1.5rem;
+    text-align: center;
+}
+.card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+
+/* Buttons */
+.btn-accent {
+    background: rgba(134, 63, 193, 0.754);
+    color: #e0f7fa;
+    border: none;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    transition: 0.3s;
+}
+.btn-accent:hover {
+    background: rgba(0, 150, 199, 0.5);
+    color: #23024c;
+}
+
+.btn-outline-primary, .btn-outline-secondary {
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    font-weight: 500;
+    border: 2px solid #038495;
+    color: #00525c;
+    transition: 0.3s;
+}
+.btn-outline-primary:hover, .btn-outline-secondary:hover {
+    background: rgba(7, 195, 220, 0.3);
+    color: #e0f7fa;
+    border-color: #00acc1;
+}
+
+.btn-secondary {
+    background: rgba(0, 0, 0, 0.401);
+    color: #e0f7fa;
+    border: none;
+    cursor: not-allowed;
+}
+
+/* Section Header */
+.section-header {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: rgba(0, 150, 199, 0.3);
+    color: #e0f7fa;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2 class="section-header">Available Plans</h2>
+        </div>
+    </div>
+
+    {% if user_subscriptions %}
+    <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+            <h4 class="section-header" style="font-size:1.3rem;">Your Active Subscriptions</h4>
+            <ul class="list-group mb-3">
+                {% for sub in user_subscriptions %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" style="background: rgba(15,76,117,0.25); color:#e0f7fa; border:none; margin-bottom:5px;">
+                    <div>
+                        <strong>{{ sub.plan_name }}</strong>
+                        (Ends: {{ sub.end_date[:10] if sub.end_date else 'N/A' }})
+                    </div>
+                    <form action="{{ url_for('cancel_subscription', sub_id=sub.id) }}" method="POST">
+                        <button class="btn btn-secondary btn-sm">Cancel</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 justify-content-center">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card card-hover h-100">
+                <h5>{{ plan.name }}</h5>
+                <p>{{ plan.details }}</p>
+                <h6>{{ plan.price }}</h6>
+
+                {% set subscribed = user_subscriptions | selectattr("plan_name", "equalto", plan.name) | list %}
+
+                {% if subscribed %}
+                    <button class="btn btn-secondary mt-2" disabled>Subscribed</button>
+                    <a href="{{ url_for('features', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Features</a>
+                {% else %}
+                    <form action="{{ url_for('subscribe_plan', plan_name=plan.name) }}" method="POST">
+                        <button type="submit" class="btn btn-accent mt-2">Subscribe</button>
+                    </form>
+                    <button class="btn btn-secondary mt-2" disabled>Features locked</button>
+                {% endif %}
+
+                <a href="{{ url_for('plan_details', plan_name=plan.name) }}" class="btn btn-outline-primary mt-2">Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

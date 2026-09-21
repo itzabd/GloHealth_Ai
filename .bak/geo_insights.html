@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
+<span class="lang-en">Geographic Insights</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+    background: linear-gradient(135deg, #178998, #4d98df, #102f85)!important;
+
+}
+    .map-container {
+        height: 400px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+        border: 1px solid #dee2e6;
+    }
+
+    .folium-map {
+        height: 100% !important;
+        width: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .data-placeholder {
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+    }
+
+    .disease-card {
+        border-left: 4px solid;
+        transition: all 0.3s;
+        height: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .disease-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .table-container {
+        max-height: 400px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .table-scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 350px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    .table-compact {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .table-compact th,
+    .table-compact td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .table-compact th {
+        background-color: #60B5FF;
+        color: white;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .table-compact thead th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 11;
+        background-color: #60B5FF;
+    }
+
+    .table-compact tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background-color: white;
+        font-weight: 600;
+    }
+
+    .table-compact tr:hover td {
+        background-color: #f8f9fa;
+    }
+
+    .table-compact tr:hover td:first-child {
+        background-color: #e9ecef;
+    }
+
+    .stats-container {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #2A4365;
+        border-bottom: 2px solid #FF9149;
+        padding-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .map-container { height: 300px; margin-bottom: 1rem; }
+        .data-placeholder { height: 300px; }
+        .stats-container { padding: 1rem; }
+        .section-title { font-size: 1rem; }
+        .table-scroll-wrapper { max-height: 300px; font-size: 0.8rem; }
+    }
+
+    .leaflet-control-container { z-index: 1000; }
+
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+
+    .table-scroll-wrapper::-webkit-scrollbar {
+        width: 8px; height: 8px;
+    }
+    .table-scroll-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .table-scroll-wrapper::-webkit-scrollbar-thumb { background: #60B5FF; border-radius: 4px; }
+    .table-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: #4a9de6; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col text-center">
+        <h2 class="section-header">
+            <span class="lang-bn">বাংলাদেশে রোগের বিস্তার</span>
+            <span class="lang-en">Disease Spread in Bangladesh</span>
+        </h2>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="stats-container">
+    <div class="row">
+        <div class="col-md-12">
+            <h5 class="section-title">
+                <span class="lang-bn">রোগের ভৌগলিক বণ্টন</span>
+                <span class="lang-en">Geographic Distribution</span>
+            </h5>
+            {% if map_html %}
+            <div class="map-container" id="mapContainer">
+                {{ map_html|safe }}
+            </div>
+            {% else %}
+            <div class="data-placeholder">
+                <div class="text-center">
+                    <i class="bi bi-map" style="font-size: 2.5rem; color: #6c757d;"></i>
+                    <p class="mt-3 mb-0">
+                        <span class="lang-bn">মানচিত্র ডেটা পাওয়া যায়নি</span>
+                        <span class="lang-en">Map data not available</span>
+                    </p>
+                    <small class="text-muted">
+                        <span class="lang-bn">প্রেডিকশন তৈরি করার পরে ডেটা দেখা যাবে</span>
+                        <span class="lang-en">Data will appear after creating predictions</span>
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if division_counts and top_diseases %}
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <h6 class="section-title">
+                    <span class="lang-bn">বিভাগ অনুযায়ী রোগের সংখ্যা</span>
+                    <span class="lang-en">Disease Count by Division</span>
+                </h6>
+                <div class="table-container">
+                    <div class="table-scroll-wrapper">
+                        <table class="table table-compact">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <span class="lang-bn">বিভাগ</span>
+                                        <span class="lang-en">Division</span>
+                                    </th>
+                                    {% for disease in all_diseases|sort %}
+                                    <th>{{ disease }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for division, diseases in division_counts.items()|sort %}
+                                <tr>
+                                    <td><strong>{{ division }}</strong></td>
+                                    {% for disease in all_diseases|sort %}
+                                    <td class="text-center">{{ diseases.get(disease, 0) }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <small class="text-muted mt-2 d-block">
+                    <i class="bi bi-arrows-expand"></i>
+                    <span class="lang-bn">স্ক্রল করতে টেবিলটি ড্র্যাগ করুন</span>
+                    <span class="lang-en">Drag to scroll table</span>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card card-hover h-100">
+            <div class="card-body">
+                <h6 class="section-title">
+                    <span class="lang-bn">শীর্ষ রোগসমূহ</span>
+                    <span class="lang-en">Top Diseases</span>
+                </h6>
+                <div class="row">
+                    {% for disease in top_diseases|sort %}
+                    <div class="col-sm-6 col-md-6 mb-2">
+                        <div class="card disease-card" style="border-left-color: {{ disease|get_disease_color }};">
+                            <div class="card-body py-2">
+                                <h6 class="card-subtitle mb-1" style="font-size: 0.9rem;">{{ disease }}</h6>
+                                <p class="card-text mb-0">
+                                    <span class="lang-bn">কেস:</span>
+                                    <span class="lang-en">Cases:</span>
+                                    <strong class="text-primary">{{ disease_totals.get(disease, 0) }}</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    <span class="lang-bn">বিশ্লেষণের জন্য পর্যাপ্ত ডেটা নেই। প্রথমে কিছু প্রেডিকশন তৈরি করুন।</span>
+    <span class="lang-en">Not enough data for analysis. Please create some predictions first.</span>
+</div>
+{% endif %}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="alert alert-light border">
+            <small>
+                <i class="bi bi-lightbulb"></i>
+                <span class="lang-bn">টিপ: মানচিত্রটি বিভাগের কেন্দ্রগুলি দেখায়। প্রতিটি মার্কার একটি বিভাগের সমস্ত কেসকে প্রতিনিধিত্ব করে।</span>
+                <span class="lang-en">Tip: The map shows division centers. Each marker represents all cases in a division.</span>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mapContainer = document.getElementById('mapContainer');
+    if (mapContainer) {
+        setTimeout(() => {
+            const maps = mapContainer.querySelectorAll('.folium-map');
+            maps.forEach(map => {
+                if (map._leaflet_map) {
+                    map._leaflet_map.invalidateSize();
+                    map._leaflet_map.fitBounds([[20.5, 88.0], [26.5, 92.5]]);
+                }
+            });
+        }, 300);
+    }
+});
+</script>
+{% endblock %}

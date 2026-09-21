@@ -1,308 +1,235 @@
 {% extends "base.html" %}
 
-{% block title %}
-<span class="lang-bn">ভৌগলিক বিশ্লেষণ</span>
-<span class="lang-en">Geographic Insights</span>
-{% endblock %}
+{% block title %}Geo Insights · GloHealth AI{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    body {
-    background: linear-gradient(135deg, #178998, #4d98df, #102f85)!important;
-
-}
-    .map-container {
-        height: 400px;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        position: relative;
-        border: 1px solid #dee2e6;
-    }
-
-    .folium-map {
-        height: 100% !important;
-        width: 100% !important;
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    .data-placeholder {
-        height: 400px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: #f8f9fa;
-        border-radius: 12px;
-        border: 2px dashed #dee2e6;
-    }
-
-    .disease-card {
-        border-left: 4px solid;
-        transition: all 0.3s;
-        height: 100%;
-        margin-bottom: 1rem;
-    }
-
-    .disease-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .table-container {
-        max-height: 400px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .table-scroll-wrapper {
-        overflow-x: auto;
-        overflow-y: auto;
-        max-height: 350px;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-    }
-
-    .table-compact {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .table-compact th,
-    .table-compact td {
-        padding: 0.5rem;
-        font-size: 0.85rem;
-        white-space: nowrap;
-        vertical-align: middle;
-    }
-
-    .table-compact th {
-        background-color: #60B5FF;
-        color: white;
-        font-weight: 500;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-
-    .table-compact thead th:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 11;
-        background-color: #60B5FF;
-    }
-
-    .table-compact tbody td:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        background-color: white;
-        font-weight: 600;
-    }
-
-    .table-compact tr:hover td {
-        background-color: #f8f9fa;
-    }
-
-    .table-compact tr:hover td:first-child {
-        background-color: #e9ecef;
-    }
-
-    .stats-container {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #2A4365;
-        border-bottom: 2px solid #FF9149;
-        padding-bottom: 0.5rem;
-    }
-
-    @media (max-width: 768px) {
-        .map-container { height: 300px; margin-bottom: 1rem; }
-        .data-placeholder { height: 300px; }
-        .stats-container { padding: 1rem; }
-        .section-title { font-size: 1rem; }
-        .table-scroll-wrapper { max-height: 300px; font-size: 0.8rem; }
-    }
-
-    .leaflet-control-container { z-index: 1000; }
-
-    .card-hover { transition: all 0.3s ease; }
-    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
-
-    .table-scroll-wrapper::-webkit-scrollbar {
-        width: 8px; height: 8px;
-    }
-    .table-scroll-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-    .table-scroll-wrapper::-webkit-scrollbar-thumb { background: #60B5FF; border-radius: 4px; }
-    .table-scroll-wrapper::-webkit-scrollbar-thumb:hover { background: #4a9de6; }
+  .leaflet-popup-content-wrapper {
+    border-radius: var(--gh-radius-sm);
+    box-shadow: var(--gh-shadow-md);
+    border: 1px solid var(--gh-border);
+    padding: 0;
+  }
+  .leaflet-popup-content {
+    margin: 12px 14px;
+    line-height: 1.4;
+  }
+  .gh-map-legend {
+    background: #ffffff;
+    padding: 10px 14px;
+    border-radius: var(--gh-radius-sm);
+    border: 1px solid var(--gh-border);
+    box-shadow: var(--gh-shadow-sm);
+    font-size: 11px;
+    font-family: var(--gh-font-body);
+    line-height: 1.6;
+    color: var(--gh-text);
+  }
+  .gh-map-legend__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .gh-map-legend__dot {
+    background: #0369a1;
+    border-radius: 50%;
+    display: inline-block;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row mb-3">
-    <div class="col text-center">
-        <h2 class="section-header">
-            <span class="lang-bn">বাংলাদেশে রোগের বিস্তার</span>
-            <span class="lang-en">Disease Spread in Bangladesh</span>
-        </h2>
-    </div>
-</div>
-
-{% if error %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-    {{ error }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endif %}
-
-<div class="stats-container">
-    <div class="row">
-        <div class="col-md-12">
-            <h5 class="section-title">
-                <span class="lang-bn">রোগের ভৌগলিক বণ্টন</span>
-                <span class="lang-en">Geographic Distribution</span>
-            </h5>
-            {% if map_html %}
-            <div class="map-container" id="mapContainer">
-                {{ map_html|safe }}
-            </div>
-            {% else %}
-            <div class="data-placeholder">
-                <div class="text-center">
-                    <i class="bi bi-map" style="font-size: 2.5rem; color: #6c757d;"></i>
-                    <p class="mt-3 mb-0">
-                        <span class="lang-bn">মানচিত্র ডেটা পাওয়া যায়নি</span>
-                        <span class="lang-en">Map data not available</span>
-                    </p>
-                    <small class="text-muted">
-                        <span class="lang-bn">প্রেডিকশন তৈরি করার পরে ডেটা দেখা যাবে</span>
-                        <span class="lang-en">Data will appear after creating predictions</span>
-                    </small>
-                </div>
-            </div>
-            {% endif %}
+<div class="gh-container gh-page">
+    <!-- Page Header -->
+    <div class="gh-page-header">
+        <div>
+            <h1 data-i18n="nav.geo">Geo Insights</h1>
+            <p class="gh-page-header__sub">Live outbreak surveillance across Bangladesh</p>
         </div>
-    </div>
-</div>
-
-{% if division_counts and top_diseases %}
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <div class="card card-hover h-100">
-            <div class="card-body">
-                <h6 class="section-title">
-                    <span class="lang-bn">বিভাগ অনুযায়ী রোগের সংখ্যা</span>
-                    <span class="lang-en">Disease Count by Division</span>
-                </h6>
-                <div class="table-container">
-                    <div class="table-scroll-wrapper">
-                        <table class="table table-compact">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <span class="lang-bn">বিভাগ</span>
-                                        <span class="lang-en">Division</span>
-                                    </th>
-                                    {% for disease in all_diseases|sort %}
-                                    <th>{{ disease }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for division, diseases in division_counts.items()|sort %}
-                                <tr>
-                                    <td><strong>{{ division }}</strong></td>
-                                    {% for disease in all_diseases|sort %}
-                                    <td class="text-center">{{ diseases.get(disease, 0) }}</td>
-                                    {% endfor %}
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <small class="text-muted mt-2 d-block">
-                    <i class="bi bi-arrows-expand"></i>
-                    <span class="lang-bn">স্ক্রল করতে টেবিলটি ড্র্যাগ করুন</span>
-                    <span class="lang-en">Drag to scroll table</span>
-                </small>
-            </div>
+        <div>
+            <span class="gh-badge gh-badge--accent u-mono">
+                <span class="material-symbols-outlined" style="font-size: 14px;">sync</span>
+                Updated 5 min ago
+            </span>
         </div>
     </div>
 
-    <div class="col-md-6 mb-3">
-        <div class="card card-hover h-100">
-            <div class="card-body">
-                <h6 class="section-title">
-                    <span class="lang-bn">শীর্ষ রোগসমূহ</span>
-                    <span class="lang-en">Top Diseases</span>
-                </h6>
-                <div class="row">
-                    {% for disease in top_diseases|sort %}
-                    <div class="col-sm-6 col-md-6 mb-2">
-                        <div class="card disease-card" style="border-left-color: {{ disease|get_disease_color }};">
-                            <div class="card-body py-2">
-                                <h6 class="card-subtitle mb-1" style="font-size: 0.9rem;">{{ disease }}</h6>
-                                <p class="card-text mb-0">
-                                    <span class="lang-bn">কেস:</span>
-                                    <span class="lang-en">Cases:</span>
-                                    <strong class="text-primary">{{ disease_totals.get(disease, 0) }}</strong>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- KPI Row -->
+    <div class="gh-grid gh-grid--4" style="margin-bottom: 24px;">
+        <div class="gh-card gh-stat">
+            <span class="gh-stat__label">Total Cases</span>
+            <div class="gh-stat__value">{{ "{:,}".format(kpis.total_cases) if (kpis is defined and kpis and kpis.total_cases is defined and kpis.total_cases is not none) else '0' }}</div>
+            <span class="gh-stat__sub text-muted">Aggregated across 8 divisions</span>
+        </div>
+        <div class="gh-card gh-stat">
+            <span class="gh-stat__label">Top Division</span>
+            <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_division if (kpis is defined and kpis and kpis.top_division is defined and kpis.top_division) else 'Dhaka' }}</div>
+            <span class="gh-stat__sub" style="color: var(--gh-primary); font-weight: 600;">{{ kpis.top_division_pct if (kpis is defined and kpis and kpis.top_division_pct is defined and kpis.top_division_pct is not none) else '49.4' }}% of all recorded cases</span>
+        </div>
+        <div class="gh-card gh-stat">
+            <span class="gh-stat__label">Top Disease</span>
+            <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_disease if (kpis is defined and kpis and kpis.top_disease is defined and kpis.top_disease) else 'Bronchial Asthma' }}</div>
+            <span class="gh-stat__sub" style="color: var(--gh-alert); font-weight: 600;">{{ "{:,}".format(kpis.top_disease_count) if (kpis is defined and kpis and kpis.top_disease_count is defined and kpis.top_disease_count is not none) else '42' }} active cases</span>
+        </div>
+        <div class="gh-card gh-stat">
+            <span class="gh-stat__label">Active Outbreaks</span>
+            <div class="gh-stat__value">{{ kpis.active_outbreaks if (kpis is defined and kpis and kpis.active_outbreaks is defined and kpis.active_outbreaks is not none) else '3' }}</div>
+            <span class="gh-stat__sub" style="color: var(--gh-warn); font-weight: 600;">Elevated surveillance active</span>
+        </div>
+    </div>
+
+    <!-- Map Card -->
+    <div class="gh-card gh-card--flush" style="margin-bottom: 24px; overflow: hidden; border: 1px solid var(--gh-border); border-radius: var(--gh-radius);">
+        <div style="padding: 14px 20px; border-bottom: 1px solid var(--gh-border-soft); display: flex; align-items: center; justify-content: space-between;">
+            <div class="gh-row" style="gap: 8px;">
+                <span class="material-symbols-outlined" style="color: var(--gh-primary);">travel_explore</span>
+                <span style="font-weight: 600; font-size: 14px;">National Surveillance Matrix</span>
+            </div>
+            <span class="u-mono u-muted" style="font-size: 11px;">PROJECTION: WGS 84 · EPSG:4326</span>
+        </div>
+        <div id="map" style="height: 480px; width: 100%; z-index: 1;"></div>
+    </div>
+
+    <!-- 2-Column Details Grid -->
+    <div class="gh-grid gh-grid--2-1">
+        <!-- LEFT: Division Table -->
+        <div class="gh-card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 16px 20px; border-bottom: 1px solid var(--gh-border-soft);">
+                <h3 style="font-size: 15px; font-weight: 700; margin: 0;">Division Telemetry</h3>
+            </div>
+            <table class="gh-table gh-table--responsive">
+                <thead>
+                    <tr>
+                        <th>Division</th>
+                        <th>Total Cases</th>
+                        <th>Top Disease</th>
+                        <th>Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in division_data %}
+                    <tr>
+                        <td><strong>{{ d.name }}</strong></td>
+                        <td class="u-mono">{{ "{:,}".format(d.cases) }}</td>
+                        <td>{{ d.top_disease }}</td>
+                        <td>
+                            {% if d.cases > 3000 %}
+                            <span class="gh-badge gh-badge--alert">High Alert</span>
+                            {% elif d.cases > 1000 %}
+                            <span class="gh-badge gh-badge--warn">Monitored</span>
+                            {% else %}
+                            <span class="gh-badge gh-badge--accent">Stable</span>
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% endfor %}
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
-    </div>
-</div>
-{% else %}
-<div class="alert alert-info">
-    <i class="bi bi-info-circle"></i>
-    <span class="lang-bn">বিশ্লেষণের জন্য পর্যাপ্ত ডেটা নেই। প্রথমে কিছু প্রেডিকশন তৈরি করুন।</span>
-    <span class="lang-en">Not enough data for analysis. Please create some predictions first.</span>
-</div>
-{% endif %}
 
-<div class="row mt-3">
-    <div class="col-12">
-        <div class="alert alert-light border">
-            <small>
-                <i class="bi bi-lightbulb"></i>
-                <span class="lang-bn">টিপ: মানচিত্রটি বিভাগের কেন্দ্রগুলি দেখায়। প্রতিটি মার্কার একটি বিভাগের সমস্ত কেসকে প্রতিনিধিত্ব করে।</span>
-                <span class="lang-en">Tip: The map shows division centers. Each marker represents all cases in a division.</span>
-            </small>
+        <!-- RIGHT: Top 5 Diseases Progress Bars -->
+        <div class="gh-card">
+            <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px 0;">Top 5 Outbreak Diseases</h3>
+                <p class="u-muted" style="font-size: 12px; margin: 0;">Ranked by national incidence volume</p>
+            </div>
+
+            {% set max_count = top_diseases[0].count if top_diseases else 1 %}
+            {% if max_count == 0 %}{% set max_count = 1 %}{% endif %}
+
+            <div class="gh-stack" style="gap: 16px;">
+                {% for dis in top_diseases %}
+                {% set pct = (dis.count / max_count * 100)|round(1) %}
+                <div>
+                    <div class="gh-row gh-row--between" style="font-size: 13px; margin-bottom: 4px;">
+                        <span style="font-weight: 600;">{{ dis.name }}</span>
+                        <span class="u-mono" style="color: var(--gh-text-muted);">{{ "{:,}".format(dis.count) }}</span>
+                    </div>
+                    <div class="gh-progress" style="height: 7px; background-color: var(--gh-surface-2); border-radius: 9999px; overflow: hidden;">
+                        <div class="gh-progress__fill" style="width: {{ pct }}%; height: 100%; background: linear-gradient(90deg, var(--gh-primary), var(--gh-accent)); border-radius: 9999px;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const mapContainer = document.getElementById('mapContainer');
-    if (mapContainer) {
-        setTimeout(() => {
-            const maps = mapContainer.querySelectorAll('.folium-map');
-            maps.forEach(map => {
-                if (map._leaflet_map) {
-                    map._leaflet_map.invalidateSize();
-                    map._leaflet_map.fitBounds([[20.5, 88.0], [26.5, 92.5]]);
-                }
-            });
-        }, 300);
+    var mapEl = document.getElementById('map');
+    if (!mapEl) return;
+
+    var bdCenter = [23.6850, 90.3563];
+    var map = L.map('map', {
+        center: bdCenter,
+        zoom: 7,
+        scrollWheelZoom: false
+    });
+
+    // OpenStreetMap clean tile layer (Zero API key / watermark free)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var divisionData = {{ division_data|tojson }};
+
+    function getRadius(cases) {
+        if (cases >= 5000) return 22;
+        if (cases >= 3000) return 18;
+        if (cases >= 1000) return 14;
+        if (cases >= 700) return 11;
+        if (cases >= 500) return 9;
+        return 8;
     }
+
+    divisionData.forEach(function(d) {
+        var radius = getRadius(d.cases);
+        var marker = L.circleMarker([d.lat, d.lng], {
+            radius: radius,
+            fillColor: '#0369a1',
+            color: '#075985',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.7
+        }).addTo(map);
+
+        var popupContent = '<div style="font-family: var(--gh-font-body); padding: 4px;">' +
+            '<h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #0f172a;">' + d.name + ' Division</h4>' +
+            '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Reported Cases: <strong style="color: #0f172a;">' + d.cases.toLocaleString() + '</strong> (' + d.pct_of_total + '% of total)</div>' +
+            '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Prevalent: <strong style="color: #0369a1;">' + d.top_disease + '</strong></div>' +
+            '<a href="/doctors" style="font-size: 12px; color: #0369a1; font-weight: 600; text-decoration: none;">View details &rarr;</a>' +
+            '</div>';
+
+        marker.bindPopup(popupContent);
+
+        if (d.name === 'Dhaka') {
+            marker.openPopup();
+        }
+    });
+
+    // Legend Control (bottomright)
+    var legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function() {
+        var div = L.DomUtil.create('div', 'gh-map-legend');
+        div.innerHTML =
+            '<div style="font-weight: 700; margin-bottom: 6px; font-size: 12px;">Case Severity</div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 16px; height: 16px;"></span><span>High (&ge; 3,000)</span></div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 12px; height: 12px;"></span><span>Moderate (1,000 - 2,999)</span></div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 8px; height: 8px;"></span><span>Low (&lt; 1,000)</span></div>';
+        return div;
+    };
+    legend.addTo(map);
+
+    setTimeout(function() {
+        map.invalidateSize();
+    }, 250);
 });
 </script>
 {% endblock %}

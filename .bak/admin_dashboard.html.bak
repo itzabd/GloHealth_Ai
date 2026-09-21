@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="lang-bn" lang="bn">অ্যাডমিন ড্যাশবোর্ড</span>
+<span class="lang-en" lang="en">Admin Dashboard</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Glassy Card Styling */
+.card-hover {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px) saturate(150%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+.card-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+}
+.section-header {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #60B5FF, #409eff);
+    color: white;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+.btn-accent {
+    background: linear-gradient(90deg, #FF9149, #FF6B6B);
+    border: none;
+    color: white;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    transition: 0.3s;
+}
+.btn-accent:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+<!--    &lt;!&ndash; Language Toggle &ndash;&gt;-->
+<!--    <div class="text-end mb-3">-->
+<!--        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleLanguage('bn')">বাংলা</button>-->
+<!--        <button class="btn btn-sm btn-outline-primary" onclick="toggleLanguage('en')">English</button>-->
+<!--    </div>-->
+
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col text-center">
+            <h2 class="section-header">
+                <span class="lang-bn" lang="bn">অ্যাডমিন ড্যাশবোর্ড</span>
+                <span class="lang-en" lang="en">Admin Dashboard</span>
+            </h2>
+        </div>
+    </div>
+
+    <!-- Admin Feature Cards -->
+    <div class="row mb-4 justify-content-center g-4">
+        <!-- Manage Users -->
+        <div class="col-md-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">ব্যবহারকারী পরিচালনা</span>
+                        <span class="lang-en" lang="en">Manage Users</span>
+                    </h5>
+                    <p>View, edit, or delete users.</p>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
+                        <span class="lang-en" lang="en">Manage</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Doctors -->
+        <div class="col-md-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">ডাক্তার পরিচালনা</span>
+                        <span class="lang-en" lang="en">Manage Doctors</span>
+                    </h5>
+                    <p>Add, edit, or remove doctors.</p>
+                    <a href="{{ url_for('admin_doctors') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
+                        <span class="lang-en" lang="en">Manage</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Appointments -->
+        <div class="col-md-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">অ্যাপয়েন্টমেন্ট পরিচালনা</span>
+                        <span class="lang-en" lang="en">Manage Appointments</span>
+                    </h5>
+                    <p>View all bookings and update status.</p>
+                    <a href="{{ url_for('admin_appointments') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">পরিচালনা করুন</span>
+                        <span class="lang-en" lang="en">Manage</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleLanguage(lang) {
+    localStorage.setItem("lang", lang);
+    document.querySelectorAll('.lang-bn').forEach(el => el.style.display = lang === 'bn' ? '' : 'none');
+    document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem("lang") || (navigator.language.startsWith('bn') ? 'bn' : 'en');
+    toggleLanguage(savedLang);
+});
+</script>
+{% endblock %}

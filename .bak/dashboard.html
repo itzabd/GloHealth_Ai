@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="lang-bn" lang="bn">ড্যাশবোর্ড</span>
+<span class="lang-en" lang="en">Dashboard</span>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🌈 Body Gradient */
+html, body {
+
+    margin: 0;
+}
+body {
+    background: linear-gradient(135deg, #00b4db, #0083b0, #3a7bd5) !important; /* Professional Blue */
+    background-attachment: fixed;
+    background-size: cover;
+    color: #1a202c;
+}
+
+/* Wrapper so gradient shows */
+.dashboard-wrapper {
+    padding: 2rem;
+}
+
+/* 🪟 Glassy Card Styling */
+.card-hover {
+    background: rgba(255, 255, 255, 0.75); /* transparent white */
+    backdrop-filter: blur(12px) saturate(150%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+.card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+}
+
+.card-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+}
+ /* 🌟 Footer Styling */
+footer {
+    background: linear-gradient(90deg, #2c3e50, #34495e);
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+/* 📊 Table Styling */
+.table-container {
+    max-height: 400px;
+    overflow: hidden;
+    position: relative;
+}
+.table-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 350px;
+    border-radius: 12px;
+}
+.table-compact {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.table-compact th,
+.table-compact td {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.table-compact thead th {
+    background: linear-gradient(90deg, #60B5FF, #409eff);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.table-compact tbody tr:nth-child(even) td {
+    background-color: rgba(255,255,255,0.6);
+}
+.table-compact tbody tr:hover td {
+    background-color: rgba(240,245,255,0.8);
+    cursor: pointer;
+}
+.table-compact tbody tr:hover td:first-child {
+    background-color: rgba(225,230,240,0.9);
+}
+
+/* 🏷️ Section Titles */
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1a202c;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(to right, #FF9149, #60B5FF);
+    border-image-slice: 1;
+    display: inline-block;
+    padding-bottom: 0.4rem;
+}
+.section-header {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #60B5FF, #409eff);
+    color: white;
+    font-weight: 600;
+}
+
+/* 🎨 Accent Button */
+.btn-accent {
+    background: linear-gradient(90deg, #FF9149, #FF6B6B);
+    border: none;
+    color: white;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.45rem 1.2rem;
+    transition: 0.3s;
+}
+.btn-accent:hover {
+    opacity: 0.9;
+    transform: scale(1.03);
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+    .table-scroll-wrapper {
+        max-height: 300px;
+        font-size: 0.8rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!--<div class="dashboard-wrapper">-->
+<!--    &lt;!&ndash; Language Toggle &ndash;&gt;-->
+<!--    <div class="text-end mb-3">-->
+<!--        <button class="btn btn-sm btn-outline-primary me-2" onclick="toggleLanguage('bn')">বাংলা</button>-->
+<!--        <button class="btn btn-sm btn-outline-primary" onclick="toggleLanguage('en')">English</button>-->
+<!--    </div>-->
+
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col text-center">
+            <h2 class="section-header">
+                <span class="lang-bn" lang="bn">ড্যাশবোর্ড</span>
+                <span class="lang-en" lang="en">Dashboard</span>
+            </h2>
+        </div>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="row mb-4 justify-content-center">
+        <!-- User Info Card -->
+        <div class="col-md-4 mb-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">ব্যবহারকারী তথ্য</span>
+                        <span class="lang-en" lang="en">User Info</span>
+                    </h5>
+                    <h5>{{ current_user.name }}</h5>
+                    <p>
+                        <i class="bi bi-envelope"></i> {{ current_user.email }}<br>
+                        {% if current_user.address %}
+                            <i class="bi bi-geo-alt"></i> {{ current_user.address.city }}, {{ current_user.address.division }}
+                        {% else %}
+                            <i class="bi bi-geo-alt"></i> <span class="lang-bn">অজানা</span><span class="lang-en">Unknown</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geographic Insights Card -->
+        <div class="col-md-4 mb-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">ভৌগলিক বিশ্লেষণ</span>
+                        <span class="lang-en" lang="en">Geographic Insights</span>
+                    </h5>
+                    <p>
+                        <span class="lang-bn" lang="bn">বাংলাদেশে রোগের বিস্তার দেখুন</span>
+                        <span class="lang-en" lang="en">View disease spread across Bangladesh</span>
+                    </p>
+                    <a href="{{ url_for('geo_insights') }}" class="btn btn-accent">
+                        <span class="lang-bn" lang="bn">দেখুন</span>
+                        <span class="lang-en" lang="en">View Map</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- My Appointments Card -->
+        <div class="col-md-4 mb-3 d-flex">
+            <div class="card card-hover w-100 card-centered h-100">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <span class="lang-bn" lang="bn">আমার অ্যাপয়েন্টমেন্ট</span>
+                        <span class="lang-en" lang="en">My Appointments</span>
+                    </h5>
+                    <h3>{{ appointments|length if appointments else 0 }}</h3>
+                    <p>
+                        <span class="lang-bn" lang="bn">আপনার আসন্ন অ্যাপয়েন্টমেন্ট</span>
+                        <span class="lang-en" lang="en">Upcoming appointments</span>
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ url_for('appointments') }}" class="btn btn-accent">
+                            <span class="lang-bn" lang="bn">দেখুন</span>
+                            <span class="lang-en" lang="en">View</span>
+                        </a>
+                        <a href="{{ url_for('doctors') }}" class="btn btn-outline-primary">
+                            <span class="lang-bn" lang="bn">বুক করুন</span>
+                            <span class="lang-en" lang="en">Book</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Recent Tests Table -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8 mb-3">
+            <div class="card card-hover h-100">
+                <div class="card-body">
+                    <h6 class="section-title text-center">
+                        <span class="lang-bn" lang="bn">সাম্প্রতিক পরীক্ষা</span>
+                        <span class="lang-en" lang="en">Recent Tests</span>
+                    </h6>
+                    <div class="table-container">
+                        <div class="table-scroll-wrapper">
+                            <table class="table table-compact" role="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">
+                                            <span class="lang-bn" lang="bn">লক্ষণ</span>
+                                            <span class="lang-en" lang="en">Symptoms</span>
+                                        </th>
+                                        <th scope="col">
+                                            <span class="lang-bn" lang="bn">রোগ</span>
+                                            <span class="lang-en" lang="en">Disease</span>
+                                        </th>
+                                        <th scope="col">
+                                            <span class="lang-bn" lang="bn">নিশ্চিততা</span>
+                                            <span class="lang-en" lang="en">Confidence</span>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if predictions %}
+                                        {% for pred in predictions %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td title="{{ pred.symptoms|join(', ') }}">{{ pred.symptoms|join(', ') }}</td>
+                                            <td class="bangla">{{ pred.top_prediction }}</td>
+                                            <td>
+                                                <div class="progress" style="height: 8px; border-radius: 4px;">
+                                                    <div class="progress-bar bg-success" role="progressbar"
+                                                         style="width: {{ (pred.confidence * 100)|round(1) }}%;"></div>
+                                                </div>
+                                                <small class="text-muted">{{ (pred.confidence * 100)|round(1) }}%</small>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">
+                                                <span class="lang-bn" lang="bn">কোনো তথ্য পাওয়া যায়নি</span>
+                                                <span class="lang-en" lang="en">No data available</span>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 🌟 Language toggle with persistence
+function toggleLanguage(lang) {
+    localStorage.setItem("lang", lang);
+    document.querySelectorAll('.lang-bn').forEach(el => {
+        el.style.display = lang === 'bn' ? '' : 'none';
+    });
+    document.querySelectorAll('.lang-en').forEach(el => {
+        el.style.display = lang === 'en' ? '' : 'none';
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem("lang") || 
+                      (navigator.language.startsWith('bn') ? 'bn' : 'en');
+    toggleLanguage(savedLang);
+});
+</script>
+{% endblock %}

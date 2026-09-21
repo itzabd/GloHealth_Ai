@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Doctors{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: url('/static/images/blur-bg.jpg') no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #4b72e6, #0278c6);
+    }
+
+    .glass-card {
+        background: rgba(15, 76, 117, 0.25);
+        border-radius: 16px;
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        color: #e0f7fa;
+        margin-top: 2rem;
+    }
+
+    .glass-card h2 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid rgba(255,255,255,0.3);
+        color: #0e50c2;
+    }
+
+    .table tbody td {
+        color: #000000;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-primary {
+        background: rgba(16, 0, 239, 0.2);
+        border: none;
+        color: #32467f;
+        backdrop-filter: blur(5px);
+        transition: 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: rgba(55, 0, 255, 0.4);
+        color: #1a5385;
+    }
+
+    .table-responsive {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+</style>
+
+<div class="container">
+    <div class="glass-card">
+        <h2>
+            <span class="lang-bn" lang="bn">উপলব্ধ ডাক্তার</span>
+            <span class="lang-en" lang="en">Available Doctors</span>
+        </h2>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Specialty</th>
+                        <th>Hospital</th>
+                        <th>Consultation Fee</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if doctors %}
+                        {% for doctor in doctors %}
+                        <tr>
+                            <td>{{ doctor.name }}</td>
+                            <td>{{ doctor.specialty }}</td>
+                            <td>{{ doctor.hospital }}</td>
+                            <td>{{ doctor.consultation_fee }} BDT</td>
+                            <td>
+                                <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-primary btn-sm">
+                                    Book
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No doctors available at the moment.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

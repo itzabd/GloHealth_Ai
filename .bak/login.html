@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}লগইন/Login{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* 🌈 Gradient background for full page */
+  body {
+    background: linear-gradient(135deg, #0187ee, #7996e3) !important;
+    min-height: 100vh;
+    margin: 0;
+  }
+
+  /* Remove Bootstrap’s white background if applied */
+  .container, .row, .col-md-6 {
+    background: transparent !important;
+  }
+
+  /* Bengali font fix */
+  .lang-bn {
+    font-family: 'Hind Siliguri', 'SolaimanLipi', 'Noto Sans Bengali', Arial, sans-serif;
+    color: black !important;
+  }
+
+  /* 🌈 Gradient card header */
+  .card-header {
+    background: linear-gradient(135deg, #0187ee, #4cb8c4) !important;
+    color: rgb(224, 226, 228) !important;
+    font-weight: bold;
+    border-radius: 8px 8px 0 0;
+  }
+
+  /* 🌈 Gradient login button */
+  .btn-login {
+    background: linear-gradient(135deg, #4cb8c4, #3cd3ad) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600;
+    transition: 0.3s ease-in-out;
+  }
+  .btn-login:hover {
+    background: linear-gradient(135deg, #3cd3ad, #4cb8c4) !important;
+    transform: translateY(-2px);
+    color: white !important;
+  }
+
+  /* Card styling */
+  .card {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header text-center">
+        <h4 class="mb-0">
+          <span class="lang-en"><i class="bi bi-box-arrow-in-right"></i> Login to your account</span>
+          <span class="lang-bn" style="display:none;"><i class="bi bi-box-arrow-in-right"></i> অ্যাকাউন্টে লগইন করুন</span>
+        </h4>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/login" id="loginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label">
+              <span class="lang-en">Email address</span>
+              <span class="lang-bn" style="display:none;">ইমেইল ঠিকানা</span>
+            </label>
+            <input type="email" id="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">
+              <span class="lang-en">Password</span>
+              <span class="lang-bn" style="display:none;">পাসওয়ার্ড</span>
+            </label>
+            <input type="password" id="password" name="password" class="form-control" required>
+          </div>
+          <button type="submit" class="btn btn-login w-100">
+            <span class="lang-en"><i class="bi bi-box-arrow-in-right"></i> Login</span>
+            <span class="lang-bn" style="display:none;"><i class="bi bi-box-arrow-in-right"></i> লগইন</span>
+          </button>
+        </form>
+        <div class="text-center mt-3">
+          <a href="/signup" class="fw-bold">
+            <span class="lang-en">Create a new account</span>
+            <span class="lang-bn" style="display:none;">নতুন অ্যাকাউন্ট তৈরি করুন</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

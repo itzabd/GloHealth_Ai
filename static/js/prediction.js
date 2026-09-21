@@ -1,149 +1,282 @@
+/**
+ * GloHealth AI · Symptom Checker & Clinical Telemetry (Stitch)
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
+    // 1. DOM References
+    const symptomForm = document.getElementById('symptomForm');
+    const symptomCards = document.querySelectorAll('.gh-symptom');
+    const selectedCount = document.getElementById('selectedCount');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const clearAll = document.getElementById('clearAll');
+    const symptomSearch = document.getElementById('symptomSearch');
+    const categoryChips = document.getElementById('categoryChips');
+    const resultsModal = document.getElementById('resultsModal');
+    const modalBody = document.getElementById('modalBody');
+    const closeModal = document.getElementById('closeModal');
+    const userDivision = document.getElementById('userDivision');
+
     let userLocation = { lat: null, long: null };
 
-    // Symptom card toggle
-    document.querySelectorAll('.symptom-card').forEach(card => {
-        const checkbox = card.querySelector('.symptom-check');
-        card.addEventListener('click', function() {
-            checkbox.checked = !checkbox.checked;
-            this.classList.toggle('selected', checkbox.checked);
+    // Request geolocation in background if permitted
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                userLocation.lat = pos.coords.latitude;
+                userLocation.long = pos.coords.longitude;
+            },
+            err => { /* Soft ignore permission denial */ },
+            { timeout: 5000 }
+        );
+    }
+
+    // 2. Checkbox & Card Toggle Handling
+    symptomCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (e.target.closest('.gh-symptom__slider')) {
+                return;
+            }
+            const checkbox = this.querySelector('.symptom-check');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                this.classList.toggle('is-checked', checkbox.checked);
+                updateCount();
+            }
         });
     });
 
-    // Use browser location
-    const useLocationBtn = document.getElementById('useLocationBtn');
-    const locationStatus = document.getElementById('locationStatus');
-
-    useLocationBtn.addEventListener('click', function() {
-        this.disabled = true;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Detecting...';
-        locationStatus.textContent = '';
-        locationStatus.classList.remove('text-danger');
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    userLocation = {
-                        lat: position.coords.latitude,
-                        long: position.coords.longitude
-                    };
-
-                    this.innerHTML = '<i class="bi bi-check-circle"></i> Location Found';
-                    this.classList.add('btn-success');
-                    this.classList.remove('btn-outline-primary');
-                    locationStatus.textContent = 'Your location was successfully detected.';
-
-                    // Simple example mapping (expand as needed)
-                    if (userLocation.lat > 23.6 && userLocation.lat < 23.9) {
-                        document.getElementById('division').value = 'Dhaka';
-                    }
-                },
-                error => {
-                    resetLocationBtn();
-                    locationStatus.textContent = 'Error: ' + getGeoError(error.code);
-                    locationStatus.classList.add('text-danger');
-                },
-                { timeout: 10000 }
-            );
-        } else {
-            resetLocationBtn();
-            locationStatus.textContent = 'Your browser does not support location services.';
-            locationStatus.classList.add('text-danger');
-        }
+    // 3. Slider Handling
+    document.querySelectorAll('.pain-slider').forEach(slider => {
+        slider.addEventListener('input', function(e) {
+            const valDisplay = this.nextElementSibling;
+            if (valDisplay && valDisplay.classList.contains('gh-symptom__slider-value')) {
+                valDisplay.textContent = this.value;
+            }
+        });
+        slider.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     });
 
-    function resetLocationBtn() {
-        useLocationBtn.disabled = false;
-        useLocationBtn.innerHTML = '<i class="bi bi-geo-alt"></i> Use My Location';
-    }
-
-    // Prediction submission
-    document.getElementById('predictBtn').addEventListener('click', async function() {
-        const symptoms = Array.from(document.querySelectorAll('.symptom-check:checked'))
-            .map(el => el.value);
-
-        if (symptoms.length === 0) {
-            alert('Please select at least one symptom.');
-            return;
-        }
-
-        const division = document.getElementById('division').value;
-        if (!division) {
-            alert('Please select your division.');
-            return;
-        }
-
-        const locationData = {
-            division: division,
-            lat: userLocation.lat,
-            long: userLocation.long
-        };
-
-        this.disabled = true;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
-
-        try {
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    symptoms: symptoms,
-                    ...locationData
-                })
+    // 4. Search Filter
+    if (symptomSearch) {
+        symptomSearch.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            symptomCards.forEach(card => {
+                const label = card.getAttribute('data-label') || '';
+                const key = card.getAttribute('data-key') || '';
+                const matches = label.includes(query) || key.includes(query);
+                card.style.display = matches ? '' : 'none';
             });
 
-            const data = await response.json();
-            if (data.success) {
-                showResultsModal(data.predictions);
-            } else {
-                throw new Error(data.error || 'Unknown error occurred');
+            // Hide/show category group containers if empty
+            document.querySelectorAll('[data-category-group]').forEach(group => {
+                const visibleCards = group.querySelectorAll('.gh-symptom:not([style*="display: none"])');
+                group.style.display = visibleCards.length > 0 ? '' : 'none';
+            });
+        });
+    }
+
+    // 5. Category Chips Filter
+    if (categoryChips) {
+        categoryChips.addEventListener('click', function(e) {
+            const chip = e.target.closest('.gh-chip');
+            if (!chip) return;
+
+            categoryChips.querySelectorAll('.gh-chip').forEach(c => c.classList.remove('is-active'));
+            chip.classList.add('is-active');
+
+            const selectedCat = chip.getAttribute('data-category');
+            document.querySelectorAll('[data-category-group]').forEach(group => {
+                const catName = group.getAttribute('data-category-group');
+                if (selectedCat === 'all' || catName === selectedCat) {
+                    group.style.display = '';
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // 6. Clear Handler
+    function clearAllSymptoms() {
+        symptomCards.forEach(card => {
+            const checkbox = card.querySelector('.symptom-check');
+            if (checkbox) checkbox.checked = false;
+            card.classList.remove('is-checked');
+            const slider = card.querySelector('.pain-slider');
+            if (slider) slider.value = 5;
+            const valDisplay = card.querySelector('.gh-symptom__slider-value');
+            if (valDisplay) valDisplay.textContent = '5';
+        });
+        updateCount();
+    }
+
+    if (clearBtn) clearBtn.addEventListener('click', clearAllSymptoms);
+    if (clearAll) clearAll.addEventListener('click', clearAllSymptoms);
+
+    // 7. Update Count & Button State
+    function updateCount() {
+        const checked = document.querySelectorAll('.symptom-check:checked');
+        const count = checked.length;
+        if (selectedCount) selectedCount.textContent = count;
+        if (analyzeBtn) {
+            analyzeBtn.disabled = (count === 0);
+        }
+    }
+
+    // 8. Analyze Trigger
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', async function() {
+            const checkedInputs = Array.from(document.querySelectorAll('.symptom-check:checked'));
+            const symptoms = checkedInputs.map(input => input.value);
+            const division = (userDivision && userDivision.value) ? userDivision.value : 'Dhaka';
+
+            if (!symptoms.length) return;
+
+            this.classList.add('gh-btn--loading');
+            this.disabled = true;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        symptoms: symptoms,
+                        division: division,
+                        lat: userLocation.lat,
+                        long: userLocation.long
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success && data.predictions && data.predictions.length) {
+                    renderResult(data.predictions, data.location_factors || {});
+                    if (resultsModal) resultsModal.classList.add('is-open');
+                } else {
+                    throw new Error(data.error || 'Diagnostic evaluation failed.');
+                }
+            } catch (err) {
+                alert('Analysis Error: ' + err.message);
+            } finally {
+                this.classList.remove('gh-btn--loading');
+                updateCount();
             }
-        } catch (error) {
-            alert('Error: ' + error.message);
-        } finally {
-            this.disabled = false;
-            this.innerHTML = '<i class="bi bi-heart-pulse"></i> Check Symptoms';
+        });
+    }
+
+    // 9. Modal Close Handlers
+    function hideModal() {
+        if (resultsModal) resultsModal.classList.remove('is-open');
+    }
+
+    if (closeModal) closeModal.addEventListener('click', hideModal);
+
+    if (resultsModal) {
+        resultsModal.addEventListener('click', function(e) {
+            if (e.target === resultsModal) hideModal();
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && resultsModal && resultsModal.classList.contains('is-open')) {
+            hideModal();
         }
     });
 
-    function getGeoError(code) {
-        const errors = { 1: 'Permission denied', 2: 'Position unavailable', 3: 'Timeout' };
-        return errors[code] || 'Unknown error';
-    }
+    // 10. Render Assessment Result
+    function renderResult(predictions, location) {
+        if (!modalBody || !predictions || !predictions.length) return;
 
-    function showResultsModal(predictions) {
-        const modalHtml = `
-            <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header bg-primary text-white">
-                            <h5 class="modal-title">Prediction Results</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        const top = predictions[0];
+        const pct = Math.round((top.confidence || 0) * 100);
+        const divName = location.division || (userDivision ? userDivision.value : 'National Average');
+
+        let differentialHtml = '';
+        if (predictions.length > 1) {
+            differentialHtml = `
+                <div class="gh-modal__section u-mt-3">
+                    <div class="gh-modal__section-title">Differential Candidates</div>
+                    <div class="gh-stack" style="gap: 6px;">
+                        ${predictions.slice(1, 3).map(p => {
+                            const pPct = Math.round((p.confidence || 0) * 100);
+                            return `
+                                <div class="gh-row gh-row--between" style="padding: 6px 10px; background: var(--gh-surface-2); border-radius: var(--gh-radius-sm); font-size: 13px;">
+                                    <span>${p.disease}</span>
+                                    <span class="u-mono" style="font-weight: 600; color: var(--gh-text-muted);">${pPct}%</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        modalBody.innerHTML = `
+            <div class="gh-modal__result">
+                <div class="gh-row gh-row--between">
+                    <div class="gh-badge gh-badge--alert">Primary Match</div>
+                    <span class="u-mono u-muted" style="font-size: 11px;">NODE DHK</span>
+                </div>
+                <div class="gh-modal__condition u-mt-3">${top.disease}</div>
+                <div class="gh-row" style="gap: 12px; margin-top: 8px;">
+                    <div class="gh-confidence" style="max-width: 100%;">
+                        <div class="gh-confidence__track" style="height: 6px;">
+                            <div class="gh-confidence__fill" style="width: ${pct}%;"></div>
                         </div>
-                        <div class="modal-body">
-                            <h5>Possible Diseases:</h5>
-                            <ul class="list-group">
-                                ${predictions.map(pred => `
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>${pred.disease}</span>
-                                        <span class="badge bg-primary rounded-pill">${pred.probability}</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
+                        <span class="gh-confidence__value" style="font-size: 15px; font-weight: 700;">${pct}%</span>
                     </div>
                 </div>
             </div>
+
+            ${differentialHtml}
+
+            <div class="gh-modal__section u-mt-3">
+                <div class="gh-modal__section-title">Regional Epidemiological Telemetry</div>
+                <p class="u-muted" style="font-size: 13px;">
+                    Assessment weighted against surveillance records for <strong>${divName}</strong>. Early stage intervention is advised.
+                </p>
+            </div>
+
+            <div class="gh-modal__section u-mt-3">
+                <div class="gh-modal__section-title">Recommended Clinical Steps</div>
+                <ul class="gh-modal__precautions">
+                    <li>
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Maintain hydration with clean fluids and oral rehydration therapy.</span>
+                    </li>
+                    <li>
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Track body temperature and heart rate daily.</span>
+                    </li>
+                    <li>
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Avoid unprescribed antibiotics or heavy analgesics.</span>
+                    </li>
+                    <li>
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span>Schedule a consultation with a registered clinical specialist.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="gh-row gh-row--between u-mt-4" style="padding-top: 12px; border-top: 1px solid var(--gh-border-soft);">
+                <button type="button" class="gh-btn gh-btn--ghost" id="modalCloseBtn">Close</button>
+                <a href="/doctors" class="gh-btn gh-btn--primary">
+                    <span class="material-symbols-outlined">person_add</span>
+                    Book Specialist
+                </a>
+            </div>
+
+            <div class="gh-modal__disclaimer">
+                Decision Support Telemetry: This output is produced by predictive machine learning models and is intended for informational and triage guidance only. Consult a licensed physician for clinical diagnosis and treatment.
+            </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-        modal.show();
-        document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
-            this.remove();
-        });
+        const modalCloseBtn = modalBody.querySelector('#modalCloseBtn');
+        if (modalCloseBtn) {
+            modalCloseBtn.addEventListener('click', hideModal);
+        }
     }
 });
