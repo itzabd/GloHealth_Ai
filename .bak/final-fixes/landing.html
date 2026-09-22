@@ -105,7 +105,7 @@
 
         <!-- CTA Row -->
         <div class="flex flex-wrap items-center gap-3.5 w-full sm:w-auto mb-6">
-          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0369a1] hover:bg-[#0284c7] text-white text-sm sm:text-base font-semibold rounded-xl shadow-lg shadow-[#0369a1]/20 hover:shadow-[#0369a1]/30 transition-all text-center group text-decoration-none" href="#" data-auth-open="signup">
+          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#0369a1] hover:bg-[#0284c7] text-white text-sm sm:text-base font-semibold rounded-xl shadow-lg shadow-[#0369a1]/20 hover:shadow-[#0369a1]/30 transition-all text-center group text-decoration-none" href="{{ url_for('prediction') }}">
             <span data-i18n="l.cta">Start Free Symptom Check</span>
             <span class="material-symbols-outlined text-lg group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
           </a>
@@ -113,10 +113,6 @@
             <span class="material-symbols-outlined text-lg">play_circle</span>
             <span data-i18n="l.cta2">See how it works</span>
           </a>
-        </div>
-
-                <div class="text-xs text-[#64748b] -mt-2 mb-6">
-          <span>Already registered?</span> <a href="#" data-auth-open="login" class="text-[#0369a1] font-semibold hover:underline" data-i18n="nav.signin">Sign in</a>
         </div>
 
         <!-- Trust & Verification Row -->
@@ -402,7 +398,7 @@
             </div>
           </div>
           <div>
-            <a class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0369a1] group-hover:text-[#0284c7] transition-colors text-decoration-none" href="#" data-auth-open="signup">
+            <a class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#0369a1] group-hover:text-[#0284c7] transition-colors text-decoration-none" href="{{ url_for('prediction') }}">
               <span data-i18n="l.mod1_cta">Explore Diagnostic Flow</span>
               <span class="material-symbols-outlined text-base group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>
@@ -524,7 +520,7 @@
                   </div>
                 </div>
               </div>
-              <a href="#" data-auth-open="signup" class="w-full py-1.5 bg-[#0369a1] hover:bg-[#0284c7] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1 transition-colors shadow-xs text-decoration-none">
+              <a href="{{ url_for('doctors') }}" class="w-full py-1.5 bg-[#0369a1] hover:bg-[#0284c7] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1 transition-colors shadow-xs text-decoration-none">
                 <span class="material-symbols-outlined text-sm">videocam</span>
                 <span data-i18n="l.book_priority">Book Priority Consultation</span>
               </a>
@@ -972,7 +968,7 @@
               </li>
             </ul>
           </div>
-          <a href="#" data-auth-open="signup" class="w-full py-3 px-4 border border-[#cbd5e1] hover:bg-[#f8fafc] text-sm font-semibold text-[#0f172a] rounded-xl transition-all shadow-xs text-center text-decoration-none">
+          <a href="{{ url_for('prediction') }}" class="w-full py-3 px-4 border border-[#cbd5e1] hover:bg-[#f8fafc] text-sm font-semibold text-[#0f172a] rounded-xl transition-all shadow-xs text-center text-decoration-none">
             Get Started Free
           </a>
         </div>
@@ -1017,7 +1013,7 @@
               </li>
             </ul>
           </div>
-          <a href="#" data-auth-open="signup" class="w-full py-3 px-4 bg-[#0369a1] hover:bg-[#0284c7] text-white text-sm font-semibold rounded-xl shadow-md shadow-[#0369a1]/20 hover:shadow-lg transition-all text-center text-decoration-none">
+          <a href="{{ url_for('plans') }}" class="w-full py-3 px-4 bg-[#0369a1] hover:bg-[#0284c7] text-white text-sm font-semibold rounded-xl shadow-md shadow-[#0369a1]/20 hover:shadow-lg transition-all text-center text-decoration-none">
             Start 14-Day Free Trial
           </a>
         </div>
@@ -1130,7 +1126,7 @@
           <span data-i18n="l.final_cta_p">Join over 1,248 patients and healthcare providers utilizing predictive clinical telemetry across Bangladesh. No credit card required.</span>
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0369a1] hover:bg-[#0284c7] text-white text-base font-semibold rounded-xl shadow-lg shadow-[#0369a1]/40 hover:shadow-[#0369a1]/60 transition-all group text-decoration-none" href="#" data-auth-open="signup">
+          <a class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#0369a1] hover:bg-[#0284c7] text-white text-base font-semibold rounded-xl shadow-lg shadow-[#0369a1]/40 hover:shadow-[#0369a1]/60 transition-all group text-decoration-none" href="{{ url_for('prediction') }}">
             <span>Start Free Assessment</span>
             <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </a>

@@ -46,43 +46,6 @@
         .gh-nav__hamburger { display: inline-flex; }
         .gh-nav__links { display: none; }
       }
-
-      /* Toast Notifications */
-      .gh-toast-container {
-        position: fixed; top: 80px; right: 24px; z-index: 9999;
-        display: flex; flex-direction: column; gap: 12px; pointer-events: none;
-      }
-      .gh-toast {
-        pointer-events: auto;
-        background: var(--gh-surface); border: 1px solid var(--gh-border);
-        border-left: 4px solid var(--gh-primary);
-        border-radius: 8px; padding: 14px 18px;
-        box-shadow: 0 8px 24px rgba(15,23,42,.12);
-        min-width: 280px; max-width: 400px;
-        display: flex; align-items: flex-start; gap: 12px;
-        animation: gh-toast-in .25s ease; font-size: 14px;
-      }
-      .gh-toast--success { border-left-color: var(--gh-accent); }
-      .gh-toast--danger  { border-left-color: var(--gh-alert); }
-      .gh-toast--warning { border-left-color: var(--gh-warn); }
-      .gh-toast__icon { flex-shrink: 0; font-family: 'Material Symbols Outlined'; font-size: 20px; line-height: 1; }
-      .gh-toast--success .gh-toast__icon { color: var(--gh-accent); }
-      .gh-toast--danger  .gh-toast__icon { color: var(--gh-alert); }
-      .gh-toast--warning .gh-toast__icon { color: var(--gh-warn); }
-      .gh-toast--info    .gh-toast__icon { color: var(--gh-primary); }
-      .gh-toast__msg { flex: 1; color: var(--gh-text); }
-      .gh-toast__close {
-        background: none; border: none; cursor: pointer; color: var(--gh-text-muted);
-        padding: 0; font-family: 'Material Symbols Outlined'; font-size: 18px; line-height: 1;
-      }
-      @keyframes gh-toast-in { from { opacity:0; transform:translateX(24px); } to { opacity:1; transform:translateX(0); } }
-      @keyframes gh-toast-out { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(24px); } }
-      .gh-toast.is-leaving { animation: gh-toast-out .2s ease forwards; }
-      @media (max-width: 640px) {
-        .gh-toast-container { top: auto; bottom: 16px; right: 16px; left: 16px; }
-        .gh-toast { min-width: 0; width: 100%; }
-      }
-
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -137,8 +100,8 @@
                 {% if current_user.is_authenticated %}
                 <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 18px; font-weight: 600; border-radius: 6px;" data-i18n="nav.dashboard">Dashboard</a>
                 {% else %}
-                <a href="#" data-auth-open="login" class="gh-nav__link" style="color: #0f172a; font-weight: 600; padding: 0 4px; border: none; height: auto;" data-i18n="nav.signin">Sign in</a>
-                <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 20px; font-weight: 600; border-radius: 6px; background-color: #0284c7; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);" data-i18n="nav.getstarted">Get Started</a>
+                <a href="{{ url_for('login') }}" data-auth-open="login" class="gh-nav__link" style="color: #0f172a; font-weight: 600; padding: 0 4px; border: none; height: auto;" data-i18n="nav.signin">Sign in</a>
+                <a href="{{ url_for('signup') }}" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 20px; font-weight: 600; border-radius: 6px; background-color: #0284c7; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);" data-i18n="nav.getstarted">Get Started</a>
                 {% endif %}
             </div>
 
@@ -206,8 +169,8 @@
                     </a>
                 </div>
                 {% else %}
-                <a href="#" data-auth-open="login" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="nav.signin">Sign in</a>
-                <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="nav.getstarted">Sign up</a>
+                <a href="{{ url_for('login') }}" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="nav.signin">Sign in</a>
+                <a href="{{ url_for('signup') }}" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="nav.getstarted">Sign up</a>
                 {% endif %}
             </div>
             {% endif %}
@@ -215,17 +178,18 @@
     </header>
     {% endif %}
 
-    <!-- Global Flashed Messages as Toasts -->
+    <!-- Global Flashed Alerts -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      <script>
-      window.__pendingToasts = [
-        {% for category, message in messages %}
-        { msg: {{ message|tojson }}, cat: {{ category|tojson }} }{% if not loop.last %},{% endif %}
-        {% endfor %}
-      ];
-      </script>
-      {% endif %}
+        {% if messages %}
+        <div class="gh-container u-mt-3">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert" style="border-radius: var(--gh-radius); border: 1px solid var(--gh-border);">
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
     {% endwith %}
 
     <!-- Main Content Injection -->
@@ -1495,39 +1459,5 @@
     </script>
 
     {% block extra_js %}{% endblock %}
-
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="gh-toast-container" aria-live="polite"></div>
-
-    <script>
-    (function() {
-      var ICONS = { success: 'check_circle', danger: 'error', warning: 'warning', info: 'info' };
-      window.ghToast = function(message, category) {
-        category = category || 'info';
-        var c = document.getElementById('toastContainer'); if (!c) return;
-        var t = document.createElement('div');
-        t.className = 'gh-toast gh-toast--' + category;
-        t.innerHTML = '<span class="gh-toast__icon material-symbols-outlined">' +
-          (ICONS[category]||'info') + '</span>' +
-          '<span class="gh-toast__msg"></span>' +
-          '<button class="gh-toast__close material-symbols-outlined" aria-label="Close">close</button>';
-        t.querySelector('.gh-toast__msg').textContent = message;
-        function dismiss() { t.classList.add('is-leaving'); setTimeout(function(){ t.remove(); }, 200); }
-        t.querySelector('.gh-toast__close').addEventListener('click', dismiss);
-        c.appendChild(t);
-        setTimeout(dismiss, 5000);
-      };
-    })();
-    </script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      (window.__pendingToasts || []).forEach(function(t) {
-        var cat = t.cat === 'error' ? 'danger' : (t.cat === 'message' ? 'info' : t.cat);
-        if (window.ghToast) window.ghToast(t.msg, cat);
-      });
-    });
-    </script>
-
 </body>
 </html>

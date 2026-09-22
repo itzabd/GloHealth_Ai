@@ -330,14 +330,4 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModal();
         }
     });
-
-    // Global delegated listener for any auth modal triggers
-    document.addEventListener('click', function(e) {
-        var trigger = e.target.closest('[data-auth-open]');
-        if (trigger) {
-            e.preventDefault();
-            openModal(trigger.dataset.authOpen);
-        }
-    });
-
 });

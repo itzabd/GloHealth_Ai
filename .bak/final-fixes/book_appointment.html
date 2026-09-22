@@ -164,10 +164,6 @@
         r.closest('label').classList.toggle('is-checked', r.checked);
       });
     });
-  var firstTime = document.querySelector('[data-time]:not([disabled])');
-  if (firstTime && !document.getElementById('timeInput').value) {
-    firstTime.classList.add('is-active');
-    document.getElementById('timeInput').value = firstTime.dataset.time;
-  }
+  });
 </script>
 {% endblock %}

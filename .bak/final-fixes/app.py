@@ -939,10 +939,11 @@ def dashboard():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 
 @app.route('/prediction')
