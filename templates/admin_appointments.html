@@ -4,20 +4,20 @@
 
 {% block content %}
 <div class="dashboard-wrapper">
-  <a href="{{ url_for('add_appointment_page') }}" class="btn btn-accent mb-3">Add Appointment</a>
+  <a href="{{ url_for('add_appointment_page') }}" class="btn btn-accent mb-3" data-i18n="c.add">Add Appointment</a>
 
   <div class="table-wrapper">
     <table class="table table-hover">
   <thead>
     <tr>
       <th>#</th>
-      <th>User Name</th>
-      <th>Email</th>
-      <th>Doctor</th>
-      <th>Scheduled Time</th>
-      <th>Status</th>
-      <th>Payment</th>
-      <th>Actions</th>
+      <th data-i18n="c.user_name">User Name</th>
+      <th data-i18n="c.email">Email</th>
+      <th data-i18n="ap.doc">Doctor</th>
+      <th data-i18n="c.scheduled_time">Scheduled Time</th>
+      <th data-i18n="c.status">Status</th>
+      <th data-i18n="c.payment">Payment</th>
+      <th data-i18n="c.actions">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -32,16 +32,16 @@
         <td>{{ appt.status }}</td>
         <td>{{ appt.payment_status }}</td>
         <td>
-          <a href="{{ url_for('edit_appointment_page', appointment_id=appt.id) }}" class="btn btn-sm btn-accent">Edit</a>
+          <a href="{{ url_for('edit_appointment_page', appointment_id=appt.id) }}" class="btn btn-sm btn-accent" data-i18n="c.edit">Edit</a>
           <form action="{{ url_for('delete_appointment_page', appointment_id=appt.id) }}" method="POST" style="display:inline;">
-            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+            <button type="submit" class="btn btn-sm btn-outline-danger" data-i18n="c.delete">Delete</button>
           </form>
         </td>
       </tr>
       {% endfor %}
     {% else %}
       <tr>
-        <td colspan="8" class="text-center">No appointments found</td>
+        <td colspan="8" class="text-center" data-i18n="ad.no_appts">No appointments found</td>
       </tr>
     {% endif %}
   </tbody>

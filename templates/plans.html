@@ -24,7 +24,7 @@
         <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between; {% if is_current_free %}border: 2px solid var(--gh-primary); box-shadow: 0 0 16px rgba(3,105,161,0.25);{% endif %}">
             <div>
                 <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Free</h3>
-                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;">Essential diagnostic screening</p>
+                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;" data-i18n="p.free_sub">Essential diagnostic screening</p>
                 
                 <div style="margin-bottom: 24px;">
                     <span style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--gh-text-main);">৳0</span>
@@ -34,36 +34,36 @@
                 <ul class="gh-modal__precautions" style="padding: 0; list-style: none; margin-bottom: 20px;">
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>5 symptom checks / month</span>
+                        <span data-i18n="p.f_free_1">5 symptom checks / month</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Basic disease predictions</span>
+                        <span data-i18n="p.f_free_2">Basic disease predictions</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Community support</span>
+                        <span data-i18n="p.f_free_3">Community support</span>
                     </li>
                     <li class="u-muted" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px; text-decoration: line-through; opacity: 0.6;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-                        <span>Doctor consultations</span>
+                        <span data-i18n="p.f_free_4">Doctor consultations</span>
                     </li>
                     <li class="u-muted" style="display: flex; align-items: center; gap: 8px; font-size: 14px; text-decoration: line-through; opacity: 0.6;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-                        <span>Geo insights access</span>
+                        <span data-i18n="p.f_free_5">Geo insights access</span>
                     </li>
                 </ul>
             </div>
 
             <div style="margin-top: 24px;">
                 {% if is_current_free %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
+                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">Current Plan</button>
                     {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
+                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;"><span data-i18n="p.active_until">Active until</span> {{ end_date }}</div>
                     {% endif %}
                 {% else %}
                     <form action="{{ url_for('subscribe_plan', plan_name='Free') }}" method="POST">
-                        <button class="gh-btn gh-btn--primary gh-btn--block" type="submit">Upgrade to Free</button>
+                        <button class="gh-btn gh-btn--primary gh-btn--block" type="submit" data-i18n="p.upgrade_free">Upgrade to Free</button>
                     </form>
                 {% endif %}
             </div>
@@ -78,7 +78,7 @@
 
             <div>
                 <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Plus</h3>
-                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;">Comprehensive proactive health care</p>
+                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;" data-i18n="p.plus_sub">Comprehensive proactive health care</p>
 
                 <div style="margin-bottom: 24px;">
                     <span style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--gh-primary);" class="price-val" data-monthly="৳499" data-yearly="৳399">৳499</span>
@@ -88,32 +88,32 @@
                 <ul class="gh-modal__precautions" style="padding: 0; list-style: none; margin-bottom: 20px;">
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>50 symptom checks / month</span>
+                        <span data-i18n="p.f_plus_1">50 symptom checks / month</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Advanced predictions + confidence</span>
+                        <span data-i18n="p.f_plus_2">Advanced predictions + confidence</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>2 free doctor consultations</span>
+                        <span data-i18n="p.f_plus_3">2 free doctor consultations</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Geo insights access</span>
+                        <span data-i18n="p.f_free_5">Geo insights access</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Priority email support</span>
+                        <span data-i18n="p.f_plus_5">Priority email support</span>
                     </li>
                 </ul>
             </div>
 
             <div style="margin-top: 24px;">
                 {% if is_current_plus %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
+                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">Current Plan</button>
                     {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
+                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;"><span data-i18n="p.active_until">Active until</span> {{ end_date }}</div>
                     {% endif %}
                 {% else %}
                     <form action="{{ url_for('subscribe_plan', plan_name='Premium Plan') }}" method="POST">
@@ -128,7 +128,7 @@
         <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between; {% if is_current_pro %}border: 2px solid var(--gh-primary); box-shadow: 0 0 16px rgba(3,105,161,0.25);{% endif %}">
             <div>
                 <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Pro</h3>
-                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;">For families & continuous monitoring</p>
+                <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;" data-i18n="p.pro_sub">For families & continuous monitoring</p>
 
                 <div style="margin-bottom: 24px;">
                     <span style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; color: var(--gh-text-main);" class="price-val" data-monthly="৳1,299" data-yearly="৳1,039">৳1,299</span>
@@ -138,32 +138,32 @@
                 <ul class="gh-modal__precautions" style="padding: 0; list-style: none; margin-bottom: 20px;">
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Unlimited symptom checks</span>
+                        <span data-i18n="p.f_pro_1">Unlimited symptom checks</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>All Plus features</span>
+                        <span data-i18n="p.f_pro_2">All Plus features</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>Unlimited doctor consultations</span>
+                        <span data-i18n="p.f_pro_3">Unlimited doctor consultations</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>API access + exports</span>
+                        <span data-i18n="p.f_pro_4">API access + exports</span>
                     </li>
                     <li style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
                         <span class="material-symbols-outlined" style="font-size: 18px; color: var(--gh-accent);">check</span>
-                        <span>24/7 phone support</span>
+                        <span data-i18n="p.f_pro_5">24/7 phone support</span>
                     </li>
                 </ul>
             </div>
 
             <div style="margin-top: 24px;">
                 {% if is_current_pro %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
+                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">Current Plan</button>
                     {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
+                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;"><span data-i18n="p.active_until">Active until</span> {{ end_date }}</div>
                     {% endif %}
                 {% else %}
                     <form action="{{ url_for('subscribe_plan', plan_name='Ultimate Plan') }}" method="POST">
@@ -180,7 +180,7 @@
     <div style="text-align:center; margin-top: 32px;">
       <form method="POST" action="{{ url_for('cancel_subscription', sub_id=current_sub_id) }}" style="display:inline;">
         <button type="submit" class="gh-btn gh-btn--ghost"
-                onclick="return confirm('Cancel your current subscription?');">
+                onclick="return confirm('Cancel your current subscription?');" data-i18n="p.cancel_sub">
           Cancel Subscription
         </button>
       </form>

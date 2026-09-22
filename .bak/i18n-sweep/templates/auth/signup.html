@@ -1,0 +1,254 @@
+{% set hide_nav = true %}
+{% extends "base.html" %}
+
+{% block title %}Create Account · GloHealth AI{% endblock %}
+
+{% block content %}
+<div class="gh-auth">
+    <!-- LEFT COLUMN: Brand & Clinical Telemetry Intro (55%) -->
+    <div class="gh-auth__brand">
+        <div>
+            <a href="{{ url_for('index') }}" class="gh-nav__brand" style="margin-bottom: 48px; display: inline-flex; text-decoration: none; align-items: center; gap: 8px;">
+                <span class="gh-nav__brand-name" style="font-size: 24px;">GloHealth</span>
+                <span class="gh-nav__brand-badge" style="font-size: 13px;">AI</span>
+            </a>
+
+            <h1 class="gh-auth__title">Clinical-grade AI healthcare for Bangladesh.</h1>
+            <p class="gh-auth__sub">Join patients and healthcare specialists nationwide using predictive diagnostics and real-time surveillance.</p>
+
+            <ul class="gh-modal__precautions" style="margin-top: 36px; padding: 0; list-style: none;">
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">vital_signs</span>
+                    <span>132+ symptom features modeled on national disease vectors</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">verified_user</span>
+                    <span>Verified physician network across all 8 administrative divisions</span>
+                </li>
+                <li>
+                    <span class="material-symbols-outlined" style="color: var(--gh-primary);">shield</span>
+                    <span>Secure medical profile and historical encounter encryption</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;">
+            ISO-27799 Encrypted Telemetry · BMDC Aligned
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Signup Form (45%) -->
+    <div class="gh-auth__form-col">
+        <div class="gh-auth__card gh-auth__card--wide">
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Create Account</h2>
+            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;">Register for predictive clinical access</p>
+
+            <!-- Flashed Alerts inside auth card -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert" style="border-radius: var(--gh-radius-sm); font-size: 13px; padding: 10px 14px; margin-bottom: 16px;">
+                            <span>{{ message }}</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 12px;"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('signup') }}" method="POST" id="signupForm">
+                <div style="margin-bottom: 14px;">
+                    <label for="name" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Full Name</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="text" id="name" name="name" required placeholder="e.g. Dr. Sabrina Ahmed" class="gh-auth__input" autofocus autocomplete="name">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label for="email" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Email Address</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="email" id="email" name="email" required placeholder="name@example.com" class="gh-auth__input" autocomplete="email">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label for="password" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Password</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" class="gh-auth__input" autocomplete="new-password">
+                    </div>
+                    <span class="u-muted" style="font-size: 11.5px; margin-top: 4px; display: block;">At least 6 characters</span>
+                </div>
+
+                <!-- Divider Label: Address -->
+                <div class="gh-auth__section-divider">
+                    <span>Address Information</span>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label for="address_line1" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Address Line 1</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="text" id="address_line1" name="address_line1" required placeholder="House / street" class="gh-auth__input" autocomplete="address-line1">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 14px;">
+                    <label for="address_line2" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Address Line 2 (Optional)</label>
+                    <div class="gh-auth__input-wrap">
+                        <input type="text" id="address_line2" name="address_line2" placeholder="Apartment, floor" class="gh-auth__input" autocomplete="address-line2">
+                    </div>
+                </div>
+
+                <div class="gh-grid gh-grid--2" style="gap: 12px; margin-bottom: 14px;">
+                    <div>
+                        <label for="city" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">City</label>
+                        <div class="gh-auth__input-wrap">
+                            <input type="text" id="city" name="city" required placeholder="e.g. Dhaka" class="gh-auth__input" autocomplete="address-level2">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="postal_code" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Postal Code</label>
+                        <div class="gh-auth__input-wrap">
+                            <input type="text" id="postal_code" name="postal_code" required maxlength="4" placeholder="1207" class="gh-auth__input" autocomplete="postal-code">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="division" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Division</label>
+                    <div class="gh-auth__input-wrap">
+                        <select id="division" name="division" required class="gh-auth__input" style="cursor: pointer;">
+                            <option value="" disabled selected>Select your division</option>
+                            <option value="Dhaka">Dhaka</option>
+                            <option value="Chittagong">Chittagong</option>
+                            <option value="Rajshahi">Rajshahi</option>
+                            <option value="Khulna">Khulna</option>
+                            <option value="Barisal">Barisal</option>
+                            <option value="Sylhet">Sylhet</option>
+                            <option value="Rangpur">Rangpur</option>
+                            <option value="Mymensingh">Mymensingh</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 12.5px; color: var(--gh-text);">
+                        <input type="checkbox" required style="accent-color: var(--gh-primary); width: 16px; height: 16px; border-radius: 4px; margin-top: 2px;">
+                        <span>I agree to the <a href="#" style="color: var(--gh-primary);">Terms of Service</a> and <a href="#" style="color: var(--gh-primary);">Privacy Policy</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" style="width: 100%; justify-content: center; padding: 11px; font-size: 14px; font-weight: 600;">
+                    Create Account
+                </button>
+            </form>
+
+            <div style="text-align: center; font-size: 13px; color: var(--gh-text-muted); margin-top: 24px;">
+                Already have an account? <a href="{{ url_for('login') }}" style="color: var(--gh-primary); font-weight: 600;">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.gh-auth {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    min-height: 100vh;
+    background-color: var(--gh-surface);
+}
+
+.gh-auth__brand {
+    background-color: var(--gh-bg);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid var(--gh-border);
+}
+
+.gh-auth__title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--gh-text);
+    margin: 0 0 12px 0;
+}
+
+.gh-auth__sub {
+    font-size: 15px;
+    color: var(--gh-text-muted);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 440px;
+}
+
+.gh-auth__form-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background-color: #ffffff;
+}
+
+.gh-auth__card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.gh-auth__card--wide {
+    max-width: 480px;
+}
+
+.gh-auth__input-wrap {
+    background-color: #ffffff;
+    border: 1px solid var(--gh-border);
+    border-radius: 8px;
+    padding: 2px 4px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gh-auth__input-wrap:focus-within {
+    border-color: var(--gh-primary);
+    box-shadow: 0 0 0 3px var(--gh-primary-tint);
+}
+
+.gh-auth__input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 9px 12px;
+    font-size: 13.5px;
+    color: var(--gh-text);
+    background: transparent;
+}
+
+.gh-auth__section-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0 14px 0;
+    color: var(--gh-text-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.gh-auth__section-divider::after {
+    content: '';
+    flex: 1;
+    margin-left: 10px;
+    border-bottom: 1px solid var(--gh-border);
+}
+
+@media (max-width: 900px) {
+    .gh-auth {
+        grid-template-columns: 1fr;
+    }
+    .gh-auth__brand {
+        display: none;
+    }
+    .gh-auth__form-col {
+        padding: 48px 20px;
+    }
+}
+</style>
+{% endblock %}

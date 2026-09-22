@@ -61,22 +61,22 @@
         <div class="gh-card gh-stat">
             <span class="gh-stat__label" data-i18n="g.cases">Total Cases</span>
             <div class="gh-stat__value">{{ "{:,}".format(kpis.total_cases) if (kpis is defined and kpis and kpis.total_cases is defined and kpis.total_cases is not none) else '0' }}</div>
-            <span class="gh-stat__sub text-muted">Aggregated across 8 divisions</span>
+            <span class="gh-stat__sub text-muted" data-i18n="g.aggregated">Aggregated across 8 divisions</span>
         </div>
         <div class="gh-card gh-stat">
             <span class="gh-stat__label" data-i18n="g.top_div">Top Division</span>
             <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_division if (kpis is defined and kpis and kpis.top_division is defined and kpis.top_division) else 'Dhaka' }}</div>
-            <span class="gh-stat__sub" style="color: var(--gh-primary); font-weight: 600;">{{ kpis.top_division_pct if (kpis is defined and kpis and kpis.top_division_pct is defined and kpis.top_division_pct is not none) else '49.4' }}% of all recorded cases</span>
+            <span class="gh-stat__sub" style="color: var(--gh-primary); font-weight: 600;">{{ kpis.top_division_pct if (kpis is defined and kpis and kpis.top_division_pct is defined and kpis.top_division_pct is not none) else '49.4' }}<span data-i18n="g.pct_cases">% of all recorded cases</span></span>
         </div>
         <div class="gh-card gh-stat">
             <span class="gh-stat__label" data-i18n="g.top_dis">Top Disease</span>
             <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_disease if (kpis is defined and kpis and kpis.top_disease is defined and kpis.top_disease) else 'Bronchial Asthma' }}</div>
-            <span class="gh-stat__sub" style="color: var(--gh-alert); font-weight: 600;">{{ "{:,}".format(kpis.top_disease_count) if (kpis is defined and kpis and kpis.top_disease_count is defined and kpis.top_disease_count is not none) else '42' }} active cases</span>
+            <span class="gh-stat__sub" style="color: var(--gh-alert); font-weight: 600;">{{ "{:,}".format(kpis.top_disease_count) if (kpis is defined and kpis and kpis.top_disease_count is defined and kpis.top_disease_count is not none) else '42' }} <span data-i18n="g.active_cases">active cases</span></span>
         </div>
         <div class="gh-card gh-stat">
             <span class="gh-stat__label" data-i18n="g.outbreaks">Active Outbreaks</span>
             <div class="gh-stat__value">{{ kpis.active_outbreaks if (kpis is defined and kpis and kpis.active_outbreaks is defined and kpis.active_outbreaks is not none) else '3' }}</div>
-            <span class="gh-stat__sub" style="color: var(--gh-warn); font-weight: 600;">Elevated surveillance active</span>
+            <span class="gh-stat__sub" style="color: var(--gh-warn); font-weight: 600;" data-i18n="g.elevated">Elevated surveillance active</span>
         </div>
     </div>
 
@@ -85,7 +85,7 @@
         <div style="padding: 14px 20px; border-bottom: 1px solid var(--gh-border-soft); display: flex; align-items: center; justify-content: space-between;">
             <div class="gh-row" style="gap: 8px;">
                 <span class="material-symbols-outlined" style="color: var(--gh-primary);">travel_explore</span>
-                <span style="font-weight: 600; font-size: 14px;">National Surveillance Matrix</span>
+                <span style="font-weight: 600; font-size: 14px;" data-i18n="g.matrix">National Surveillance Matrix</span>
             </div>
             <span class="u-mono u-muted" style="font-size: 11px;">PROJECTION: WGS 84 · EPSG:4326</span>
         </div>
@@ -97,7 +97,7 @@
         <!-- LEFT: Division Table -->
         <div class="gh-card" style="padding: 0; overflow: hidden;">
             <div style="padding: 16px 20px; border-bottom: 1px solid var(--gh-border-soft);">
-                <h3 style="font-size: 15px; font-weight: 700; margin: 0;">Division Telemetry</h3>
+                <h3 style="font-size: 15px; font-weight: 700; margin: 0;" data-i18n="g.div_telemetry">Division Telemetry</h3>
             </div>
             <table class="gh-table gh-table--responsive">
                 <thead>
@@ -116,11 +116,11 @@
                         <td>{{ d.top_disease }}</td>
                         <td>
                             {% if d.cases > 3000 %}
-                            <span class="gh-badge gh-badge--alert">High Alert</span>
+                            <span class="gh-badge gh-badge--alert" data-i18n="g.high_alert">High Alert</span>
                             {% elif d.cases > 1000 %}
-                            <span class="gh-badge gh-badge--warn">Monitored</span>
+                            <span class="gh-badge gh-badge--warn" data-i18n="g.monitored">Monitored</span>
                             {% else %}
-                            <span class="gh-badge gh-badge--accent">Stable</span>
+                            <span class="gh-badge gh-badge--accent" data-i18n="g.stable">Stable</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -133,7 +133,7 @@
         <div class="gh-card">
             <div style="margin-bottom: 16px;">
                 <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px 0;" data-i18n="g.top5">Top 5 Outbreak Diseases</h3>
-                <p class="u-muted" style="font-size: 12px; margin: 0;">Ranked by national incidence volume</p>
+                <p class="u-muted" style="font-size: 12px; margin: 0;" data-i18n="g.ranked_inc">Ranked by national incidence volume</p>
             </div>
 
             {% set max_count = top_diseases[0].count if top_diseases else 1 %}
@@ -201,10 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }).addTo(map);
 
         var popupContent = '<div style="font-family: var(--gh-font-body); padding: 4px;">' +
-            '<h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #0f172a;">' + d.name + ' Division</h4>' +
-            '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Reported Cases: <strong style="color: #0f172a;">' + d.cases.toLocaleString() + '</strong> (' + d.pct_of_total + '% of total)</div>' +
-            '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">Prevalent: <strong style="color: #0369a1;">' + d.top_disease + '</strong></div>' +
-            '<a href="/doctors" style="font-size: 12px; color: #0369a1; font-weight: 600; text-decoration: none;">View details &rarr;</a>' +
+            '<h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #0f172a;">' + d.name + ' ' + t('dr.division_suffix') + '</h4>' +
+            '<div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">' + t('g.cases') + ': <strong style="color: #0f172a;">' + d.cases.toLocaleString() + '</strong> (' + d.pct_of_total + t('g.pct_cases') + ')</div>' +
+            '<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">' + t('g.dis') + ': <strong style="color: #0369a1;">' + d.top_disease + '</strong></div>' +
+            '<a href="/doctors" style="font-size: 12px; color: #0369a1; font-weight: 600; text-decoration: none;">' + t('g.view_details') + ' &rarr;</a>' +
             '</div>';
 
         marker.bindPopup(popupContent);
@@ -219,10 +219,10 @@ document.addEventListener('DOMContentLoaded', function() {
     legend.onAdd = function() {
         var div = L.DomUtil.create('div', 'gh-map-legend');
         div.innerHTML =
-            '<div style="font-weight: 700; margin-bottom: 6px; font-size: 12px;">Case Severity</div>' +
-            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 16px; height: 16px;"></span><span>High (&ge; 3,000)</span></div>' +
-            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 12px; height: 12px;"></span><span>Moderate (1,000 - 2,999)</span></div>' +
-            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 8px; height: 8px;"></span><span>Low (&lt; 1,000)</span></div>';
+            '<div style="font-weight: 700; margin-bottom: 6px; font-size: 12px;" data-i18n="g.case_sev">' + t('g.case_sev') + '</div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 16px; height: 16px;"></span><span data-i18n="g.high_range">' + t('g.high_range') + '</span></div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 12px; height: 12px;"></span><span data-i18n="g.mod_range">' + t('g.mod_range') + '</span></div>' +
+            '<div class="gh-map-legend__row"><span class="gh-map-legend__dot" style="width: 8px; height: 8px;"></span><span data-i18n="g.low_range">' + t('g.low_range') + '</span></div>';
         return div;
     };
     legend.addTo(map);

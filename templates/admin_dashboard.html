@@ -20,12 +20,12 @@
                 </div>
                 <span class="gh-nav__brand-name" style="font-size: 18px; font-weight: 700; color: var(--gh-primary); letter-spacing: -0.02em;">GloHealth</span>
                 <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
-                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;">ADMIN CONSOLE</span>
+                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
             </a>
             <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
             <div class="gh-row" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block;"></span>
-                <span>HQ CLUSTER : PROD · ACTIVE</span>
+                <span data-i18n="ad.cluster">HQ CLUSTER : PROD · ACTIVE</span>
             </div>
         </div>
 
@@ -61,7 +61,7 @@
             <!-- Exit to Patient Portal Link -->
             <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 8px;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
-                <span>Patient Portal</span>
+                <span data-i18n="ad.patient_portal">Patient Portal</span>
             </a>
             <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
                 <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
@@ -86,7 +86,7 @@
 
                 <!-- Section Label -->
                 <div style="padding: 16px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
-                    MANAGEMENT
+                    <span data-i18n="ad.mgmt">MANAGEMENT</span>
                 </div>
 
                 <!-- Nav items list -->
@@ -94,46 +94,46 @@
                     <!-- Dashboard (Active) -->
                     <a href="{{ url_for('admin_dashboard') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 600; border-radius: 6px; background-color: #f0f9ff; color: #0369a1; border-left: 4px solid #0369a1; text-decoration: none;">
                         <span class="material-symbols-outlined" style="color: #0369a1; font-size: 20px;">dashboard</span>
-                        <span>Dashboard</span>
+                        <span data-i18n="nav.dashboard">Dashboard</span>
                     </a>
                     <!-- Users -->
                     <a href="{{ url_for('admin_users') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">group</span>
-                        <span>Users</span>
+                        <span data-i18n="ad.users">Users</span>
                     </a>
                     <!-- Doctors -->
                     <a href="{{ url_for('admin_doctors') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">medical_services</span>
-                        <span>Doctors</span>
+                        <span data-i18n="ad.doctors">Doctors</span>
                     </a>
                     <!-- Appointments -->
                     <a href="{{ url_for('admin_appointments') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">calendar_today</span>
-                        <span>Appointments</span>
+                        <span data-i18n="ad.appts">Appointments</span>
                     </a>
                     <!-- Insights -->
                     <a href="{{ url_for('geo_insights') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">insights</span>
-                        <span>Insights</span>
+                        <span data-i18n="ad.insights">Insights</span>
                     </a>
                     <!-- System Settings -->
                     <a href="{{ url_for('admin_settings') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">settings</span>
-                        <span>System Settings</span>
+                        <span data-i18n="ad.settings">System Settings</span>
                     </a>
                 </nav>
 
                 <!-- Section Label -->
-                <div style="padding: 24px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
+                <div style="padding: 24px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;" data-i18n="ad.telem_logs">
                     TELEMETRY LOGS
                 </div>
                 <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 4px; font-size: 12px;">
                     <div style="padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; color: #64748b; font-family: monospace; border-radius: 4px; background: #f8fafc;">
                         <span>ISO-27799 Guard</span>
-                        <span style="font-size: 10px; color: #059669; font-weight: 700;">PASS</span>
+                        <span style="font-size: 10px; color: #059669; font-weight: 700;" data-i18n="ad.pass">PASS</span>
                     </div>
                     <div style="padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; color: #64748b; font-family: monospace; border-radius: 4px; background: #f8fafc;">
-                        <span>Latency SLA</span>
+                        <span><span data-i18n="ad.lat_sla">Latency SLA</span></span>
                         <span style="font-size: 10px; color: #475569; font-weight: 600;">14ms</span>
                     </div>
                 </div>
@@ -160,18 +160,18 @@
                 <!-- Workspace Header -->
                 <div class="gh-row" style="justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; flex-wrap: wrap; gap: 16px;">
                     <div>
-                        <h1 class="font-headline-lg" style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">Admin Overview</h1>
-                        <p style="font-size: 14px; color: #64748b; margin: 0;">Platform health &amp; activity telemetry dashboard</p>
+                        <h1 class="font-headline-lg" style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;" data-i18n="ad.overview">Admin Overview</h1>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;" data-i18n="ad.overview_sub">Platform health &amp; activity telemetry dashboard</p>
                     </div>
                     <div class="gh-row" style="gap: 12px; align-items: center;">
                         <button type="button" class="gh-chip" style="height: 38px; padding: 0 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; color: #334155; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
                             <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">calendar_today</span>
-                            <span>Last 30 days</span>
+                            <span><span data-i18n="ad.last_30_days">Last 30 days</span></span>
                             <span class="material-symbols-outlined" style="font-size: 16px; color: #94a3b8;">expand_more</span>
                         </button>
                         <button type="button" class="gh-btn gh-btn--primary" style="height: 38px; padding: 0 16px; border-radius: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
-                            <span>Export Audit</span>
+                            <span><span data-i18n="ad.export_audit">Export Audit</span></span>
                         </button>
                     </div>
                 </div>
@@ -181,7 +181,7 @@
                     <!-- Card 1 -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Total Users</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_users">Total Users</span>
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">group</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
@@ -198,7 +198,7 @@
                     <!-- Card 2 -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Active Subscriptions</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_subs">Active Subscriptions</span>
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">credit_card</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
@@ -213,7 +213,7 @@
                     <!-- Card 3 -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Predictions Today</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_pred">Predictions Today</span>
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">psychology</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
@@ -228,14 +228,14 @@
                     <!-- Card 4 -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">System Uptime</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_uptime">System Uptime</span>
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">speed</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
                             <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">99.97%</div>
                             <div style="display: inline-flex; align-items: center; color: #0d9488; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600; gap: 4px;">
                                 <span style="width: 6px; height: 6px; border-radius: 50%; background: #0d9488;"></span>
-                                <span>All systems normal</span>
+                                <span><span data-i18n="ad.all_systems_normal">All systems normal</span></span>
                             </div>
                         </div>
                     </div>
@@ -249,17 +249,17 @@
                         <!-- Header -->
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px;">
                             <div>
-                                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0;">User Growth &amp; Telemetry Ingestion</h2>
-                                <p style="font-size: 12px; color: #64748b; margin: 0;">Monthly registered clinical accounts and intake volume</p>
+                                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0;" data-i18n="ad.user_growth">User Growth &amp; Telemetry Ingestion</h2>
+                                <p style="font-size: 12px; color: #64748b; margin: 0;"><span data-i18n="ad.monthly_user_growth">Monthly registered clinical accounts and intake volume</span></p>
                             </div>
                             <div class="gh-row" style="gap: 16px; font-size: 12px; font-family: monospace;">
                                 <div class="gh-row" style="gap: 6px; align-items: center;">
                                     <span style="width: 12px; height: 3px; background: #0369a1; display: inline-block;"></span>
-                                    <span style="color: #475569;">Registered Users</span>
+                                    <span style="color: #475569;"><span data-i18n="ad.registered_users">Registered Users</span></span>
                                 </div>
                                 <div class="gh-row" style="gap: 6px; align-items: center;">
                                     <span style="width: 12px; height: 3px; background: #cbd5e1; display: inline-block;"></span>
-                                    <span style="color: #94a3b8;">Intake Target</span>
+                                    <span style="color: #94a3b8;"><span data-i18n="ad.intake_target">Intake Target</span></span>
                                 </div>
                             </div>
                         </div>
@@ -317,8 +317,8 @@
 
                         <!-- Summary Footnote -->
                         <div style="margin-top: 32px; padding-top: 12px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: monospace; color: #64748b;">
-                            <span>Peak Day: <strong style="color: #0f172a;">Day 28 (1,230 intake sessions)</strong></span>
-                            <span style="color: #94a3b8;">Rolling calculation verified by clinical engine</span>
+                            <span><span data-i18n="ad.peak_day">Peak Day:</span> <strong style="color: #0f172a;">Day 28 (1,230 intake sessions)</strong></span>
+                            <span style="color: #94a3b8;" data-i18n="ad.rolling_calc">Rolling calculation verified by clinical engine</span>
                         </div>
                     </div>
 
@@ -326,7 +326,7 @@
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
                             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px;">
-                                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Recent Activity</h2>
+                                <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;" data-i18n="ad.recent_activity">Recent Activity</h2>
                                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #0369a1;"></span>
                             </div>
 
@@ -338,7 +338,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">person_add</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">New user registered</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_new_user">New user registered</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">2 min ago · Patient Portal</p>
                                     </div>
                                 </li>
@@ -348,7 +348,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">medical_services</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">Dr. Rahman updated schedule</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_dr_sched">Dr. Rahman updated schedule</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">18 min ago · Cardio Unit</p>
                                     </div>
                                 </li>
@@ -358,7 +358,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">upgrade</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">Subscription upgrade (Pro)</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_sub_up">Subscription upgrade (Pro)</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">1 h ago · Clinic Tier #9</p>
                                     </div>
                                 </li>
@@ -368,7 +368,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">New doctor verified</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_doc_ver">New doctor verified</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">3 h ago · Internal Governance</p>
                                     </div>
                                 </li>
@@ -378,7 +378,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">neurology</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">Prediction model retrained</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_model_retrain">Prediction model retrained</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">6 h ago · Model v2.4a deployed</p>
                                     </div>
                                 </li>
@@ -388,7 +388,7 @@
                                         <span class="material-symbols-outlined" style="font-size: 16px;">backup</span>
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">System backup completed</p>
+                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_sys_backup">System backup completed</p>
                                         <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">12 h ago · Encrypted Cold Storage</p>
                                     </div>
                                 </li>
@@ -397,7 +397,7 @@
 
                         <!-- View All Activity -->
                         <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
-                            <a href="{{ url_for('admin_users') }}" style="color: #0369a1; font-weight: 600; font-size: 13px; text-decoration: none;">
+                            <a href="{{ url_for('admin_users') }}" style="color: #0369a1; font-weight: 600; font-size: 13px; text-decoration: none;" data-i18n="ad.view_all">
                                 View all activity &rarr;
                             </a>
                         </div>
@@ -407,13 +407,13 @@
                 <!-- 3. Docked Dedicated Admin Footer -->
                 <footer style="margin-top: 32px; padding: 24px 0; border-top: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; font-size: 12px; color: #64748b;">
                     <div>
-                        <strong style="color: #0f172a;">GloHealth AI Systems</strong> · Diagnostic telemetry &amp; clinical records strictly encrypted under ISO-27799.
+                        <strong style="color: #0f172a;">GloHealth AI Systems</strong> · <span data-i18n="ad.footer_enc">Diagnostic telemetry &amp; clinical records strictly encrypted under ISO-27799.</span>
                     </div>
                     <div class="gh-row" style="gap: 20px; flex-wrap: wrap;">
-                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'">Clinical Governance</a>
-                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'">Data Security Protocol</a>
-                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'">HIPAA Compliance</a>
-                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'">Telemetry Diagnostics</a>
+                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'" data-i18n="ad.clin_gov">Clinical Governance</a>
+                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'" data-i18n="ad.data_sec">Data Security Protocol</a>
+                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'" data-i18n="ad.hipaa_comp">HIPAA Compliance</a>
+                        <a href="#" style="color: #64748b; text-decoration: none;" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#64748b'" data-i18n="ad.telem_diag">Telemetry Diagnostics</a>
                     </div>
                 </footer>
 

@@ -90,8 +90,8 @@
                         <li>{{ feature }}</li>
                     {% endfor %}
                 </ul>
-                <a href="{{ url_for('subscribe_plan', plan_name=plan_name) }}" class="btn btn-accent mt-3">Subscribe</a>
-                <a href="{{ url_for('plans') }}" class="btn btn-outline-secondary mt-2">Back to Plans</a>
+                <a href="{{ url_for('subscribe_plan', plan_name=plan_name) }}" class="btn btn-accent mt-3" data-i18n="p.subscribe">Subscribe</a>
+                <a href="{{ url_for('plans') }}" class="btn btn-outline-secondary mt-2" data-i18n="c.back_to_plans">Back to Plans</a>
             </div>
         </div>
     </div>

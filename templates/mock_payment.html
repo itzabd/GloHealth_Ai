@@ -8,19 +8,19 @@
         <p>Price: {{ 500 if plan_name=='Basic Plan' else 1200 if plan_name=='Premium Plan' else 2500 }} BDT</p>
         <form method="POST">
             <div class="mb-3">
-                <label>Card Number</label>
+                <label data-i18n="c.card_number">Card Number</label>
                 <input type="text" class="form-control" name="card_number" required>
             </div>
             <div class="mb-3">
-                <label>Expiry</label>
+                <label data-i18n="c.expiry">Expiry</label>
                 <input type="text" class="form-control" name="expiry" required>
             </div>
             <div class="mb-3">
-                <label>CVV</label>
+                <label data-i18n="c.cvv">CVV</label>
                 <input type="text" class="form-control" name="cvv" required>
             </div>
-            <button type="submit" class="btn btn-success">Pay & Subscribe</button>
-            <a href="{{ url_for('plans') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-success" data-i18n="c.pay_subscribe">Pay & Subscribe</button>
+            <a href="{{ url_for('plans') }}" class="btn btn-secondary" data-i18n="c.cancel">Cancel</a>
         </form>
     </div>
 </div>

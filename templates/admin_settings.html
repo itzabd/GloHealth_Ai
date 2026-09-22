@@ -2,7 +2,7 @@
 
 {% block title %}
 <span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
-<span class="lang-en" lang="en">System Settings</span>
+<span class="lang-en" lang="en" data-i18n="ad.settings">System Settings</span>
 {% endblock %}
 
 {% block extra_css %}
@@ -41,7 +41,7 @@
         <div class="col text-center">
             <h2 class="section-header">
                 <span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
-                <span class="lang-en" lang="en">System Settings</span>
+                <span class="lang-en" lang="en" data-i18n="ad.settings">System Settings</span>
             </h2>
         </div>
     </div>
@@ -53,12 +53,12 @@
                 <div class="card-body">
                     <h5 class="section-title">
                         <span class="lang-bn" lang="bn">সাধারণ সেটিংস</span>
-                        <span class="lang-en" lang="en">General Settings</span>
+                        <span class="lang-en" lang="en" data-i18n="c.general_settings">General Settings</span>
                     </h5>
-                    <p>Change system configurations.</p>
+                    <p data-i18n="c.change_sys_config">Change system configurations.</p>
                     <a href="{{ url_for('update_settings') }}" class="btn btn-accent">
                         <span class="lang-bn" lang="bn">আপডেট করুন</span>
-                        <span class="lang-en" lang="en">Update</span>
+                        <span data-i18n="c.update">Update</span>
                     </a>
                 </div>
             </div>

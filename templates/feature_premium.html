@@ -103,24 +103,24 @@
 
 <div class="container">
     <div class="glass-card">
-        <h2>Premium Plan Features</h2>
+        <h2 data-i18n="c.prem_plan_feat">Premium Plan Features</h2>
         <ul>
-            <li>Includes specialist consultation</li>
-            <li>Detailed health reports</li>
+            <li data-i18n="c.inc_spec_consult">Includes specialist consultation</li>
+            <li data-i18n="c.detailed_reports">Detailed health reports</li>
             <li>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</li>
-            <li>Priority appointment scheduling</li>
+            <li data-i18n="c.priority_scheduling">Priority appointment scheduling</li>
         </ul>
 
-        <h4>Available Doctors</h4>
+        <h4 data-i18n="c.available_doctors">Available Doctors</h4>
         <div class="table-responsive">
             <table class="table table-bordered table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Specialty</th>
-                        <th>Hospital</th>
-                        <th>Consultation Fee</th>
-                        <th>Action</th>
+                        <th data-i18n="c.name">Name</th>
+                        <th data-i18n="c.specialty">Specialty</th>
+                        <th data-i18n="c.hospital">Hospital</th>
+                        <th data-i18n="dr.consult_fee">Consultation Fee</th>
+                        <th data-i18n="c.actions">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -131,7 +131,7 @@
                             <td>{{ doctor.hospital }}</td>
                             <td>{{ doctor.consultation_fee }} BDT</td>
                             <td>
-                                <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-accent btn-sm">
+                                <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-accent btn-sm" data-i18n="c.book">
                                     Book
                                 </a>
                             </td>
@@ -141,7 +141,7 @@
             </table>
         </div>
 
-        <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
+        <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3" data-i18n="c.back_to_plans">Back to Plans</a>
     </div>
 </div>
 {% endblock %}

@@ -2,7 +2,7 @@
 
 {% block title %}
 <span class="lang-bn" lang="bn">ব্যবহারকারী পরিচালনা</span>
-<span class="lang-en" lang="en">Manage Users</span>
+<span class="lang-en" lang="en" data-i18n="ad.manage_users">Manage Users</span>
 {% endblock %}
 
 {% block extra_css %}
@@ -49,7 +49,7 @@
         <div class="col text-center">
             <h2 class="section-header">
                 <span class="lang-bn" lang="bn">ব্যবহারকারী পরিচালনা</span>
-                <span class="lang-en" lang="en">Manage Users</span>
+                <span class="lang-en" lang="en" data-i18n="ad.manage_users">Manage Users</span>
             </h2>
         </div>
     </div>
@@ -61,11 +61,11 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>City</th>
-                            <th>Division</th>
-                            <th>Actions</th>
+                            <th data-i18n="c.email">Email</th>
+                            <th data-i18n="c.name">Name</th>
+                            <th data-i18n="c.city">City</th>
+                            <th data-i18n="c.division">Division</th>
+                            <th data-i18n="c.actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,8 +78,8 @@
                                 <td>{{ user.city or 'N/A' }}</td>
                                 <td>{{ user.division or 'N/A' }}</td>
                                 <td>
-                                    <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-sm btn-accent">Edit</a>
-                                    <a href="{{ url_for('delete_user', user_id=user.id) }}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                    <a href="{{ url_for('edit_user', user_id=user.id) }}" class="btn btn-sm btn-accent" data-i18n="c.edit">Edit</a>
+                                    <a href="{{ url_for('delete_user', user_id=user.id) }}" class="btn btn-sm btn-outline-danger" data-i18n="c.delete">Delete</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -87,7 +87,7 @@
                         <tr>
                             <td colspan="6" class="text-center text-muted">
                                 <span class="lang-bn" lang="bn">কোনো ব্যবহারকারী পাওয়া যায়নি</span>
-                                <span class="lang-en" lang="en">No users found</span>
+                                <span data-i18n="ad.no_users">No users found</span>
                             </td>
                         </tr>
                         {% endif %}

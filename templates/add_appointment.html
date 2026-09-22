@@ -7,43 +7,43 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card p-4">
-        <h4 class="mb-4">Add Appointment</h4>
+        <h4 class="mb-4" data-i18n="c.add">Add Appointment</h4>
         <form method="POST">
-          <label>User</label>
+          <label data-i18n="c.user">User</label>
           <select name="user_id" class="form-control mb-2" required>
-            <option value="">Select User</option>
+            <option value="" data-i18n="c.select_user">Select User</option>
             {% for u in users %}
               <option value="{{ u.id }}">{{ u.full_name }} ({{ u.email }})</option>
             {% endfor %}
           </select>
 
-          <label>Doctor</label>
+          <label data-i18n="ap.doc">Doctor</label>
           <select name="doctor_id" class="form-control mb-2" required>
-            <option value="">Select Doctor</option>
+            <option value="" data-i18n="c.select_doctor">Select Doctor</option>
             {% for d in doctors %}
               <option value="{{ d.id }}">{{ d.name }} - {{ d.specialty }}</option>
             {% endfor %}
           </select>
 
-          <label>Scheduled Time</label>
+          <label data-i18n="c.scheduled_time">Scheduled Time</label>
           <input type="datetime-local" name="scheduled_time" class="form-control mb-2" required>
 
-          <label>Status</label>
+          <label data-i18n="c.status">Status</label>
           <select name="status" class="form-control mb-2">
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="pending" data-i18n="ap.pend">Pending</option>
+            <option value="confirmed" data-i18n="ap.conf">Confirmed</option>
+            <option value="completed" data-i18n="ap.comp">Completed</option>
+            <option value="cancelled" data-i18n="ap.status_cancelled">Cancelled</option>
           </select>
 
-          <label>Payment Status</label>
+          <label data-i18n="ap.payment_status">Payment Status</label>
           <select name="payment_status" class="form-control mb-2">
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
+            <option value="unpaid" data-i18n="ap.unpaid">Unpaid</option>
+            <option value="paid" data-i18n="ap.paid">Paid</option>
           </select>
 
-          <button type="submit" class="btn btn-accent">Add Appointment</button>
-          <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-accent" data-i18n="c.add">Add Appointment</button>
+          <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary" data-i18n="c.cancel">Cancel</a>
         </form>
       </div>
     </div>

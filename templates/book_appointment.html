@@ -7,7 +7,7 @@
     <!-- Breadcrumb & Header -->
     <div style="margin-bottom: 24px;">
         <div class="u-muted" style="font-size: 13px; margin-bottom: 8px;">
-            <a href="{{ url_for('doctors') }}" class="u-muted" style="text-decoration: none;">Doctors</a> / <span>{{ doctor.name }}</span>
+            <a href="{{ url_for('doctors') }}" class="u-muted" style="text-decoration: none;" data-i18n="dr.title">Doctors</a> / <span>{{ doctor.name }}</span>
         </div>
         <h1 class="gh-page-header__title" style="margin: 0 0 4px 0;" data-i18n="book.title">Book Appointment</h1>
         <div class="gh-page-header__sub" data-i18n="book.sub">Choose a date and time that works for you</div>
@@ -37,15 +37,15 @@
                 </div>
                 <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" style="font-size: 18px; color: #eab308;">star</span>
-                    <span>{{ doctor.get('rating', '4.8') if doctor.get else (doctor.rating if doctor.rating else '4.8') }} ({{ doctor.get('reviews', '120') if doctor.get else (doctor.reviews if doctor.reviews else '120') }} reviews)</span>
+                    <span>{{ doctor.get('rating', '4.8') if doctor.get else (doctor.rating if doctor.rating else '4.8') }} ({{ doctor.get('reviews', '120') if doctor.get else (doctor.reviews if doctor.reviews else '120') }} <span data-i18n="book.reviews">reviews)</span></span>
                 </div>
                 <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">payments</span>
-                    <span>৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }} consultation</span>
+                    <span>৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }} <span data-i18n="book.consult">consultation</span></span>
                 </div>
                 <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
-                    <span>Avg wait 15 min</span>
+                    <span data-i18n="book.avg_wait">Avg wait 15 min</span>
                 </div>
             </div>
         </div>
@@ -101,7 +101,7 @@
                         <input type="radio" name="consult_type" value="video" checked hidden>
                         <div style="flex: 1;">
                             <div class="gh-symptom__label" data-i18n="book.video">Video consultation</div>
-                            <div class="gh-symptom__key">Online · available now</div>
+                            <div class="gh-symptom__key" data-i18n="book.online">Online · available now</div>
                         </div>
                         <span class="gh-symptom__check"></span>
                     </label>

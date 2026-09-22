@@ -13,26 +13,26 @@
                 <span class="gh-nav__brand-badge" style="font-size: 13px;">AI</span>
             </a>
 
-            <h1 class="gh-auth__title">Clinical-grade AI healthcare for Bangladesh.</h1>
-            <p class="gh-auth__sub">Join patients and healthcare specialists nationwide using predictive diagnostics and real-time surveillance.</p>
+            <h1 class="gh-auth__title" data-i18n="a.brand_title_signup">Clinical-grade AI healthcare for Bangladesh.</h1>
+            <p class="gh-auth__sub" data-i18n="a.brand_sub_signup">Join patients and healthcare specialists nationwide using predictive diagnostics and real-time surveillance.</p>
 
             <ul class="gh-modal__precautions" style="margin-top: 36px; padding: 0; list-style: none;">
                 <li>
                     <span class="material-symbols-outlined" style="color: var(--gh-primary);">vital_signs</span>
-                    <span>132+ symptom features modeled on national disease vectors</span>
+                    <span data-i18n="a.feat_sym_count">132+ symptom features modeled on national disease vectors</span>
                 </li>
                 <li>
                     <span class="material-symbols-outlined" style="color: var(--gh-primary);">verified_user</span>
-                    <span>Verified physician network across all 8 administrative divisions</span>
+                    <span data-i18n="a.feat_network">Verified physician network across all 8 administrative divisions</span>
                 </li>
                 <li>
                     <span class="material-symbols-outlined" style="color: var(--gh-primary);">shield</span>
-                    <span>Secure medical profile and historical encounter encryption</span>
+                    <span data-i18n="a.feat_secure">Secure medical profile and historical encounter encryption</span>
                 </li>
             </ul>
         </div>
 
-        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;">
+        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;" data-i18n="a.badge_signup">
             ISO-27799 Encrypted Telemetry · BMDC Aligned
         </div>
     </div>
@@ -40,8 +40,8 @@
     <!-- RIGHT COLUMN: Signup Form (45%) -->
     <div class="gh-auth__form-col">
         <div class="gh-auth__card gh-auth__card--wide">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Create Account</h2>
-            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;">Register for predictive clinical access</p>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" data-i18n="a.signup_title">Create Account</h2>
+            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;" data-i18n="a.signup_sub">Register for predictive clinical access</p>
 
             <!-- Flashed Alerts inside auth card -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,41 +57,41 @@
 
             <form action="{{ url_for('signup') }}" method="POST" id="signupForm">
                 <div style="margin-bottom: 14px;">
-                    <label for="name" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Full Name</label>
+                    <label for="name" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.name">Full Name</label>
                     <div class="gh-auth__input-wrap">
                         <input type="text" id="name" name="name" required placeholder="e.g. Dr. Sabrina Ahmed" class="gh-auth__input" autofocus autocomplete="name">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 14px;">
-                    <label for="email" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Email Address</label>
+                    <label for="email" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.email">Email Address</label>
                     <div class="gh-auth__input-wrap">
                         <input type="email" id="email" name="email" required placeholder="name@example.com" class="gh-auth__input" autocomplete="email">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 18px;">
-                    <label for="password" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Password</label>
+                    <label for="password" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.password">Password</label>
                     <div class="gh-auth__input-wrap">
                         <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" class="gh-auth__input" autocomplete="new-password">
                     </div>
-                    <span class="u-muted" style="font-size: 11.5px; margin-top: 4px; display: block;">At least 6 characters</span>
+                    <span class="u-muted" style="font-size: 11.5px; margin-top: 4px; display: block;" data-i18n="a.pwd_min">At least 6 characters</span>
                 </div>
 
                 <!-- Divider Label: Address -->
                 <div class="gh-auth__section-divider">
-                    <span>Address Information</span>
+                    <span data-i18n="a.addr">Address Information</span>
                 </div>
 
                 <div style="margin-bottom: 14px;">
-                    <label for="address_line1" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Address Line 1</label>
+                    <label for="address_line1" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.addr1">Address Line 1</label>
                     <div class="gh-auth__input-wrap">
                         <input type="text" id="address_line1" name="address_line1" required placeholder="House / street" class="gh-auth__input" autocomplete="address-line1">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 14px;">
-                    <label for="address_line2" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Address Line 2 (Optional)</label>
+                    <label for="address_line2" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.addr2">Address Line 2 (Optional)</label>
                     <div class="gh-auth__input-wrap">
                         <input type="text" id="address_line2" name="address_line2" placeholder="Apartment, floor" class="gh-auth__input" autocomplete="address-line2">
                     </div>
@@ -99,13 +99,13 @@
 
                 <div class="gh-grid gh-grid--2" style="gap: 12px; margin-bottom: 14px;">
                     <div>
-                        <label for="city" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">City</label>
+                        <label for="city" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.city">City</label>
                         <div class="gh-auth__input-wrap">
                             <input type="text" id="city" name="city" required placeholder="e.g. Dhaka" class="gh-auth__input" autocomplete="address-level2">
                         </div>
                     </div>
                     <div>
-                        <label for="postal_code" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Postal Code</label>
+                        <label for="postal_code" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.postal">Postal Code</label>
                         <div class="gh-auth__input-wrap">
                             <input type="text" id="postal_code" name="postal_code" required maxlength="4" placeholder="1207" class="gh-auth__input" autocomplete="postal-code">
                         </div>
@@ -113,10 +113,10 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label for="division" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;">Division</label>
+                    <label for="division" class="u-tracking" style="display: block; font-size: 11.5px; font-weight: 600; text-transform: uppercase; color: var(--gh-text-muted); margin-bottom: 5px;" data-i18n="a.division">Division</label>
                     <div class="gh-auth__input-wrap">
                         <select id="division" name="division" required class="gh-auth__input" style="cursor: pointer;">
-                            <option value="" disabled selected>Select your division</option>
+                            <option value="" disabled selected data-i18n="a.select_div">Select your division</option>
                             <option value="Dhaka">Dhaka</option>
                             <option value="Chittagong">Chittagong</option>
                             <option value="Rajshahi">Rajshahi</option>
@@ -132,17 +132,17 @@
                 <div style="margin-bottom: 24px;">
                     <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-size: 12.5px; color: var(--gh-text);">
                         <input type="checkbox" required style="accent-color: var(--gh-primary); width: 16px; height: 16px; border-radius: 4px; margin-top: 2px;">
-                        <span>I agree to the <a href="#" style="color: var(--gh-primary);">Terms of Service</a> and <a href="#" style="color: var(--gh-primary);">Privacy Policy</a></span>
+                        <span><span data-i18n="a.agree_prefix">I agree to the</span> <a href="#" style="color: var(--gh-primary);" data-i18n="a.terms_link">Terms of Service</a> <span data-i18n="a.and">and</span> <a href="#" style="color: var(--gh-primary);" data-i18n="a.privacy_link">Privacy Policy</a></span>
                     </label>
                 </div>
 
-                <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" style="width: 100%; justify-content: center; padding: 11px; font-size: 14px; font-weight: 600;">
+                <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" style="width: 100%; justify-content: center; padding: 11px; font-size: 14px; font-weight: 600;" data-i18n="a.create">
                     Create Account
                 </button>
             </form>
 
             <div style="text-align: center; font-size: 13px; color: var(--gh-text-muted); margin-top: 24px;">
-                Already have an account? <a href="{{ url_for('login') }}" style="color: var(--gh-primary); font-weight: 600;">Sign in</a>
+                Already have an account? <a href="{{ url_for('login') }}" style="color: var(--gh-primary); font-weight: 600;" data-i18n="a.signin_link" data-i18n="a.signin_link">Sign in</a>
             </div>
         </div>
     </div>

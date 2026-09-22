@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Basic Plan Features{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(135deg, #0a3e61, #4b72e6);
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+    }
+
+    .glass-card {
+        background: rgba(15, 76, 117, 0.25);
+        border-radius: 16px;
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        color: #e0f7fa;
+        margin-top: 2rem;
+    }
+
+    .glass-card h2 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+        color: #b2ebf2;
+    }
+
+    .glass-card h4 {
+        margin-top: 2rem;
+        color: #80deea;
+    }
+
+    ul {
+        list-style: disc;
+        padding-left: 1.5rem;
+        color: #e0f7fa;
+    }
+
+    .table {
+        background: rgba(10, 46, 80, 0.25);
+        border-radius: 12px;
+        overflow: hidden;
+        color: #e0f7fa;
+        margin-top: 1rem;
+    }
+
+    .table thead th {
+        border-bottom: 2px solid rgba(178, 235, 242, 0.4);
+        color: #00a1f7;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .table tbody td {
+        color: #242323;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .table tbody tr {
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        transform: translateY(-3px);
+        background: rgba(0, 105, 148, 0.3);
+    }
+
+    .btn-accent {
+        background: rgba(16, 0, 239, 0.2);
+        border: none;
+        color: #32467f;
+        backdrop-filter: blur(5px);
+        transition: 0.3s ease;
+    }
+
+    .btn-accent:hover {
+        background: rgba(55, 0, 255, 0.4);
+        color: #1a5385;
+    }
+
+    .btn-outline-primary {
+        border-color: #00acc1;
+        color: #00acc1;
+        transition: 0.3s;
+    }
+
+    .btn-outline-primary:hover {
+        background: rgba(0, 172, 193, 0.3);
+        color: #e0f7fa;
+        border-color: #00acc1;
+    }
+
+    @media (max-width: 768px) {
+        .table thead th, .table tbody td {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="glass-card">
+        <h2>Basic Plan Features</h2>
+        <ul>
+            <li>Access to general consultation</li>
+            <li>Basic health reports</li>
+            <li>Remaining free checkups: {{ subscription.checkup_points if subscription else 0 }}</li>
+            <li>Book appointment with general doctors</li>
+        </ul>
+
+        <h4>Available Doctors</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Specialty</th>
+                        <th>Hospital</th>
+                        <th>Consultation Fee</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doctor in doctors %}
+                        {% if doctor.specialty.lower() == 'general' %}
+                        <tr>
+                            <td>{{ doctor.name }}</td>
+                            <td>{{ doctor.specialty }}</td>
+                            <td>{{ doctor.hospital }}</td>
+                            <td>{{ doctor.consultation_fee }} BDT</td>
+                            <td>
+                                <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="btn btn-accent btn-sm">
+                                    Book
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{{ url_for('plans') }}" class="btn btn-outline-primary mt-3">Back to Plans</a>
+    </div>
+</div>
+{% endblock %}

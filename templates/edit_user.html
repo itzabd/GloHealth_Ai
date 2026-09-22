@@ -2,7 +2,7 @@
 
 {% block title %}
 <span class="lang-bn" lang="bn">ব্যবহারকারী সম্পাদনা</span>
-<span class="lang-en" lang="en">Edit User</span>
+<span class="lang-en" lang="en" data-i18n="c.edit">Edit User</span>
 {% endblock %}
 
 {% block content %}
@@ -12,27 +12,27 @@
             <div class="card p-4">
                 <h4 class="mb-4">
                     <span class="lang-bn" lang="bn">ব্যবহারকারী সম্পাদনা</span>
-                    <span class="lang-en" lang="en">Edit User</span>
+                    <span class="lang-en" lang="en" data-i18n="c.edit">Edit User</span>
                 </h4>
                 <form method="POST">
                     <div class="mb-3">
-                        <label class="form-label">Full Name</label>
+                        <label class="form-label" data-i18n="c.name">Full Name</label>
                         <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label" data-i18n="c.email">Email</label>
                         <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">City</label>
+                        <label class="form-label" data-i18n="c.city">City</label>
                         <input type="text" name="city" class="form-control" value="{{ user.city }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Division</label>
+                        <label class="form-label" data-i18n="c.division">Division</label>
                         <input type="text" name="division" class="form-control" value="{{ user.division }}">
                     </div>
-                    <button type="submit" class="btn btn-accent">Save Changes</button>
-                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-accent" data-i18n="c.save_changes">Save Changes</button>
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary" data-i18n="c.cancel">Cancel</a>
                 </form>
             </div>
         </div>
