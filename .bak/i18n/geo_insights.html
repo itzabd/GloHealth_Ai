@@ -45,13 +45,13 @@
     <!-- Page Header -->
     <div class="gh-page-header">
         <div>
-            <h1 data-i18n="g.title">Geo Insights</h1>
-            <p class="gh-page-header__sub" data-i18n="g.sub">Live outbreak surveillance across Bangladesh</p>
+            <h1 data-i18n="nav.geo">Geo Insights</h1>
+            <p class="gh-page-header__sub">Live outbreak surveillance across Bangladesh</p>
         </div>
         <div>
             <span class="gh-badge gh-badge--accent u-mono">
                 <span class="material-symbols-outlined" style="font-size: 14px;">sync</span>
-                <span data-i18n="g.updated">Updated 5 min ago</span>
+                Updated 5 min ago
             </span>
         </div>
     </div>
@@ -59,22 +59,22 @@
     <!-- KPI Row -->
     <div class="gh-grid gh-grid--4" style="margin-bottom: 24px;">
         <div class="gh-card gh-stat">
-            <span class="gh-stat__label" data-i18n="g.cases">Total Cases</span>
+            <span class="gh-stat__label">Total Cases</span>
             <div class="gh-stat__value">{{ "{:,}".format(kpis.total_cases) if (kpis is defined and kpis and kpis.total_cases is defined and kpis.total_cases is not none) else '0' }}</div>
             <span class="gh-stat__sub text-muted">Aggregated across 8 divisions</span>
         </div>
         <div class="gh-card gh-stat">
-            <span class="gh-stat__label" data-i18n="g.top_div">Top Division</span>
+            <span class="gh-stat__label">Top Division</span>
             <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_division if (kpis is defined and kpis and kpis.top_division is defined and kpis.top_division) else 'Dhaka' }}</div>
             <span class="gh-stat__sub" style="color: var(--gh-primary); font-weight: 600;">{{ kpis.top_division_pct if (kpis is defined and kpis and kpis.top_division_pct is defined and kpis.top_division_pct is not none) else '49.4' }}% of all recorded cases</span>
         </div>
         <div class="gh-card gh-stat">
-            <span class="gh-stat__label" data-i18n="g.top_dis">Top Disease</span>
+            <span class="gh-stat__label">Top Disease</span>
             <div class="gh-stat__value" style="font-size: 20px;">{{ kpis.top_disease if (kpis is defined and kpis and kpis.top_disease is defined and kpis.top_disease) else 'Bronchial Asthma' }}</div>
             <span class="gh-stat__sub" style="color: var(--gh-alert); font-weight: 600;">{{ "{:,}".format(kpis.top_disease_count) if (kpis is defined and kpis and kpis.top_disease_count is defined and kpis.top_disease_count is not none) else '42' }} active cases</span>
         </div>
         <div class="gh-card gh-stat">
-            <span class="gh-stat__label" data-i18n="g.outbreaks">Active Outbreaks</span>
+            <span class="gh-stat__label">Active Outbreaks</span>
             <div class="gh-stat__value">{{ kpis.active_outbreaks if (kpis is defined and kpis and kpis.active_outbreaks is defined and kpis.active_outbreaks is not none) else '3' }}</div>
             <span class="gh-stat__sub" style="color: var(--gh-warn); font-weight: 600;">Elevated surveillance active</span>
         </div>
@@ -102,10 +102,10 @@
             <table class="gh-table gh-table--responsive">
                 <thead>
                     <tr>
-                        <th data-i18n="g.div">Division</th>
-                        <th data-i18n="g.cases">Total Cases</th>
-                        <th data-i18n="g.dis">Top Disease</th>
-                        <th data-i18n="g.trend">Trend</th>
+                        <th>Division</th>
+                        <th>Total Cases</th>
+                        <th>Top Disease</th>
+                        <th>Trend</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -132,7 +132,7 @@
         <!-- RIGHT: Top 5 Diseases Progress Bars -->
         <div class="gh-card">
             <div style="margin-bottom: 16px;">
-                <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px 0;" data-i18n="g.top5">Top 5 Outbreak Diseases</h3>
+                <h3 style="font-size: 15px; font-weight: 700; margin: 0 0 4px 0;">Top 5 Outbreak Diseases</h3>
                 <p class="u-muted" style="font-size: 12px; margin: 0;">Ranked by national incidence volume</p>
             </div>
 

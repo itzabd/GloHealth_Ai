@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ plan_name }} Features{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ plan_name }} Features</h2>
+    <ul class="list-group mt-3">
+        {% for feature in features %}
+        <li class="list-group-item">{{ feature }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('plans') }}" class="btn btn-secondary mt-3">Back to Plans</a>
+</div>
+{% endblock %}

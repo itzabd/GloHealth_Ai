@@ -8,10 +8,10 @@
     <div class="gh-page-header gh-row justify-content-between align-items-center" style="margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
         <div>
             <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
-                <h1 class="gh-page-header__title" style="margin: 0;" data-i18n="dr.title">Specialist Doctors Network</h1>
+                <h1 class="gh-page-header__title" style="margin: 0;">Specialist Doctors Network</h1>
                 <span class="gh-badge gh-badge--accent" style="font-size: 11px; padding: 2px 8px;">ACTIVE MATRIX: 8 DIVISIONS</span>
             </div>
-            <div class="gh-page-header__sub" data-i18n="dr.sub">Verified clinical specialists across Bangladesh for physical and telehealth consultations</div>
+            <div class="gh-page-header__sub">Verified clinical specialists across Bangladesh for physical and telehealth consultations</div>
         </div>
         <div class="gh-row" style="gap: 12px; align-items: center; flex-wrap: wrap;">
             <div class="gh-row" style="gap: 6px; align-items: center; padding: 6px 12px; background: #ffffff; border: 1px solid var(--gh-border); border-radius: var(--gh-radius-sm); font-size: 12px;" class="u-muted">
@@ -20,7 +20,7 @@
             </div>
             <a href="{{ url_for('prediction') }}" class="gh-btn gh-btn--outline">
                 <span class="material-symbols-outlined" style="font-size: 18px;">stethoscope</span>
-                <span data-i18n="dr.book_sym">Book by Symptoms</span>
+                <span>Book by Symptoms</span>
             </a>
         </div>
     </div>
@@ -31,7 +31,7 @@
             <!-- Search Input with Leading Search Icon -->
             <div style="flex: 2; min-width: 240px; position: relative;">
                 <span class="material-symbols-outlined u-muted" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none;">search</span>
-                <input type="text" id="doctorSearch" data-i18n-placeholder="dr.search_ph" placeholder="Search by name, hospital, or specialty…" 
+                <input type="text" id="doctorSearch" placeholder="Search by name, hospital, or specialty…" 
                        style="width: 100%; height: 42px; padding: 0 14px 0 40px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 14px; font-family: var(--gh-font-body); color: var(--gh-text-main); outline: none; transition: border-color 0.15s, box-shadow 0.15s;" 
                        onfocus="this.style.borderColor='var(--gh-primary)'; this.style.boxShadow='0 0 0 3px rgba(3,105,161,0.1)';" 
                        onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';" />
@@ -41,7 +41,7 @@
             <div style="flex: 1; min-width: 160px;">
                 <select id="specialtyFilter" 
                         style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 13px; font-family: var(--gh-font-body); color: var(--gh-text-main); cursor: pointer; outline: none;">
-                    <option value="" data-i18n="dr.all_spec">All Specialties</option>
+                    <option value="">All Specialties</option>
                     <option value="Cardiology">Cardiology</option>
                     <option value="Dermatology">Dermatology</option>
                     <option value="Neurology">Neurology</option>
@@ -55,7 +55,7 @@
             <div style="flex: 1; min-width: 150px;">
                 <select id="divisionFilter" 
                         style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 13px; font-family: var(--gh-font-body); color: var(--gh-text-main); cursor: pointer; outline: none;">
-                    <option value="" data-i18n="dr.all_div">All Divisions</option>
+                    <option value="">All Divisions</option>
                     <option value="Dhaka">Dhaka</option>
                     <option value="Chattogram">Chattogram</option>
                     <option value="Khulna">Khulna</option>
@@ -71,7 +71,7 @@
             <div>
                 <button type="button" id="clearFiltersBtn" class="gh-btn gh-btn--ghost" style="height: 42px;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">filter_alt_off</span>
-                    <span data-i18n="dr.clear">Clear filters</span>
+                    <span>Clear filters</span>
                 </button>
             </div>
         </div>

@@ -13,8 +13,8 @@
                 <span class="gh-nav__brand-badge" style="font-size: 13px;">AI</span>
             </a>
 
-            <h1 class="gh-auth__title" data-i18n="a.login_title">Welcome back.</h1>
-            <p class="gh-auth__sub" data-i18n="a.login_sub">Sign in to access your symptom history, appointments, and regional insights.</p>
+            <h1 class="gh-auth__title">Welcome back.</h1>
+            <p class="gh-auth__sub">Sign in to access your symptom history, appointments, and regional insights.</p>
 
             <ul class="gh-modal__precautions" style="margin-top: 36px; padding: 0; list-style: none;">
                 <li>
@@ -32,7 +32,7 @@
             </ul>
         </div>
 
-        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;" data-i18n="a.hipaa">
+        <div class="u-mono u-muted" style="font-size: 12px; margin-top: 48px;">
             HIPAA compliant · ISO-27799 encrypted
         </div>
     </div>
@@ -40,8 +40,8 @@
     <!-- RIGHT COLUMN: Sign In Form (45%) -->
     <div class="gh-auth__form-col">
         <div class="gh-auth__card">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" data-i18n="a.login_title">Sign In</h2>
-            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;" data-i18n="a.login_sub">Use your GloHealth account</p>
+            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">Sign In</h2>
+            <p class="u-muted" style="font-size: 13px; margin-bottom: 24px;">Use your GloHealth account</p>
 
             <!-- Flashed Alerts inside auth card -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -57,14 +57,14 @@
 
             <form action="{{ url_for('login') }}" method="POST" id="loginForm">
                 <div style="margin-bottom: 16px;">
-                    <label for="email" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;" data-i18n="a.email">Email address</label>
+                    <label for="email" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Email address</label>
                     <div class="gh-auth__input-wrap">
                         <input type="email" id="email" name="email" required placeholder="name@example.com" class="gh-auth__input" autofocus autocomplete="email">
                     </div>
                 </div>
 
                 <div style="margin-bottom: 16px;">
-                    <label for="password" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;" data-i18n="a.password">Password</label>
+                    <label for="password" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Password</label>
                     <div class="gh-auth__input-wrap">
                         <input type="password" id="password" name="password" required placeholder="••••••••" class="gh-auth__input" autocomplete="current-password">
                     </div>
@@ -73,18 +73,18 @@
                 <div class="gh-row gh-row--between" style="font-size: 13px; margin-bottom: 24px;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--gh-text);">
                         <input type="checkbox" name="remember" style="accent-color: var(--gh-primary); width: 15px; height: 15px; border-radius: 4px;">
-                        <span data-i18n="a.remember">Remember me</span>
+                        <span>Remember me</span>
                     </label>
-                    <a href="#" style="color: var(--gh-primary); font-weight: 500;" data-i18n="a.forgot">Forgot?</a>
+                    <a href="#" style="color: var(--gh-primary); font-weight: 500;">Forgot?</a>
                 </div>
 
                 <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" style="width: 100%; justify-content: center; padding: 11px; font-size: 14px; font-weight: 600;">
-                    <span data-i18n="a.login_title">Sign In</span>
+                    Sign In
                 </button>
             </form>
 
             <div class="gh-auth__divider">
-                <span data-i18n="a.or">or continue with</span>
+                <span>or continue with</span>
             </div>
 
             <div class="gh-grid gh-grid--2" style="gap: 12px; margin-bottom: 24px;">
@@ -97,7 +97,7 @@
             </div>
 
             <div style="text-align: center; font-size: 13px; color: var(--gh-text-muted);">
-                <span data-i18n="a.new">New to GloHealth?</span> <a href="{{ url_for('signup') }}" style="color: var(--gh-primary); font-weight: 600;" data-i18n="a.create">Create an account</a>
+                New to GloHealth? <a href="{{ url_for('signup') }}" style="color: var(--gh-primary); font-weight: 600;">Create an account</a>
             </div>
         </div>
     </div>

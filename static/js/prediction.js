@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const userDivision = document.getElementById('userDivision');
 
     let userLocation = { lat: null, long: null };
+    // Cache last result so we can re-render it when language changes
+    let lastPredictions = null;
+    let lastLocation = {};
+
+    // i18n helper: get translated string, fallback to key
+    function t(key) {
+        var lang = (window.GH_LANG || 'en');
+        var dict = (window.GH_I18N && window.GH_I18N[lang]) || {};
+        return dict[key] !== undefined ? dict[key] : key;
+    }
 
     // Request geolocation in background if permitted
     if (navigator.geolocation) {
@@ -152,7 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await response.json();
                 if (data.success && data.predictions && data.predictions.length) {
-                    renderResult(data.predictions, data.location_factors || {});
+                    lastPredictions = data.predictions;
+                    lastLocation = data.location_factors || {};
+                    renderResult(lastPredictions, lastLocation);
                     if (resultsModal) resultsModal.classList.add('is-open');
                 } else {
                     throw new Error(data.error || 'Diagnostic evaluation failed.');
@@ -185,7 +197,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 10. Render Assessment Result
+    // Re-render modal when language is toggled mid-session
+    document.addEventListener('gh:langchange', function() {
+        if (lastPredictions && resultsModal && resultsModal.classList.contains('is-open')) {
+            renderResult(lastPredictions, lastLocation);
+        }
+    });
+
+    // 10. Render Assessment Result (i18n-aware)
     function renderResult(predictions, location) {
         if (!modalBody || !predictions || !predictions.length) return;
 
@@ -197,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (predictions.length > 1) {
             differentialHtml = `
                 <div class="gh-modal__section u-mt-3">
-                    <div class="gh-modal__section-title">Differential Candidates</div>
+                    <div class="gh-modal__section-title">${t('result.differential')}</div>
                     <div class="gh-stack" style="gap: 6px;">
                         ${predictions.slice(1, 3).map(p => {
                             const pPct = Math.round((p.confidence || 0) * 100);
@@ -216,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modalBody.innerHTML = `
             <div class="gh-modal__result">
                 <div class="gh-row gh-row--between">
-                    <div class="gh-badge gh-badge--alert">Primary Match</div>
+                    <div class="gh-badge gh-badge--alert">${t('result.primary_match')}</div>
                     <span class="u-mono u-muted" style="font-size: 11px;">NODE DHK</span>
                 </div>
                 <div class="gh-modal__condition u-mt-3">${top.disease}</div>
@@ -233,44 +252,44 @@ document.addEventListener('DOMContentLoaded', function() {
             ${differentialHtml}
 
             <div class="gh-modal__section u-mt-3">
-                <div class="gh-modal__section-title">Regional Epidemiological Telemetry</div>
+                <div class="gh-modal__section-title">${t('result.regional')}</div>
                 <p class="u-muted" style="font-size: 13px;">
-                    Assessment weighted against surveillance records for <strong>${divName}</strong>. Early stage intervention is advised.
+                    ${t('result.regional_text')} <strong>${divName}</strong>${t('result.intervention')}
                 </p>
             </div>
 
             <div class="gh-modal__section u-mt-3">
-                <div class="gh-modal__section-title">Recommended Clinical Steps</div>
+                <div class="gh-modal__section-title">${t('result.steps')}</div>
                 <ul class="gh-modal__precautions">
                     <li>
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>Maintain hydration with clean fluids and oral rehydration therapy.</span>
+                        <span>${t('result.step1')}</span>
                     </li>
                     <li>
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>Track body temperature and heart rate daily.</span>
+                        <span>${t('result.step2')}</span>
                     </li>
                     <li>
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>Avoid unprescribed antibiotics or heavy analgesics.</span>
+                        <span>${t('result.step3')}</span>
                     </li>
                     <li>
                         <span class="material-symbols-outlined">check_circle</span>
-                        <span>Schedule a consultation with a registered clinical specialist.</span>
+                        <span>${t('result.step4')}</span>
                     </li>
                 </ul>
             </div>
 
             <div class="gh-row gh-row--between u-mt-4" style="padding-top: 12px; border-top: 1px solid var(--gh-border-soft);">
-                <button type="button" class="gh-btn gh-btn--ghost" id="modalCloseBtn">Close</button>
+                <button type="button" class="gh-btn gh-btn--ghost" id="modalCloseBtn">${t('common.close')}</button>
                 <a href="/doctors" class="gh-btn gh-btn--primary">
                     <span class="material-symbols-outlined">person_add</span>
-                    Book Specialist
+                    ${t('common.book_specialist')}
                 </a>
             </div>
 
             <div class="gh-modal__disclaimer">
-                Decision Support Telemetry: This output is produced by predictive machine learning models and is intended for informational and triage guidance only. Consult a licensed physician for clinical diagnosis and treatment.
+                ${t('result.disclaimer')}
             </div>
         `;
 
@@ -280,3 +299,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+

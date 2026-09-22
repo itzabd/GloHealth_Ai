@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribe - {{ plan_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-4 mx-auto" style="max-width:500px;">
+        <h3>Subscribe to {{ plan_name }}</h3>
+        <p>Price: {{ plan_price }}</p>
+        <form method="POST" action="{{ url_for('process_subscribe', plan_name=plan_name) }}">
+            <div class="mb-3">
+                <label>Card Number</label>
+                <input type="text" class="form-control" name="card_number" required>
+            </div>
+            <div class="mb-3">
+                <label>Expiry</label>
+                <input type="text" class="form-control" name="expiry" required>
+            </div>
+            <div class="mb-3">
+                <label>CVV</label>
+                <input type="text" class="form-control" name="cvv" required>
+            </div>
+            <button type="submit" class="btn btn-success">Pay & Subscribe</button>
+            <a href="{{ url_for('plans') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
