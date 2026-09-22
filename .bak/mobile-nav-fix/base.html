@@ -26,8 +26,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- Clinical Telemetry Design System -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=4.2" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=4.1" />
     <style>
+      .gh-nav__hamburger { display: none; background: none; border: none; padding: 8px; cursor: pointer; color: var(--gh-text); }
+      .gh-nav__drawer {
+        display: none; position: absolute; top: 64px; left: 0; right: 0;
+        background: var(--gh-surface); border-bottom: 1px solid var(--gh-border);
+        box-shadow: 0 4px 12px rgba(15,23,42,.08); padding: 12px 24px; z-index: 99;
+        flex-direction: column; gap: 4px;
+      }
+      .gh-nav__drawer.is-open { display: flex; }
+      .gh-nav__drawer a {
+        padding: 12px; border-radius: 8px; color: var(--gh-text);
+        font-weight: 500; text-decoration: none;
+      }
+      .gh-nav__drawer a:hover { background: var(--gh-surface-2); }
+
+      @media (max-width: 900px) {
+        .gh-nav__hamburger { display: inline-flex; }
+        .gh-nav__links { display: none; }
+      }
+
       /* Toast Notifications */
       .gh-toast-container {
         position: fixed; top: 80px; right: 24px; z-index: 9999;
@@ -93,27 +112,36 @@
                 <a href="#pricing" class="gh-nav__link" data-i18n="nav.plans">Pricing</a>
             </nav>
 
+            <div class="gh-nav__drawer" id="navDrawer">
+                <a href="#features" data-i18n="nav.features">Features</a>
+                <a href="#how-it-works" data-i18n="nav.how">How it works</a>
+                <a href="#doctors" data-i18n="nav.doctors">Doctors</a>
+                <a href="#pricing" data-i18n="nav.plans">Pricing</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="{{ url_for('logout') }}" data-i18n="nav.logout">Logout</a>
+                {% else %}
+                <a href="#" data-auth-open="login" data-i18n="nav.signin">Sign in</a>
+                <a href="#" data-auth-open="signup" data-i18n="nav.getstarted">Get Started</a>
+                {% endif %}
+            </div>
+
             <!-- Marketing Right Controls -->
-            <div class="gh-nav__right" style="gap: 12px;">
-                <!-- Language Switcher Pill (Always visible) -->
+            <div class="gh-nav__right" style="gap: 16px;">
+                <button class="gh-nav__hamburger" id="navToggle" aria-label="Menu">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <!-- Language Switcher Pill -->
                 <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
                     <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
                 </button>
 
-                <!-- Desktop Actions (Hidden on mobile) -->
-                <div class="gh-nav__desktop-actions">
-                    {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 18px; font-weight: 600; border-radius: 6px;" data-i18n="nav.dashboard">Dashboard</a>
-                    {% else %}
-                    <a href="#" data-auth-open="login" class="gh-nav__link" style="color: #0f172a; font-weight: 600; padding: 0 4px; border: none; height: auto;" data-i18n="nav.signin">Sign in</a>
-                    <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 20px; font-weight: 600; border-radius: 6px; background-color: #0284c7; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);" data-i18n="nav.getstarted">Get Started</a>
-                    {% endif %}
-                </div>
-
-                <!-- Mobile Hamburger Toggle (Visible on mobile <= 860px) -->
-                <button class="gh-nav__hamburger" id="navToggle" aria-label="Open navigation menu" aria-expanded="false" type="button">
-                    <span class="material-symbols-outlined" id="navToggleIcon">menu</span>
-                </button>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 18px; font-weight: 600; border-radius: 6px;" data-i18n="nav.dashboard">Dashboard</a>
+                {% else %}
+                <a href="#" data-auth-open="login" class="gh-nav__link" style="color: #0f172a; font-weight: 600; padding: 0 4px; border: none; height: auto;" data-i18n="nav.signin">Sign in</a>
+                <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" style="padding: 8px 20px; font-weight: 600; border-radius: 6px; background-color: #0284c7; box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);" data-i18n="nav.getstarted">Get Started</a>
+                {% endif %}
             </div>
 
             {% else %}
@@ -130,162 +158,63 @@
                 {% endif %}
             </nav>
 
+            <div class="gh-nav__drawer" id="navDrawer">
+                <a href="{{ url_for('dashboard') }}" data-i18n="nav.dashboard">Dashboard</a>
+                <a href="{{ url_for('prediction') }}" data-i18n="nav.checker">Symptom Checker</a>
+                <a href="{{ url_for('geo_insights') }}" data-i18n="nav.geo">Geo Insights</a>
+                <a href="{{ url_for('doctors') }}" data-i18n="nav.doctors">Doctors</a>
+                <a href="{{ url_for('appointments') }}" data-i18n="nav.appointments">Appointments</a>
+                <a href="{{ url_for('plans') }}" data-i18n="nav.plans">Plans</a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}" data-i18n="nav.logout">Logout</a>
+                {% endif %}
+            </div>
+
             <!-- App Right Controls: Language, Notifications, Help, User Profile -->
-            <div class="gh-nav__right" style="gap: 12px;">
-                <!-- Language Switcher Pill (Always visible) -->
+            <div class="gh-nav__right">
+                <button class="gh-nav__hamburger" id="navToggle" aria-label="Menu">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <!-- Language Switcher Pill -->
                 <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
                     <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
                 </button>
 
-                <!-- Desktop Controls & Profile (Hidden on mobile) -->
-                <div class="gh-nav__desktop-actions">
-                    <!-- Notifications -->
-                    <button type="button" class="gh-nav__icon-btn" aria-label="Notifications" title="Notifications">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-
-                    <!-- Help -->
-                    <button type="button" class="gh-nav__icon-btn" aria-label="Help" title="Help & Diagnostics">
-                        <span class="material-symbols-outlined">help_outline</span>
-                    </button>
-
-                    <!-- Divider -->
-                    <div class="gh-nav__vdiv"></div>
-
-                    <!-- User Profile / Auth -->
-                    {% if current_user.is_authenticated %}
-                    <div class="gh-nav__user">
-                        <div class="gh-nav__avatar">
-                            {{ (current_user.name[:2] if current_user.name else 'SA')|upper }}
-                        </div>
-                        <div class="gh-nav__user-details">
-                            <span class="gh-nav__user-id">ID: {{ (current_user.id[:8] if current_user.id else 'GLH-9042')|upper }}</span>
-                            <span class="gh-nav__user-tier">{{ 'ADMIN TIER' if current_user.is_admin else 'PATIENT TIER' }}</span>
-                        </div>
-                        <a href="{{ url_for('logout') }}" class="gh-nav__logout-btn" title="Sign out">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">logout</span>
-                        </a>
-                    </div>
-                    {% else %}
-                    <a href="#" data-auth-open="login" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="nav.signin">Sign in</a>
-                    <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="nav.getstarted">Sign up</a>
-                    {% endif %}
-                </div>
-
-                <!-- Mobile Hamburger Toggle (Visible on mobile <= 860px) -->
-                <button class="gh-nav__hamburger" id="navToggle" aria-label="Open navigation menu" aria-expanded="false" type="button">
-                    <span class="material-symbols-outlined" id="navToggleIcon">menu</span>
+                <!-- Notifications -->
+                <button type="button" class="gh-nav__icon-btn" aria-label="Notifications" title="Notifications">
+                    <span class="material-symbols-outlined">notifications</span>
                 </button>
-            </div>
-            {% endif %}
-        </div>
 
-        <!-- Stitch Mobile Drawer Dropdown -->
-        {% if request.endpoint == 'index' %}
-        <div class="gh-nav__drawer" id="navDrawer" aria-hidden="true">
-            <nav class="gh-nav__drawer-nav">
-                <a href="#features" class="gh-nav__drawer-link">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.features">Features</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="#how-it-works" class="gh-nav__drawer-link">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.how">How it works</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="#doctors" class="gh-nav__drawer-link">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.doctors">Doctors</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="#pricing" class="gh-nav__drawer-link">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.plans">Pricing</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-            </nav>
+                <!-- Help -->
+                <button type="button" class="gh-nav__icon-btn" aria-label="Help" title="Help & Diagnostics">
+                    <span class="material-symbols-outlined">help_outline</span>
+                </button>
 
-            <div class="gh-nav__drawer-divider"></div>
+                <!-- Divider -->
+                <div class="gh-nav__vdiv"></div>
 
-            <div class="gh-nav__drawer-actions">
+                <!-- User Profile / Auth -->
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--primary w-100 justify-content-center" style="height: 42px; font-weight: 600;" data-i18n="nav.dashboard">Dashboard</a>
-                <a href="{{ url_for('logout') }}" class="gh-btn gh-btn--outline w-100 justify-content-center" style="height: 42px; font-weight: 600;" data-i18n="nav.logout">Logout</a>
-                {% else %}
-                <button type="button" class="gh-btn gh-btn--primary w-100 justify-content-center" data-auth-open="signup" onclick="if(window.GH_OPEN_AUTH){event.preventDefault();window.GH_OPEN_AUTH('signup');}" style="height: 42px; font-weight: 600;" data-i18n="nav.getstarted">Get Started</button>
-                <button type="button" class="gh-btn gh-btn--outline w-100 justify-content-center" data-auth-open="login" onclick="if(window.GH_OPEN_AUTH){event.preventDefault();window.GH_OPEN_AUTH('login');}" style="height: 42px; font-weight: 600;" data-i18n="nav.signin">Sign in</button>
-                {% endif %}
-            </div>
-
-            <div class="gh-nav__drawer-footer">
-                <span class="gh-nav__drawer-badge">
-                    <span class="material-symbols-outlined" style="font-size: 16px; color: #0284c7;">verified_user</span>
-                    <span data-i18n="l.hipaa_iso">ISO-27799 Encrypted · BMDC Verified</span>
-                </span>
-            </div>
-        </div>
-        {% else %}
-        <div class="gh-nav__drawer" id="navDrawer" aria-hidden="true">
-            {% if current_user.is_authenticated %}
-            <div class="gh-nav__drawer-user">
-                <div class="gh-nav__avatar">{{ (current_user.name[:2] if current_user.name else 'SA')|upper }}</div>
-                <div class="gh-nav__drawer-user-info">
-                    <span class="gh-nav__drawer-user-name">{{ current_user.name or 'Authenticated User' }}</span>
-                    <span class="gh-nav__user-tier">{{ 'ADMIN TIER' if current_user.is_admin else 'PATIENT TIER' }}</span>
+                <div class="gh-nav__user">
+                    <div class="gh-nav__avatar">
+                        {{ (current_user.name[:2] if current_user.name else 'SA')|upper }}
+                    </div>
+                    <div class="gh-nav__user-details">
+                        <span class="gh-nav__user-id">ID: {{ (current_user.id[:8] if current_user.id else 'GLH-9042')|upper }}</span>
+                        <span class="gh-nav__user-tier">{{ 'ADMIN TIER' if current_user.is_admin else 'PATIENT TIER' }}</span>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="gh-nav__logout-btn" title="Sign out">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">logout</span>
+                    </a>
                 </div>
-            </div>
-            <div class="gh-nav__drawer-divider"></div>
-            {% endif %}
-
-            <nav class="gh-nav__drawer-nav">
-                <a href="{{ url_for('dashboard') }}" class="gh-nav__drawer-link {% if request.endpoint == 'dashboard' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.dashboard">Dashboard</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="{{ url_for('prediction') }}" class="gh-nav__drawer-link {% if request.endpoint == 'prediction' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.checker">Symptom Checker</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="{{ url_for('geo_insights') }}" class="gh-nav__drawer-link {% if request.endpoint == 'geo_insights' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.geo">Geo Insights</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="{{ url_for('doctors') }}" class="gh-nav__drawer-link {% if request.endpoint == 'doctors' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.doctors">Doctors</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="{{ url_for('appointments') }}" class="gh-nav__drawer-link {% if request.endpoint == 'appointments' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.appointments">Appointments</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                <a href="{{ url_for('plans') }}" class="gh-nav__drawer-link {% if request.endpoint == 'plans' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.plans">Plans</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                {% if current_user.is_authenticated and current_user.is_admin %}
-                <a href="{{ url_for('admin_dashboard') }}" class="gh-nav__drawer-link {% if request.endpoint == 'admin_dashboard' %}is-active{% endif %}">
-                    <span class="gh-nav__drawer-link-text" data-i18n="nav.admin">Admin</span>
-                    <span class="material-symbols-outlined gh-nav__drawer-chevron">chevron_right</span>
-                </a>
-                {% endif %}
-            </nav>
-
-            <div class="gh-nav__drawer-divider"></div>
-
-            <div class="gh-nav__drawer-actions">
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('logout') }}" class="gh-btn gh-btn--outline w-100 justify-content-center" style="color: var(--gh-alert); border-color: #fecdd3; height: 42px; font-weight: 600;" data-i18n="nav.logout">
-                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 6px;">logout</span>
-                    Logout
-                </a>
                 {% else %}
-                <button type="button" class="gh-btn gh-btn--primary w-100 justify-content-center" data-auth-open="signup" onclick="if(window.GH_OPEN_AUTH){event.preventDefault();window.GH_OPEN_AUTH('signup');}" style="height: 42px; font-weight: 600;" data-i18n="nav.getstarted">Get Started</button>
-                <button type="button" class="gh-btn gh-btn--outline w-100 justify-content-center" data-auth-open="login" onclick="if(window.GH_OPEN_AUTH){event.preventDefault();window.GH_OPEN_AUTH('login');}" style="height: 42px; font-weight: 600;" data-i18n="nav.signin">Sign in</button>
+                <a href="#" data-auth-open="login" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="nav.signin">Sign in</a>
+                <a href="#" data-auth-open="signup" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="nav.getstarted">Sign up</a>
                 {% endif %}
             </div>
+            {% endif %}
         </div>
-        {% endif %}
     </header>
-
-    <!-- Mobile Drawer Backdrop Overlay -->
-    <div class="gh-nav__backdrop" id="navBackdrop"></div>
     {% endif %}
 
     <!-- Global Flashed Messages as Toasts -->
@@ -1602,59 +1531,9 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-      var navToggle = document.getElementById('navToggle');
-      var navDrawer = document.getElementById('navDrawer');
-      var navBackdrop = document.getElementById('navBackdrop');
-      var navToggleIcon = document.getElementById('navToggleIcon');
-
-      function setDrawerState(open) {
-        if (!navDrawer) return;
-        navDrawer.classList.toggle('is-open', open);
-        navDrawer.setAttribute('aria-hidden', !open);
-        if (navBackdrop) navBackdrop.classList.toggle('is-open', open);
-        if (navToggle) {
-          navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-          navToggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
-        }
-        if (navToggleIcon) {
-          navToggleIcon.textContent = open ? 'close' : 'menu';
-        }
-      }
-
-      if (navToggle && navDrawer) {
-        navToggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-          var isOpen = navDrawer.classList.contains('is-open');
-          setDrawerState(!isOpen);
-        });
-
-        if (navBackdrop) {
-          navBackdrop.addEventListener('click', function() {
-            setDrawerState(false);
-          });
-        }
-
-        // Close when clicking on any link or button inside drawer
-        navDrawer.querySelectorAll('a, button').forEach(function(el) {
-          el.addEventListener('click', function() {
-            setDrawerState(false);
-          });
-        });
-
-        // Close on Escape key
-        document.addEventListener('keydown', function(e) {
-          if (e.key === 'Escape' && navDrawer.classList.contains('is-open')) {
-            setDrawerState(false);
-          }
-        });
-
-        // Close on viewport expand beyond mobile breakpoint
-        window.addEventListener('resize', function() {
-          if (window.innerWidth > 860 && navDrawer.classList.contains('is-open')) {
-            setDrawerState(false);
-          }
-        });
-      }
+      var t = document.getElementById('navToggle');
+      var d = document.getElementById('navDrawer');
+      if (t && d) t.addEventListener('click', function() { d.classList.toggle('is-open'); });
     });
     </script>
 
