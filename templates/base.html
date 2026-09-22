@@ -113,14 +113,16 @@
             </nav>
 
             <div class="gh-nav__drawer" id="navDrawer">
-                <a href="{{ url_for('dashboard') }}" data-i18n="nav.dashboard">Dashboard</a>
-                <a href="{{ url_for('prediction') }}" data-i18n="nav.checker">Symptom Checker</a>
-                <a href="{{ url_for('geo_insights') }}" data-i18n="nav.geo">Geo Insights</a>
-                <a href="{{ url_for('doctors') }}" data-i18n="nav.doctors">Doctors</a>
-                <a href="{{ url_for('appointments') }}" data-i18n="nav.appointments">Appointments</a>
-                <a href="{{ url_for('plans') }}" data-i18n="nav.plans">Plans</a>
+                <a href="#features" data-i18n="nav.features">Features</a>
+                <a href="#how-it-works" data-i18n="nav.how">How it works</a>
+                <a href="#doctors" data-i18n="nav.doctors">Doctors</a>
+                <a href="#pricing" data-i18n="nav.plans">Pricing</a>
                 {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" data-i18n="nav.dashboard">Dashboard</a>
                 <a href="{{ url_for('logout') }}" data-i18n="nav.logout">Logout</a>
+                {% else %}
+                <a href="#" data-auth-open="login" data-i18n="nav.signin">Sign in</a>
+                <a href="#" data-auth-open="signup" data-i18n="nav.getstarted">Get Started</a>
                 {% endif %}
             </div>
 
