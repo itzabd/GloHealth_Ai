@@ -1,102 +1,169 @@
 {% extends "base.html" %}
 
-{% block title %}Book Appointment{% endblock %}
+{% block title %}Book Appointment · GloHealth AI{% endblock %}
 
 {% block content %}
-<style>
-    body {
-        background: url('/static/images/blur-bg.jpg') no-repeat center center fixed;
-        background-size: cover;
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #4b72e6, #0a3e61);
-    }
+<div class="gh-container gh-page">
+    <!-- Breadcrumb & Header -->
+    <div style="margin-bottom: 24px;">
+        <div class="u-muted" style="font-size: 13px; margin-bottom: 8px;">
+            <a href="{{ url_for('doctors') }}" class="u-muted" style="text-decoration: none;">Doctors</a> / <span>{{ doctor.name }}</span>
+        </div>
+        <h1 class="gh-page-header__title" style="margin: 0 0 4px 0;" data-i18n="book.title">Book Appointment</h1>
+        <div class="gh-page-header__sub" data-i18n="book.sub">Choose a date and time that works for you</div>
+    </div>
 
-    .glass-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        backdrop-filter: blur(10px) saturate(180%);
-        -webkit-backdrop-filter: blur(10px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-        color: #ffffff;
-        margin-top: 2rem;
-    }
-
-    .glass-card h2 {
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-
-    .glass-card p {
-        font-size: 1rem;
-        margin-bottom: 0.75rem;
-    }
-
-    .form-control, .form-check-input {
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255,255,255,0.3);
-        color: #000000;
-        border-radius: 8px;
-    }
-
-    .form-control:focus {
-        background: rgba(255, 255, 255, 0.2);
-        color: #cb0404;
-        border-color: rgba(255,255,255,0.5);
-        box-shadow: none;
-    }
-
-    .form-check-label {
-        color: #fff;
-    }
-
-    .btn-success {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        color: #fff;
-        backdrop-filter: blur(5px);
-        transition: 0.3s ease;
-    }
-
-    .btn-success:hover {
-        background: rgba(255, 255, 255, 0.4);
-        color: #fff;
-    }
-</style>
-
-<div class="container">
-    <div class="glass-card">
-        <h2>
-            <span class="lang-bn" lang="bn">ডা. {{ doctor.name }} এর সাথে অ্যাপয়েন্টমেন্ট বুক করুন</span>
-            <span class="lang-en" lang="en">Book Appointment with Dr. {{ doctor.name }}</span>
-        </h2>
-
-        <p><strong>Specialty:</strong> {{ doctor.specialty }}</p>
-        <p><strong>Hospital:</strong> {{ doctor.hospital }}</p>
-        <p><strong>Consultation Fee:</strong> {{ doctor.consultation_fee }} BDT</p>
-        <p><strong>Remaining free checkups:</strong> {{ subscription.checkup_points if subscription else 0 }}</p>
-
-        <form method="POST">
-            <div class="mb-3">
-                <label for="scheduled_time" class="form-label">Select Date & Time</label>
-                <input type="datetime-local" name="scheduled_time" class="form-control" required>
+    <!-- Two-column grid -->
+    <div class="gh-grid gh-grid--1-2" style="gap: 32px; align-items: start;">
+        
+        <!-- LEFT: Doctor Card -->
+        <div class="gh-card" style="padding: 24px;">
+            <div class="gh-row" style="gap: 16px; align-items: center; margin-bottom: 16px;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--gh-primary-light); color: var(--gh-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; flex-shrink: 0;">
+                    {{ (doctor.name[:2] if doctor.name else 'DR')|upper }}
+                </div>
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 600; margin: 0 0 6px 0; color: var(--gh-text-main);">{{ doctor.name }}</h2>
+                    <span class="gh-badge gh-badge--info">{{ doctor.specialty }}</span>
+                </div>
             </div>
 
-            {% if subscription and subscription.checkup_points > 0 %}
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" name="use_points" value="yes" id="usePoints">
-                <label class="form-check-label" for="usePoints">Use free checkup</label>
-            </div>
-            {% endif %}
+            <hr style="border: none; border-top: 1px solid var(--gh-border); margin: 16px 0;" />
 
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" name="payment_done" value="yes" id="paymentDone">
-                <label class="form-check-label" for="paymentDone">Payment done</label>
+            <div class="gh-stack" style="gap: 12px; font-size: 14px;">
+                <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">local_hospital</span>
+                    <span>{{ doctor.get('hospital', 'Clinical Hub') if doctor.get else (doctor.hospital if doctor.hospital else 'Clinical Hub') }}, {{ doctor.get('division', 'Dhaka') if doctor.get else (doctor.division if doctor.division else 'Dhaka') }}</span>
+                </div>
+                <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #eab308;">star</span>
+                    <span>{{ doctor.get('rating', '4.8') if doctor.get else (doctor.rating if doctor.rating else '4.8') }} ({{ doctor.get('reviews', '120') if doctor.get else (doctor.reviews if doctor.reviews else '120') }} reviews)</span>
+                </div>
+                <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">payments</span>
+                    <span>৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }} consultation</span>
+                </div>
+                <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
+                    <span>Avg wait 15 min</span>
+                </div>
             </div>
+        </div>
 
-            <button type="submit" class="btn btn-success">Book Appointment</button>
-        </form>
+        <!-- RIGHT: Form Card -->
+        <div class="gh-card" style="padding: 32px;">
+            <form method="POST" action="{{ url_for('book_appointment', doctor_id=doctor.id) }}">
+                
+                <!-- Section: Select Date -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); font-weight: 600; margin-bottom: 12px;" data-i18n="book.select_date">
+                    Select Date
+                </div>
+                <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 24px;">
+                    {% for day in days %}
+                    <button type="button" class="gh-chip {% if day.is_today %}is-active{% endif %}" data-date="{{ day.iso }}">
+                        {{ day.day_short }} {{ day.day_num }}
+                    </button>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="date" id="dateInput" value="{{ days[0].iso if days else '' }}">
+
+                <!-- Section: Select Time -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); font-weight: 600; margin-bottom: 12px;" data-i18n="book.select_time">
+                    Select Time
+                </div>
+                <div class="time-slots-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px;">
+                    {% for slot in slots %}
+                    <button type="button"
+                            class="gh-chip {% if slot in disabled_slots %}is-disabled{% endif %}"
+                            data-time="{{ slot }}"
+                            {% if slot in disabled_slots %}disabled{% endif %}>
+                        {{ slot }}
+                    </button>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="time" id="timeInput">
+
+                <!-- Section: Reason -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); font-weight: 600; margin-bottom: 8px;" data-i18n="book.reason">
+                    Reason for visit (optional)
+                </div>
+                <div style="margin-bottom: 24px;">
+                    <textarea name="reason" rows="4" placeholder="Briefly describe your concern…" data-i18n-ph="book.reason_ph"
+                              class="gh-chip" style="width: 100%; padding: 12px; border-radius: 8px; resize: vertical; cursor: text; text-align: left; height: auto;"></textarea>
+                </div>
+
+                <!-- Section: Consultation type -->
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); font-weight: 600; margin-bottom: 12px;" data-i18n="book.consult">
+                    Consultation type
+                </div>
+                <div class="gh-grid gh-grid--2 book-consult-grid" style="gap: 12px; margin-bottom: 32px;">
+                    <label class="gh-symptom is-checked" style="cursor: pointer; margin: 0;">
+                        <input type="radio" name="consult_type" value="video" checked hidden>
+                        <div style="flex: 1;">
+                            <div class="gh-symptom__label" data-i18n="book.video">Video consultation</div>
+                            <div class="gh-symptom__key">Online · available now</div>
+                        </div>
+                        <span class="gh-symptom__check"></span>
+                    </label>
+                    <label class="gh-symptom" style="cursor: pointer; margin: 0;">
+                        <input type="radio" name="consult_type" value="in_person" hidden>
+                        <div style="flex: 1;">
+                            <div class="gh-symptom__label" data-i18n="book.in_person">In-person visit</div>
+                            <div class="gh-symptom__key">{{ doctor.get('hospital', 'Hospital') if doctor.get else (doctor.hospital if doctor.hospital else 'Hospital') }}</div>
+                        </div>
+                        <span class="gh-symptom__check"></span>
+                    </label>
+                </div>
+
+                <!-- Bottom Row -->
+                <div class="gh-row gh-row--between book-bottom-row" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--gh-border); align-items: center;">
+                    <div>
+                        <div class="u-muted" style="font-size: 12px;" data-i18n="book.total">Total</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--gh-text-main);">৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }}</div>
+                    </div>
+                    <div class="gh-row" style="gap: 12px; align-items: center;">
+                        <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--ghost" data-i18n="c.cancel">Cancel</a>
+                        <button type="submit" class="gh-btn gh-btn--primary" data-i18n="book.confirm">Confirm Booking</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
     </div>
 </div>
+
+<style>
+  .gh-chip.is-disabled { opacity: .4; cursor: not-allowed; text-decoration: line-through; }
+  @media (max-width: 640px) {
+    .time-slots-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .book-consult-grid { grid-template-columns: 1fr !important; }
+    .book-bottom-row { position: fixed; bottom: 0; left: 0; right: 0;
+                       background: white; padding: 16px 24px;
+                       border-top: 1px solid var(--gh-border); z-index: 50; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('[data-date]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('[data-date]').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      document.getElementById('dateInput').value = btn.dataset.date;
+    });
+  });
+  document.querySelectorAll('[data-time]:not([disabled])').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('[data-time]').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      document.getElementById('timeInput').value = btn.dataset.time;
+    });
+  });
+  document.querySelectorAll('input[name="consult_type"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('input[name="consult_type"]').forEach(function(r) {
+        r.closest('label').classList.toggle('is-checked', r.checked);
+      });
+    });
+  });
+</script>
 {% endblock %}

@@ -57,3 +57,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function swapDoctorLabels() {
+    var lang = localStorage.getItem('glohealth_lang') || 'en';
+    document.querySelectorAll('[data-label-en]').forEach(function(el) {
+        var val = el.getAttribute(lang === 'bn' ? 'data-label-bn' : 'data-label-en');
+        if (val) el.textContent = val;
+    });
+}
+swapDoctorLabels();
+document.addEventListener('gh:langchange', swapDoctorLabels);
+

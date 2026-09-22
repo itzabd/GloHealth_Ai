@@ -13,7 +13,6 @@ from flask import (
     abort,
     flash,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -152,80 +151,6 @@ def symptom_label(s):
     if s in SYMPTOM_OVERRIDES:
         return SYMPTOM_OVERRIDES[s]
     return s.replace('_', ' ').strip().capitalize()
-
-SYMPTOM_LABELS_BN = {
-    'itching': 'চুলকানি', 'skin_rash': 'ত্বকে র্যাশ', 'chills': 'শীত শীত ভাব',
-    'high_fever': 'উচ্চ জ্বর', 'mild_fever': 'হালকা জ্বর', 'fatigue': 'ক্লান্তি',
-    'cough': 'কাশি', 'breathlessness': 'শ্বাসকষ্ট', 'headache': 'মাথা ব্যথা',
-    'dizziness': 'মাথা ঘোরা', 'vomiting': 'বমি', 'diarrhoea': 'ডায়রিয়া',
-    'nausea': 'বমি বমি ভাব', 'abdominal_pain': 'পেটে ব্যথা', 'chest_pain': 'বুকে ব্যথা',
-    'joint_pain': 'গাঁটে ব্যথা', 'muscle_pain': 'পেশিতে ব্যথা', 'loss_of_appetite': 'খাবারে অরুচি',
-    'yellowish_skin': 'ত্বক হলদে', 'yellowing_of_eyes': 'চোখ হলদে', 'weight_loss': 'ওজন কমা',
-    'sweating': 'ঘাম', 'dehydration': 'পানিশূন্যতা', 'constipation': 'কোষ্ঠকাঠিন্য',
-    'back_pain': 'পিঠে ব্যথা', 'neck_pain': 'ঘাড়ে ব্যথা', 'knee_pain': 'হাঁটুতে ব্যথা',
-    'hip_joint_pain': 'কোমরে ব্যথা', 'muscle_weakness': 'পেশির দুর্বলতা',
-    'stiff_neck': 'শক্ত ঘাড়', 'swelling_joints': 'গাঁট ফোলা', 'movement_stiffness': 'নড়াচড়ায় কষ্ট',
-    'loss_of_balance': 'ভারসাম্য হারানো', 'unsteadiness': 'অস্থিরতা',
-    'loss_of_smell': 'গন্ধ না পাওয়া', 'blurred_and_distorted_vision': 'ঝাপসা দৃষ্টি',
-    'redness_of_eyes': 'চোখ লাল', 'watering_from_eyes': 'চোখ দিয়ে পানি',
-    'sinus_pressure': 'সাইনাসের চাপ', 'runny_nose': 'নাক দিয়ে পানি', 'congestion': 'নাক বন্ধ',
-    'throat_irritation': 'গলা জ্বালা', 'phlegm': 'কফ', 'blood_in_sputum': 'কফে রক্ত',
-    'fast_heart_rate': 'দ্রুত হৃদস্পন্দন', 'palpitations': 'বুক ধড়ফড়',
-    'weakness_in_limbs': 'হাত-পায়ে দুর্বলতা', 'swollen_legs': 'পা ফোলা',
-    'obesity': 'স্থূলতা', 'excessive_hunger': 'অতিরিক্ত ক্ষুধা', 'increased_appetite': 'বেড়ে যাওয়া ক্ষুধা',
-    'polyuria': 'অতিরিক্ত প্রস্রাব', 'continuous_feel_of_urine': 'সবসময় প্রস্রাবের অনুভূতি',
-    'bladder_discomfort': 'মূত্রথলিতে অস্বস্তি', 'bloody_stool': 'পায়খানায় রক্ত',
-    'pain_during_bowel_movements': 'পায়খানার সময় ব্যথা', 'passage_of_gases': 'গ্যাস নির্গমন',
-    'internal_itching': 'ভেতরে চুলকানি', 'irritation_in_anus': 'পায়ুপথে জ্বালা',
-    'bruising': 'ক্ষতচিহ্ন', 'skin_peeling': 'ত্বক ওঠা', 'blister': 'ফোস্কা',
-    'pus_filled_pimples': 'পুঁজ ভরা ব্রণ', 'blackheads': 'ব্ল্যাকহেডস', 'scurring': 'দাগ',
-    'silver_like_dusting': 'রূপালী আঁশ', 'small_dents_in_nails': 'নখে ছোট গর্ত',
-    'inflammatory_nails': 'নখে প্রদাহ', 'brittle_nails': 'ভাঙা নখ',
-    'swollen_extremeties': 'হাত-পা ফোলা', 'puffy_face_and_eyes': 'মুখ ও চোখ ফোলা',
-    'enlarged_thyroid': 'থাইরয়েড বড়', 'swollen_blood_vessels': 'রক্তনালী ফোলা',
-    'prominent_veins_on_calf': 'পায়ে শিরা ফোলা', 'drying_and_tingling_lips': 'ঠোঁট শুকনো ও ঝিনঝিন',
-    'slurred_speech': 'জড়ানো কথা', 'spinning_movements': 'মাথা ঘোরা',
-    'weakness_of_one_body_side': 'শরীরের একপাশে দুর্বলতা', 'altered_sensorium': 'চেতনা পরিবর্তন',
-    'depression': 'বিষণ্নতা', 'irritability': 'খিটখিটে ভাব', 'anxiety': 'দুশ্চিন্তা',
-    'mood_swings': 'মেজাজ পরিবর্তন', 'restlessness': 'অস্থিরতা', 'lethargy': 'অলসতা',
-    'red_spots_over_body': 'শরীরে লাল দাগ', 'belly_pain': 'তলপেটে ব্যথা',
-    'abnormal_menstruation': 'অস্বাভাবিক মাসিক', 'dischromic_patches': 'বর্ণহীন দাগ',
-    'family_history': 'পারিবারিক ইতিহাস', 'mucoid_sputum': 'শ্লেষ্মাযুক্ত কফ',
-    'rusty_sputum': 'মরিচা রঙের কফ', 'lack_of_concentration': 'মনোযোগের অভাব',
-    'visual_disturbances': 'দৃষ্টি সমস্যা', 'painful_walking': 'হাঁটতে ব্যথা',
-    'red_sore_around_nose': 'নাকের চারপাশে লাল ঘা', 'yellow_crust_ooze': 'হলদে খোসা',
-    'acute_liver_failure': 'তীব্র লিভার বিকল', 'receiving_blood_transfusion': 'রক্ত গ্রহণ',
-    'receiving_unsterile_injections': 'অপরিষ্কার ইনজেকশন', 'swelling_of_stomach': 'পেট ফোলা',
-    'swelled_lymph_nodes': 'লিম্ফ নোড ফোলা', 'malaise': 'শারীরিক অস্বস্তি',
-    'nodal_skin_eruptions': 'গিঁটে চর্ম', 'toxic_look_(typhos)': 'টক্সিক লক্ষণ',
-    'extra_marital_contacts': 'অতিরিক্ত যৌন সংস্পর্শ',
-    # Remaining ~30 symptoms fall back to English via .get() default
-}
-
-SPECIALTY_BN = {
-    'Cardiologist': 'হৃদরোগ বিশেষজ্ঞ', 'Neurologist': 'স্নায়ু বিশেষজ্ঞ',
-    'Dermatologist': 'চর্ম বিশেষজ্ঞ', 'General Physician': 'সাধারণ চিকিৎসক',
-    'Pediatrician': 'শিশু বিশেষজ্ঞ', 'Orthopedic': 'অর্থোপেডিক বিশেষজ্ঞ',
-    'Cardiology': 'হৃদরোগ', 'Dermatology': 'চর্মরোগ', 'Neurology': 'স্নায়ুরোগ',
-    'Internal Medicine': 'অভ্যন্তরীণ চিকিৎসা', 'Pediatrics': 'শিশু চিকিৎসা',
-    'Orthopedics': 'অর্থোপেডিকস',
-}
-
-DIVISION_BN = {
-    'Dhaka': 'ঢাকা', 'Chattogram': 'চট্টগ্রাম', 'Chittagong': 'চট্টগ্রাম',
-    'Khulna': 'খুলনা', 'Rajshahi': 'রাজশাহী', 'Barishal': 'বরিশাল',
-    'Barisal': 'বরিশাল', 'Sylhet': 'সিলেট', 'Rangpur': 'রংপুর',
-    'Mymensingh': 'ময়মনসিংহ',
-}
-
-def symptom_label_bn(s):
-    return SYMPTOM_LABELS_BN.get(s, symptom_label(s))
-
-def specialty_bn(s):
-    return SPECIALTY_BN.get(s, s)
-
-def division_bn(d):
-    return DIVISION_BN.get(d, d)
 
 # ---- FLASH I18N ----
 FLASH_I18N = {
@@ -965,7 +890,6 @@ def prediction():
                 symptom_groups[category].append({
                     "key": symptom,
                     "label": symptom_label(symptom),
-                    "label_bn": symptom_label_bn(symptom),
                 })
                 matched = True
                 break
@@ -973,7 +897,6 @@ def prediction():
             symptom_groups['Other'].append({
                 "key": symptom,
                 "label": symptom_label(symptom),
-                "label_bn": symptom_label_bn(symptom),
             })
 
     # Fetch active subscription for current user from Supabase
@@ -1382,10 +1305,6 @@ def doctors():
     response = query.execute()
     doctors_list = response.data if hasattr(response, 'data') else []
 
-    for d in doctors_list:
-        d['specialty_bn'] = specialty_bn(d.get('specialty', ''))
-        d['division_bn'] = division_bn(d.get('division', ''))
-
     return render_template('doctors.html', doctors=doctors_list)
 # Book appointment route
 @app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
@@ -1655,15 +1574,5 @@ def features(plan_name):
         return render_template("feature_premium.html", doctors=doctors, subscription=subscription)
     elif plan_name == "Ultimate Plan":
         return render_template("feature_ultimate.html", doctors=doctors, subscription=subscription)
-
-@app.route('/set_language/<lang>', methods=['POST', 'GET'])
-def set_language(lang):
-    if lang in ('en', 'bn'):
-        session['lang'] = lang
-        resp = make_response('', 204)
-        resp.set_cookie('lang', lang, max_age=31536000, samesite='Lax')
-        return resp
-    return ('', 400)
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)

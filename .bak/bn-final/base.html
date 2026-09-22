@@ -302,8 +302,6 @@
         document.documentElement.setAttribute('lang', lang);
         document.documentElement.setAttribute('data-lang', lang);
         localStorage.setItem('glohealth_lang', lang);
-        fetch('/set_language/' + lang, { method: 'POST', credentials: 'same-origin' })
-          .catch(function(){});
         window.GH_LANG = lang;
         var dict = window.GH_I18N[lang] || {};
         /* textContent translations */

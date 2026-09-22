@@ -19,7 +19,7 @@
     </div>
 
     <!-- Tab Bar -->
-    <div class="gh-row" style="margin-bottom: var(--gh-s-4); display: flex; gap: 8px; flex-wrap: wrap;">
+    <div class="gh-row" style="gap: 8px; margin-bottom: 24px;">
         <button type="button" class="gh-chip is-active" data-tab="upcoming">Upcoming · {{ appointments|length if appointments else 2 }}</button>
         <button type="button" class="gh-chip" data-tab="past">Past · 12</button>
         <button type="button" class="gh-chip" data-tab="cancelled">Cancelled · 1</button>
@@ -27,7 +27,7 @@
 
     <!-- PANEL: Upcoming -->
     <div id="panel-upcoming">
-        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-4);">
+        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-5);">
             <table class="gh-table gh-table--responsive">
                 <thead>
                     <tr>
@@ -100,7 +100,7 @@
 
     <!-- PANEL: Past (Hidden by default) -->
     <div id="panel-past" style="display: none;" hidden>
-        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-4);">
+        <div class="gh-card gh-card--flush" style="padding: var(--gh-s-5);">
             <table class="gh-table gh-table--responsive">
                 <thead>
                     <tr>
@@ -140,7 +140,7 @@
 
     <!-- PANEL: Cancelled (Hidden by default) -->
     <div id="panel-cancelled" style="display: none;" hidden>
-        <div class="gh-card" style="padding: var(--gh-s-4); text-align: center;">
+        <div class="gh-card" style="padding: var(--gh-s-6); text-align: center;">
             <div class="gh-empty">
                 <span class="material-symbols-outlined gh-empty__icon" style="font-size: 48px; color: var(--gh-text-muted); margin-bottom: 12px;">event_busy</span>
                 <h3 class="gh-empty__title" style="margin-bottom: 8px; font-size: 18px; font-weight: 600;">No cancelled appointments</h3>

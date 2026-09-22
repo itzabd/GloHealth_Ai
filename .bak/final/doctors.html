@@ -90,28 +90,25 @@
     <!-- 3-Column Doctors Grid -->
     <div id="doctorsGrid" class="gh-grid gh-grid--3" style="gap: 24px;">
         {% if doctors and doctors|length > 0 %}
-            {% for doctor in doctors %}
+            {% for doc in doctors %}
             <div class="gh-card doctor-card" 
-                 data-name="{{ doctor.name }}" 
-                 data-specialty="{{ doctor.specialty }}" 
-                 data-hospital="{{ doctor.hospital if doctor.hospital else '' }}" 
-                 data-division="{{ doctor.division if doctor.division else 'Dhaka' }}" 
+                 data-name="{{ doc.name }}" 
+                 data-specialty="{{ doc.specialty }}" 
+                 data-hospital="{{ doc.hospital if doc.hospital else '' }}" 
+                 data-division="{{ doc.division if doc.division else 'Dhaka' }}" 
                  style="display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--gh-border); transition: border-color 0.15s, box-shadow 0.15s;">
                 <div>
                     <!-- Doctor Header -->
                     <div class="gh-row" style="gap: 12px; align-items: flex-start; margin-bottom: 14px;">
                         <div style="width: 46px; height: 46px; border-radius: var(--gh-radius-sm); background: var(--gh-primary-light); color: var(--gh-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0;">
-                            {{ (doctor.name[:2] if doctor.name else 'DR')|upper }}
+                            {{ (doc.name[:2] if doc.name else 'DR')|upper }}
                         </div>
                         <div style="flex: 1; min-width: 0;">
                             <div class="gh-row" style="justify-content: space-between; align-items: center; gap: 4px;">
-                                <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ doctor.name }}</h3>
+                                <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ doc.name }}</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info"
-                                  data-label-en="{{ doctor.specialty }}"
-                                  data-label-bn="{{ doctor.specialty_bn }}"
-                                  style="font-size: 11px; margin-top: 4px;">{{ doctor.specialty }}</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">{{ doc.specialty }}</span>
                         </div>
                     </div>
 
@@ -119,22 +116,21 @@
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">local_hospital</span>
-                            <span class="u-muted">{{ doctor.hospital if doctor.hospital else 'General Hospital' }}</span>
+                            <span class="u-muted">{{ doc.hospital if doc.hospital else 'General Hospital' }}</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="{{ doctor.division }}"
-                                  data-label-bn="{{ doctor.division_bn }}">{{ doctor.division }}</span> Division</span>
+                            <span class="u-muted">{{ doc.division if doc.division else 'Dhaka' }} Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">Consultation Fee</span>
-                            <span class="u-mono" style="font-weight: 700; font-size: 15px; color: var(--gh-primary);">৳{{ doctor.fee if doctor.fee else '800' }}</span>
+                            <span class="u-mono" style="font-weight: 700; font-size: 15px; color: var(--gh-primary);">৳{{ doc.fee if doc.fee else '800' }}</span>
                         </li>
                     </ul>
                 </div>
 
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id) }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('book_appointment', doctor_id=doc.id) }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
             {% endfor %}
@@ -152,7 +148,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Ayesha Rahman</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Cardiology" data-label-bn="হৃদরোগ" style="font-size: 11px; margin-top: 4px;">Cardiology</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Cardiology</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -162,7 +158,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Dhaka" data-label-bn="ঢাকা">Dhaka</span> Division</span>
+                            <span class="u-muted">Dhaka Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">12 yrs exp · Fee</span>
@@ -171,7 +167,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '1') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
 
@@ -187,7 +183,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Nusrat Jahan</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Dermatology" data-label-bn="চর্মরোগ" style="font-size: 11px; margin-top: 4px;">Dermatology</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Dermatology</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -197,7 +193,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Dhaka" data-label-bn="ঢাকা">Dhaka</span> Division</span>
+                            <span class="u-muted">Dhaka Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">8 yrs exp · Fee</span>
@@ -206,7 +202,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '2') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
 
@@ -222,7 +218,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Tanvir Ahmed</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Neurology" data-label-bn="স্নায়ুরোগ" style="font-size: 11px; margin-top: 4px;">Neurology</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Neurology</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -232,7 +228,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Chattogram" data-label-bn="চট্টগ্রাম">Chattogram</span> Division</span>
+                            <span class="u-muted">Chattogram Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">15 yrs exp · Fee</span>
@@ -241,7 +237,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '3') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
 
@@ -257,7 +253,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Farhana Islam</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Internal Medicine" data-label-bn="অভ্যন্তরীণ চিকিৎসা" style="font-size: 11px; margin-top: 4px;">Internal Medicine</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Internal Medicine</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -267,7 +263,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Dhaka" data-label-bn="ঢাকা">Dhaka</span> Division</span>
+                            <span class="u-muted">Dhaka Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">10 yrs exp · Fee</span>
@@ -276,7 +272,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '4') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
 
@@ -292,7 +288,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Kamal Hossain</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Pediatrics" data-label-bn="শিশু চিকিৎসা" style="font-size: 11px; margin-top: 4px;">Pediatrics</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Pediatrics</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -302,7 +298,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Sylhet" data-label-bn="সিলেট">Sylhet</span> Division</span>
+                            <span class="u-muted">Sylhet Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">9 yrs exp · Fee</span>
@@ -311,7 +307,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '5') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
 
@@ -327,7 +323,7 @@
                                 <h3 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--gh-text-main);">Dr. Shahnaz Parveen</h3>
                                 <span class="gh-badge gh-badge--success" style="font-size: 10px; padding: 1px 6px;">VERIFIED</span>
                             </div>
-                            <span class="gh-badge gh-badge--info" data-label-en="Orthopedics" data-label-bn="অর্থোপেডিকস" style="font-size: 11px; margin-top: 4px;">Orthopedics</span>
+                            <span class="gh-badge gh-badge--accent" style="font-size: 11px; margin-top: 4px;">Orthopedics</span>
                         </div>
                     </div>
                     <ul class="gh-stack" style="gap: 10px; list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 13px;">
@@ -337,7 +333,7 @@
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center;">
                             <span class="material-symbols-outlined u-muted" style="font-size: 16px;">location_on</span>
-                            <span class="u-muted"><span data-label-en="Rajshahi" data-label-bn="রাজশাহী">Rajshahi</span> Division</span>
+                            <span class="u-muted">Rajshahi Division</span>
                         </li>
                         <li class="gh-row" style="gap: 8px; align-items: center; justify-content: space-between; padding-top: 6px; border-top: 1px solid #f1f5f9;">
                             <span class="u-muted" style="font-size: 12px;">11 yrs exp · Fee</span>
@@ -346,7 +342,7 @@
                     </ul>
                 </div>
                 <div style="padding-top: 14px; border-top: 1px solid var(--gh-border); margin-top: 4px;">
-                    <a href="{{ url_for('book_appointment', doctor_id=doctor.id if doctor is defined and doctor else '6') }}" class="gh-btn gh-btn--primary gh-btn--sm">Book Now</a>
+                    <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--primary gh-btn--block">Book Consultation</a>
                 </div>
             </div>
         {% endif %}
@@ -365,15 +361,4 @@
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/doctors.js') }}"></script>
-<script>
-function swapDoctorLabels() {
-  var lang = localStorage.getItem('glohealth_lang') || 'en';
-  document.querySelectorAll('[data-label-en]').forEach(function(el) {
-    var val = el.getAttribute(lang === 'bn' ? 'data-label-bn' : 'data-label-en');
-    if (val) el.textContent = val;
-  });
-}
-swapDoctorLabels();
-document.addEventListener('gh:langchange', swapDoctorLabels);
-</script>
 {% endblock %}

@@ -62,9 +62,7 @@
                     {% for s in items %}
                     <label class="gh-symptom" data-key="{{ s.key }}" data-label="{{ s.label|lower }}">
                         <div style="flex: 1; min-width: 0;">
-                            <div class="gh-symptom__label"
-                                 data-label-en="{{ s.label }}"
-                                 data-label-bn="{{ s.label_bn }}">{{ s.label }}</div>
+                            <div class="gh-symptom__label">{{ s.label }}</div>
                             <div class="gh-symptom__key">{{ s.key }}</div>
                             <div class="gh-symptom__slider" onclick="event.stopPropagation();">
                                 <div class="gh-symptom__slider-row">

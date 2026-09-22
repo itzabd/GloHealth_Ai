@@ -13,7 +13,6 @@ from flask import (
     abort,
     flash,
     jsonify,
-    make_response,
     redirect,
     render_template,
     request,
@@ -153,180 +152,6 @@ def symptom_label(s):
         return SYMPTOM_OVERRIDES[s]
     return s.replace('_', ' ').strip().capitalize()
 
-SYMPTOM_LABELS_BN = {
-    'itching': 'চুলকানি', 'skin_rash': 'ত্বকে র্যাশ', 'chills': 'শীত শীত ভাব',
-    'high_fever': 'উচ্চ জ্বর', 'mild_fever': 'হালকা জ্বর', 'fatigue': 'ক্লান্তি',
-    'cough': 'কাশি', 'breathlessness': 'শ্বাসকষ্ট', 'headache': 'মাথা ব্যথা',
-    'dizziness': 'মাথা ঘোরা', 'vomiting': 'বমি', 'diarrhoea': 'ডায়রিয়া',
-    'nausea': 'বমি বমি ভাব', 'abdominal_pain': 'পেটে ব্যথা', 'chest_pain': 'বুকে ব্যথা',
-    'joint_pain': 'গাঁটে ব্যথা', 'muscle_pain': 'পেশিতে ব্যথা', 'loss_of_appetite': 'খাবারে অরুচি',
-    'yellowish_skin': 'ত্বক হলদে', 'yellowing_of_eyes': 'চোখ হলদে', 'weight_loss': 'ওজন কমা',
-    'sweating': 'ঘাম', 'dehydration': 'পানিশূন্যতা', 'constipation': 'কোষ্ঠকাঠিন্য',
-    'back_pain': 'পিঠে ব্যথা', 'neck_pain': 'ঘাড়ে ব্যথা', 'knee_pain': 'হাঁটুতে ব্যথা',
-    'hip_joint_pain': 'কোমরে ব্যথা', 'muscle_weakness': 'পেশির দুর্বলতা',
-    'stiff_neck': 'শক্ত ঘাড়', 'swelling_joints': 'গাঁট ফোলা', 'movement_stiffness': 'নড়াচড়ায় কষ্ট',
-    'loss_of_balance': 'ভারসাম্য হারানো', 'unsteadiness': 'অস্থিরতা',
-    'loss_of_smell': 'গন্ধ না পাওয়া', 'blurred_and_distorted_vision': 'ঝাপসা দৃষ্টি',
-    'redness_of_eyes': 'চোখ লাল', 'watering_from_eyes': 'চোখ দিয়ে পানি',
-    'sinus_pressure': 'সাইনাসের চাপ', 'runny_nose': 'নাক দিয়ে পানি', 'congestion': 'নাক বন্ধ',
-    'throat_irritation': 'গলা জ্বালা', 'phlegm': 'কফ', 'blood_in_sputum': 'কফে রক্ত',
-    'fast_heart_rate': 'দ্রুত হৃদস্পন্দন', 'palpitations': 'বুক ধড়ফড়',
-    'weakness_in_limbs': 'হাত-পায়ে দুর্বলতা', 'swollen_legs': 'পা ফোলা',
-    'obesity': 'স্থূলতা', 'excessive_hunger': 'অতিরিক্ত ক্ষুধা', 'increased_appetite': 'বেড়ে যাওয়া ক্ষুধা',
-    'polyuria': 'অতিরিক্ত প্রস্রাব', 'continuous_feel_of_urine': 'সবসময় প্রস্রাবের অনুভূতি',
-    'bladder_discomfort': 'মূত্রথলিতে অস্বস্তি', 'bloody_stool': 'পায়খানায় রক্ত',
-    'pain_during_bowel_movements': 'পায়খানার সময় ব্যথা', 'passage_of_gases': 'গ্যাস নির্গমন',
-    'internal_itching': 'ভেতরে চুলকানি', 'irritation_in_anus': 'পায়ুপথে জ্বালা',
-    'bruising': 'ক্ষতচিহ্ন', 'skin_peeling': 'ত্বক ওঠা', 'blister': 'ফোস্কা',
-    'pus_filled_pimples': 'পুঁজ ভরা ব্রণ', 'blackheads': 'ব্ল্যাকহেডস', 'scurring': 'দাগ',
-    'silver_like_dusting': 'রূপালী আঁশ', 'small_dents_in_nails': 'নখে ছোট গর্ত',
-    'inflammatory_nails': 'নখে প্রদাহ', 'brittle_nails': 'ভাঙা নখ',
-    'swollen_extremeties': 'হাত-পা ফোলা', 'puffy_face_and_eyes': 'মুখ ও চোখ ফোলা',
-    'enlarged_thyroid': 'থাইরয়েড বড়', 'swollen_blood_vessels': 'রক্তনালী ফোলা',
-    'prominent_veins_on_calf': 'পায়ে শিরা ফোলা', 'drying_and_tingling_lips': 'ঠোঁট শুকনো ও ঝিনঝিন',
-    'slurred_speech': 'জড়ানো কথা', 'spinning_movements': 'মাথা ঘোরা',
-    'weakness_of_one_body_side': 'শরীরের একপাশে দুর্বলতা', 'altered_sensorium': 'চেতনা পরিবর্তন',
-    'depression': 'বিষণ্নতা', 'irritability': 'খিটখিটে ভাব', 'anxiety': 'দুশ্চিন্তা',
-    'mood_swings': 'মেজাজ পরিবর্তন', 'restlessness': 'অস্থিরতা', 'lethargy': 'অলসতা',
-    'red_spots_over_body': 'শরীরে লাল দাগ', 'belly_pain': 'তলপেটে ব্যথা',
-    'abnormal_menstruation': 'অস্বাভাবিক মাসিক', 'dischromic_patches': 'বর্ণহীন দাগ',
-    'family_history': 'পারিবারিক ইতিহাস', 'mucoid_sputum': 'শ্লেষ্মাযুক্ত কফ',
-    'rusty_sputum': 'মরিচা রঙের কফ', 'lack_of_concentration': 'মনোযোগের অভাব',
-    'visual_disturbances': 'দৃষ্টি সমস্যা', 'painful_walking': 'হাঁটতে ব্যথা',
-    'red_sore_around_nose': 'নাকের চারপাশে লাল ঘা', 'yellow_crust_ooze': 'হলদে খোসা',
-    'acute_liver_failure': 'তীব্র লিভার বিকল', 'receiving_blood_transfusion': 'রক্ত গ্রহণ',
-    'receiving_unsterile_injections': 'অপরিষ্কার ইনজেকশন', 'swelling_of_stomach': 'পেট ফোলা',
-    'swelled_lymph_nodes': 'লিম্ফ নোড ফোলা', 'malaise': 'শারীরিক অস্বস্তি',
-    'nodal_skin_eruptions': 'গিঁটে চর্ম', 'toxic_look_(typhos)': 'টক্সিক লক্ষণ',
-    'extra_marital_contacts': 'অতিরিক্ত যৌন সংস্পর্শ',
-    # Remaining ~30 symptoms fall back to English via .get() default
-}
-
-SPECIALTY_BN = {
-    'Cardiologist': 'হৃদরোগ বিশেষজ্ঞ', 'Neurologist': 'স্নায়ু বিশেষজ্ঞ',
-    'Dermatologist': 'চর্ম বিশেষজ্ঞ', 'General Physician': 'সাধারণ চিকিৎসক',
-    'Pediatrician': 'শিশু বিশেষজ্ঞ', 'Orthopedic': 'অর্থোপেডিক বিশেষজ্ঞ',
-    'Cardiology': 'হৃদরোগ', 'Dermatology': 'চর্মরোগ', 'Neurology': 'স্নায়ুরোগ',
-    'Internal Medicine': 'অভ্যন্তরীণ চিকিৎসা', 'Pediatrics': 'শিশু চিকিৎসা',
-    'Orthopedics': 'অর্থোপেডিকস',
-}
-
-DIVISION_BN = {
-    'Dhaka': 'ঢাকা', 'Chattogram': 'চট্টগ্রাম', 'Chittagong': 'চট্টগ্রাম',
-    'Khulna': 'খুলনা', 'Rajshahi': 'রাজশাহী', 'Barishal': 'বরিশাল',
-    'Barisal': 'বরিশাল', 'Sylhet': 'সিলেট', 'Rangpur': 'রংপুর',
-    'Mymensingh': 'ময়মনসিংহ',
-}
-
-def symptom_label_bn(s):
-    return SYMPTOM_LABELS_BN.get(s, symptom_label(s))
-
-def specialty_bn(s):
-    return SPECIALTY_BN.get(s, s)
-
-def division_bn(d):
-    return DIVISION_BN.get(d, d)
-
-# ---- FLASH I18N ----
-FLASH_I18N = {
-    'en': {
-        'flash.unauthorized': "Unauthorized access",
-        'flash.err_users': "Error fetching users",
-        'flash.err_doctors': "Error fetching doctors: {err}",
-        'flash.doctor_added': "Doctor added successfully!",
-        'flash.err_add_doctor': "Error adding doctor: {err}",
-        'flash.err_doctor': "Error fetching doctor: {err}",
-        'flash.doctor_updated': "Doctor updated successfully!",
-        'flash.err_update_doctor': "Error updating doctor: {err}",
-        'flash.doctor_deleted': "Doctor deleted successfully!",
-        'flash.err_delete_doctor': "Error deleting doctor: {err}",
-        'flash.err_appts': "Error fetching appointments",
-        'flash.appt_added': "Appointment added successfully!",
-        'flash.err_add_appt': "Error adding appointment: {err}",
-        'flash.err_appt': "Error fetching appointment: {err}",
-        'flash.appt_updated': "Appointment updated successfully!",
-        'flash.err_update_appt': "Error updating appointment: {err}",
-        'flash.appt_deleted': "Appointment deleted successfully!",
-        'flash.err_delete_appt': "Error deleting appointment: {err}",
-        'flash.user_updated': "User updated successfully!",
-        'flash.user_deleted': "User deleted successfully!",
-        'flash.err_delete_user': "Error deleting user: {err}",
-        'flash.settings_updated': "Settings updated successfully",
-        'flash.err_settings': "Error updating settings",
-        'flash.email_pwd_required': "Email and password are required.",
-        'flash.invalid_credentials': "Invalid email or password. Please try again.",
-        'flash.signup_required': "Full name, email, and password are required.",
-        'flash.pwd_min_len': "Password must be at least 6 characters long.",
-        'flash.create_acc_failed': "Failed to create account. Please try again.",
-        'flash.acc_created_welcome': "Account created successfully! Welcome to GloHealth AI.",
-        'flash.acc_created_login': "Account created successfully! Please log in.",
-        'flash.acc_exists': "An account with this email already exists. Please log in.",
-        'flash.signup_err': "Signup error: {err}",
-        'flash.doctor_not_found': "Doctor not found.",
-        'flash.select_date_time': "Please select a date and time.",
-        'flash.appt_booked': "Appointment booked successfully!",
-        'flash.subscribed': "Subscribed to {plan} successfully!",
-        'flash.sub_cancelled': "Subscription canceled successfully.",
-        'flash.sub_cancel_failed': "Failed to cancel subscription.",
-        'flash.plan_not_found': "Plan not found!",
-        'flash.feature_sub_required': "You need to subscribe to access this feature page.",
-    },
-    'bn': {
-        'flash.unauthorized': "অননুমোদিত প্রবেশ",
-        'flash.err_users': "ব্যবহারকারী আনতে ত্রুটি",
-        'flash.err_doctors': "ডাক্তার আনতে ত্রুটি: {err}",
-        'flash.doctor_added': "ডাক্তার সফলভাবে যোগ করা হয়েছে!",
-        'flash.err_add_doctor': "ডাক্তার যোগ করতে ত্রুটি: {err}",
-        'flash.err_doctor': "ডাক্তার আনতে ত্রুটি: {err}",
-        'flash.doctor_updated': "ডাক্তার সফলভাবে আপডেট করা হয়েছে!",
-        'flash.err_update_doctor': "ডাক্তার আপডেট করতে ত্রুটি: {err}",
-        'flash.doctor_deleted': "ডাক্তার সফলভাবে মুছে ফেলা হয়েছে!",
-        'flash.err_delete_doctor': "ডাক্তার মুছতে ত্রুটি: {err}",
-        'flash.err_appts': "অ্যাপয়েন্টমেন্ট আনতে ত্রুটি",
-        'flash.appt_added': "অ্যাপয়েন্টমেন্ট সফলভাবে যোগ করা হয়েছে!",
-        'flash.err_add_appt': "অ্যাপয়েন্টমেন্ট যোগ করতে ত্রুটি: {err}",
-        'flash.err_appt': "অ্যাপয়েন্টমেন্ট আনতে ত্রুটি: {err}",
-        'flash.appt_updated': "অ্যাপয়েন্টমেন্ট সফলভাবে আপডেট করা হয়েছে!",
-        'flash.err_update_appt': "অ্যাপয়েন্টমেন্ট আপডেট করতে ত্রুটি: {err}",
-        'flash.appt_deleted': "অ্যাপয়েন্টমেন্ট সফলভাবে মুছে ফেলা হয়েছে!",
-        'flash.err_delete_appt': "অ্যাপয়েন্টমেন্ট মুছতে ত্রুটি: {err}",
-        'flash.user_updated': "ব্যবহারকারী সফলভাবে আপডেট করা হয়েছে!",
-        'flash.user_deleted': "ব্যবহারকারী সফলভাবে মুছে ফেলা হয়েছে!",
-        'flash.err_delete_user': "ব্যবহারকারী মুছতে ত্রুটি: {err}",
-        'flash.settings_updated': "সেটিংস সফলভাবে আপডেট করা হয়েছে",
-        'flash.err_settings': "সেটিংস আপডেট করতে ত্রুটি",
-        'flash.email_pwd_required': "ইমেইল এবং পাসওয়ার্ড আবশ্যক।",
-        'flash.invalid_credentials': "অবৈধ ইমেইল বা পাসওয়ার্ড। আবার চেষ্টা করুন।",
-        'flash.signup_required': "পুরো নাম, ইমেইল এবং পাসওয়ার্ড আবশ্যক।",
-        'flash.pwd_min_len': "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।",
-        'flash.create_acc_failed': "অ্যাকাউন্ট তৈরি করতে ব্যর্থ হয়েছে। আবার চেষ্টা করুন।",
-        'flash.acc_created_welcome': "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! GloHealth AI-তে স্বাগতম।",
-        'flash.acc_created_login': "অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে! অনুগ্রহ করে লগ ইন করুন।",
-        'flash.acc_exists': "এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট বিদ্যমান। অনুগ্রহ করে লগ ইন করুন।",
-        'flash.signup_err': "নিবন্ধন ত্রুটি: {err}",
-        'flash.doctor_not_found': "ডাক্তার পাওয়া যায়নি।",
-        'flash.select_date_time': "অনুগ্রহ করে একটি তারিখ ও সময় নির্বাচন করুন।",
-        'flash.appt_booked': "অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে!",
-        'flash.subscribed': "{plan}-এ সফলভাবে সাবস্ক্রাইব করা হয়েছে!",
-        'flash.sub_cancelled': "সাবস্ক্রিপশন সফলভাবে বাতিল করা হয়েছে।",
-        'flash.sub_cancel_failed': "সাবস্ক্রিপশন বাতিল করতে ব্যর্থ হয়েছে।",
-        'flash.plan_not_found': "প্ল্যান পাওয়া যায়নি!",
-        'flash.feature_sub_required': "এই ফিচার পেজটি ব্যবহার করতে আপনাকে সাবস্ক্রাইব করতে হবে।",
-    }
-}
-
-
-def t_flash(key, **kw):
-    lang = session.get('lang', 'en')
-    s = FLASH_I18N.get(lang, {}).get(key) or FLASH_I18N['en'].get(key, key)
-    return s.format(**kw) if kw else s
-
-
-@app.before_request
-def _set_lang():
-    if 'lang' not in session:
-        session['lang'] = request.cookies.get('lang', 'en')
-
 
 
 # User class
@@ -399,7 +224,7 @@ def admin_dashboard():
 @login_required
 def admin_users():
     if not getattr(current_user, 'is_admin', False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for('dashboard'))
 
     try:
@@ -408,7 +233,7 @@ def admin_users():
         return render_template("admin_users.html", users=users)
     except Exception as e:
         print(f"Admin Users error: {e}")
-        flash(t_flash("flash.err_users"), "danger")
+        flash("Error fetching users", "danger")
         return redirect(url_for("admin_dashboard"))
 
 # View all doctors
@@ -416,7 +241,7 @@ def admin_users():
 @login_required
 def admin_doctors():
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("dashboard"))
 
     try:
@@ -424,7 +249,7 @@ def admin_doctors():
         doctors = resp.data if hasattr(resp, "data") else []
         return render_template("admin_doctors.html", doctors=doctors)
     except Exception as e:
-        flash(t_flash("flash.err_doctors", err=str(e)), "danger")
+        flash(f"Error fetching doctors: {str(e)}", "danger")
         return redirect(url_for("admin_dashboard"))
 
 
@@ -433,7 +258,7 @@ def admin_doctors():
 @login_required
 def add_doctor_page():
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_doctors"))
 
     if request.method == "POST":
@@ -449,10 +274,10 @@ def add_doctor_page():
                 "availability": data.get("availability"),
                 "contact": data.get("contact")
             }).execute()
-            flash(t_flash("flash.doctor_added"), "success")
+            flash("Doctor added successfully!", "success")
             return redirect(url_for("admin_doctors"))
         except Exception as e:
-            flash(t_flash("flash.err_add_doctor", err=str(e)), "danger")
+            flash(f"Error adding doctor: {str(e)}", "danger")
 
     return render_template("add_doctor.html")
 
@@ -462,14 +287,14 @@ def add_doctor_page():
 @login_required
 def edit_doctor_page(doctor_id):
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_doctors"))
 
     try:
         resp = supabase.from_("doctors").select("*").eq("id", doctor_id).single().execute()
         doctor = resp.data
     except Exception as e:
-        flash(t_flash("flash.err_doctor", err=str(e)), "danger")
+        flash(f"Error fetching doctor: {str(e)}", "danger")
         return redirect(url_for("admin_doctors"))
 
     if request.method == "POST":
@@ -485,10 +310,10 @@ def edit_doctor_page(doctor_id):
                 "availability": data.get("availability"),
                 "contact": data.get("contact")
             }).eq("id", doctor_id).execute()
-            flash(t_flash("flash.doctor_updated"), "success")
+            flash("Doctor updated successfully!", "success")
             return redirect(url_for("admin_doctors"))
         except Exception as e:
-            flash(t_flash("flash.err_update_doctor", err=str(e)), "danger")
+            flash(f"Error updating doctor: {str(e)}", "danger")
 
     return render_template("edit_doctor.html", doctor=doctor)
 
@@ -498,14 +323,14 @@ def edit_doctor_page(doctor_id):
 @login_required
 def delete_doctor_page(doctor_id):
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_doctors"))
 
     try:
         supabase.from_("doctors").delete().eq("id", doctor_id).execute()
-        flash(t_flash("flash.doctor_deleted"), "success")
+        flash("Doctor deleted successfully!", "success")
     except Exception as e:
-        flash(t_flash("flash.err_delete_doctor", err=str(e)), "danger")
+        flash(f"Error deleting doctor: {str(e)}", "danger")
 
     return redirect(url_for("admin_doctors"))
 # View all appointments
@@ -513,7 +338,7 @@ def delete_doctor_page(doctor_id):
 @login_required
 def admin_appointments():
     if not getattr(current_user, 'is_admin', False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for('dashboard'))
 
     try:
@@ -529,7 +354,7 @@ def admin_appointments():
         return render_template('admin_appointments.html', appointments=appointments)
     except Exception as e:
         print(f"Admin Appointments error: {e}")
-        flash(t_flash("flash.err_appts"), "danger")
+        flash("Error fetching appointments", "danger")
         return redirect(url_for('admin_dashboard'))
 
 
@@ -538,7 +363,7 @@ def admin_appointments():
 @login_required
 def add_appointment_page():
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_appointments"))
 
     # Fetch doctors and users
@@ -563,10 +388,10 @@ def add_appointment_page():
                 "payment_status": data.get("payment_status", "unpaid")
             }).execute()
 
-            flash(t_flash("flash.appt_added"), "success")
+            flash("Appointment added successfully!", "success")
             return redirect(url_for("admin_appointments"))
         except Exception as e:
-            flash(t_flash("flash.err_add_appt", err=str(e)), "danger")
+            flash(f"Error adding appointment: {str(e)}", "danger")
 
     return render_template("add_appointment.html", doctors=doctors, users=users)
 
@@ -575,7 +400,7 @@ def add_appointment_page():
 @login_required
 def edit_appointment_page(appointment_id):
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_appointments"))
 
     try:
@@ -589,7 +414,7 @@ def edit_appointment_page(appointment_id):
         users = users_resp.data if hasattr(users_resp, "data") else []
 
     except Exception as e:
-        flash(t_flash("flash.err_appt", err=str(e)), "danger")
+        flash(f"Error fetching appointment: {str(e)}", "danger")
         return redirect(url_for("admin_appointments"))
 
     if request.method == "POST":
@@ -606,10 +431,10 @@ def edit_appointment_page(appointment_id):
                 "payment_status": data.get("payment_status", "unpaid")
             }).eq("id", appointment_id).execute()
 
-            flash(t_flash("flash.appt_updated"), "success")
+            flash("Appointment updated successfully!", "success")
             return redirect(url_for("admin_appointments"))
         except Exception as e:
-            flash(t_flash("flash.err_update_appt", err=str(e)), "danger")
+            flash(f"Error updating appointment: {str(e)}", "danger")
 
     return render_template("edit_appointment.html", appointment=appointment, doctors=doctors, users=users)
 
@@ -619,14 +444,14 @@ def edit_appointment_page(appointment_id):
 @login_required
 def delete_appointment_page(appointment_id):
     if not getattr(current_user, "is_admin", False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for("admin_appointments"))
 
     try:
         supabase.from_("appointments").delete().eq("id", appointment_id).execute()
-        flash(t_flash("flash.appt_deleted"), "success")
+        flash("Appointment deleted successfully!", "success")
     except Exception as e:
-        flash(t_flash("flash.err_delete_appt", err=str(e)), "danger")
+        flash(f"Error deleting appointment: {str(e)}", "danger")
 
     return redirect(url_for("admin_appointments"))
 
@@ -647,7 +472,7 @@ def edit_user(user_id):
             "division": division
         }).eq("id", user_id).execute()
 
-        flash(t_flash("flash.user_updated"), "success")
+        flash("User updated successfully!", "success")
         return redirect(url_for("admin_users"))
 
     # Fetch user for pre-fill
@@ -665,9 +490,9 @@ def delete_user(user_id):
         # # Then delete from auth.users
         # supabase.auth.admin.delete_user(user_id)
 
-        flash(t_flash("flash.user_deleted"), "success")
+        flash("User deleted successfully!", "success")
     except Exception as e:
-        flash(t_flash("flash.err_delete_user", err=str(e)), "danger")
+        flash(f"Error deleting user: {str(e)}", "danger")
 
     return redirect(url_for("admin_users"))
 
@@ -677,7 +502,7 @@ def delete_user(user_id):
 @login_required
 def admin_settings():
     if not getattr(current_user, 'is_admin', False):
-        flash(t_flash("flash.unauthorized"), "danger")
+        flash("Unauthorized access", "danger")
         return redirect(url_for('dashboard'))
 
     try:
@@ -696,13 +521,13 @@ def admin_settings():
             else:
                 supabase.from_('system_settings').insert(updated_settings).execute()
 
-            flash(t_flash("flash.settings_updated"), "success")
+            flash("Settings updated successfully", "success")
             return redirect(url_for('admin_settings'))
 
         return render_template('admin_settings.html', settings=settings)
     except Exception as e:
         print(f"Update settings error: {str(e)}")
-        flash(t_flash("flash.err_settings"), "danger")
+        flash("Error updating settings", "danger")
         return redirect(url_for('admin_dashboard'))
 
 
@@ -735,7 +560,7 @@ def login():
             password = request.form.get('password', '').strip()
 
             if not email or not password:
-                flash(t_flash("flash.email_pwd_required"), "danger")
+                flash("Email and password are required.", "danger")
                 return render_template('auth/login.html')
 
             response = supabase.auth.sign_in_with_password({
@@ -754,11 +579,11 @@ def login():
                     login_user(user)
                     return redirect(url_for('dashboard'))
 
-            flash(t_flash("flash.invalid_credentials"), "danger")
+            flash("Invalid email or password. Please try again.", "danger")
 
         except Exception as e:
             print(f"Login error: {str(e)}")
-            flash(t_flash("flash.invalid_credentials"), "danger")
+            flash("Invalid email or password. Please try again.", "danger")
             return render_template('auth/login.html')
 
     return render_template('auth/login.html')
@@ -778,11 +603,11 @@ def signup():
             postal_code = request.form.get('postal_code', '').strip()
 
             if not name or not email or not password:
-                flash(t_flash("flash.signup_required"), "danger")
+                flash("Full name, email, and password are required.", "danger")
                 return render_template('auth/signup.html')
 
             if len(password) < 6:
-                flash(t_flash("flash.pwd_min_len"), "danger")
+                flash("Password must be at least 6 characters long.", "danger")
                 return render_template('auth/signup.html')
 
             auth_response = supabase.auth.sign_up({
@@ -797,7 +622,7 @@ def signup():
             })
 
             if not auth_response or not auth_response.user:
-                flash(t_flash("flash.create_acc_failed"), "danger")
+                flash("Failed to create account. Please try again.", "danger")
                 return render_template('auth/signup.html')
 
             user = auth_response.user
@@ -837,22 +662,22 @@ def signup():
                 app_user = load_user(user.id)
                 if app_user:
                     login_user(app_user)
-                    flash(t_flash("flash.acc_created_welcome"), "success")
+                    flash("Account created successfully! Welcome to GloHealth AI.", "success")
                     return redirect(url_for('dashboard'))
 
-            flash(t_flash("flash.acc_created_login"), "success")
+            flash("Account created successfully! Please log in.", "success")
             return redirect(url_for('login'))
 
         except Exception as e:
             error_msg = str(e)
             print(f"Signup error: {error_msg}")
             if "User already registered" in error_msg or "user_already_exists" in error_msg:
-                flash(t_flash("flash.acc_exists"), "warning")
+                flash("An account with this email already exists. Please log in.", "warning")
                 return redirect(url_for('login'))
             elif "Password should be at least 6 characters" in error_msg or "weak_password" in error_msg:
-                flash(t_flash("flash.pwd_min_len"), "danger")
+                flash("Password must be at least 6 characters long.", "danger")
             else:
-                flash(t_flash("flash.signup_err", err=error_msg), "danger")
+                flash(f"Signup error: {error_msg}", "danger")
             return render_template('auth/signup.html')
 
     return render_template('auth/signup.html')
@@ -965,7 +790,6 @@ def prediction():
                 symptom_groups[category].append({
                     "key": symptom,
                     "label": symptom_label(symptom),
-                    "label_bn": symptom_label_bn(symptom),
                 })
                 matched = True
                 break
@@ -973,7 +797,6 @@ def prediction():
             symptom_groups['Other'].append({
                 "key": symptom,
                 "label": symptom_label(symptom),
-                "label_bn": symptom_label_bn(symptom),
             })
 
     # Fetch active subscription for current user from Supabase
@@ -1382,71 +1205,91 @@ def doctors():
     response = query.execute()
     doctors_list = response.data if hasattr(response, 'data') else []
 
-    for d in doctors_list:
-        d['specialty_bn'] = specialty_bn(d.get('specialty', ''))
-        d['division_bn'] = division_bn(d.get('division', ''))
-
     return render_template('doctors.html', doctors=doctors_list)
 # Book appointment route
 @app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
 @login_required
 def book_appointment(doctor_id):
-    # Fetch doctor from Supabase
-    doc_resp = supabase.table('doctors').select('*').eq('id', doctor_id).execute()
-    doctor = doc_resp.data[0] if doc_resp.data else None
-    if not doctor:
-        flash(t_flash('flash.doctor_not_found'), 'danger')
-        return redirect(url_for('doctors'))
+    try:
+        # Fetch doctor details
+        doctor_resp = supabase.from_('doctors')\
+                              .select('*')\
+                              .eq('id', doctor_id)\
+                              .maybe_single()\
+                              .execute()
+        doctor = doctor_resp.data if hasattr(doctor_resp, 'data') else None
+        if not doctor:
+            return "Doctor not found", 404
 
-    if request.method == 'POST':
-        date_str = request.form.get('date')       # e.g. "2026-09-23"
-        time_str = request.form.get('time')       # e.g. "10:00"
-        reason = request.form.get('reason', '').strip()
-        consult_type = request.form.get('consult_type', 'video')
+        # Fetch user's active subscription with checkup points
+        sub_resp = supabase.table("user_subscriptions")\
+            .select("*")\
+            .eq("user_id", str(current_user.id))\
+            .eq("active", True)\
+            .order("start_date", desc=True)\
+            .limit(1)\
+            .execute()
+        subscription = sub_resp.data[0] if sub_resp.data else None
+        if not subscription:
+            flash("You need an active subscription to book an appointment.", "danger")
+            return redirect(url_for('plans'))
 
-        if not date_str or not time_str:
-            flash(t_flash('flash.select_date_time'), 'warning')
-            return redirect(url_for('book_appointment', doctor_id=doctor_id))
+        if request.method == 'POST':
+            scheduled_time = request.form.get('scheduled_time')
+            payment_done = request.form.get('payment_done') == 'yes'  # checkbox: paid
+            use_points = request.form.get('use_points') == 'yes'      # checkbox: free checkup
 
-        scheduled_time = f"{date_str}T{time_str}:00"
+            if not scheduled_time:
+                flash("Please select a date and time", "warning")
+                return redirect(url_for('book_appointment', doctor_id=doctor_id))
 
-        supabase.table('appointments').insert({
-            'user_id': str(current_user.id),
-            'doctor_id': doctor_id,
-            'scheduled_time': scheduled_time,
-            'status': 'pending',
-            'payment_status': 'unpaid',
-            'user_name': getattr(current_user, 'name', '') or '',
-            'user_email': getattr(current_user, 'email', '') or '',
-            'doctor_name': doctor.get('name', ''),
-        }).execute()
+            # Default status/payment
+            status = 'pending'
+            payment_status = 'unpaid'
 
-        flash(t_flash('flash.appt_booked'), 'success')
-        return redirect(url_for('appointments'))
+            # Handle free checkup
+            if use_points:
+                if subscription["checkup_points"] <= 0:
+                    flash("No free checkups remaining for this month.", "warning")
+                    return redirect(url_for('features', plan_name=subscription["plan_name"]))
 
-    # Build next 7 days for date chips
-    from datetime import date as date_cls, timedelta as td
-    today = date_cls.today()
-    days = []
-    for i in range(7):
-        d = today + td(days=i)
-        days.append({
-            'iso': d.isoformat(),
-            'day_short': d.strftime('%a'),
-            'day_num': d.day,
-            'is_today': i == 0,
-        })
+                # Deduct one free checkup point
+                new_points = subscription["checkup_points"] - 1
+                supabase.table("user_subscriptions") \
+                    .update({"checkup_points": new_points}) \
+                    .eq("id", subscription["id"]) \
+                    .execute()
 
-    # Static time slots (with some marked disabled as mock)
-    slots = ['09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30',
-             '14:00','14:30','15:00','15:30']
-    disabled_slots = ['09:30', '11:00', '15:00']
+                subscription["checkup_points"] = new_points
+                status = 'confirmed'
+                payment_status = 'free'
+            else:
+                # Paid booking
+                status = 'confirmed' if payment_done else 'pending'
+                payment_status = 'paid' if payment_done else 'unpaid'
 
-    return render_template('book_appointment.html',
-                           doctor=doctor,
-                           days=days,
-                           slots=slots,
-                           disabled_slots=disabled_slots)
+            # Insert appointment
+            supabase.from_('appointments').insert({
+                'user_id': str(current_user.id),
+                'doctor_id': doctor_id,
+                'scheduled_time': scheduled_time,
+                'status': status,
+                'payment_status': payment_status
+            }).execute()
+
+            flash("Appointment booked successfully!", "success")
+            return redirect(url_for('appointments'))
+
+        # GET request: show form
+        return render_template(
+            'book_appointment.html',
+            doctor=doctor,
+            subscription=subscription
+        )
+
+    except Exception as e:
+        print(f"Book appointment error: {str(e)}")
+        return "Error booking appointment", 500
 
 @app.route('/appointments')
 @login_required
@@ -1535,7 +1378,7 @@ def subscribe_plan(plan_name):
         "checkup_points": plan_points.get(plan_name, 0)
     }).execute()
 
-    flash(t_flash('flash.subscribed', plan=plan_name), "success")
+    flash(f"Subscribed to {plan_name} successfully!", "success")
     return redirect(url_for('plans'))
 
 # Cancel subscription
@@ -1553,9 +1396,9 @@ def cancel_subscription(sub_id):
         .execute()
 
     if response.data:  # If data is returned, the update succeeded
-        flash(t_flash("flash.sub_cancelled"), "success")
+        flash("Subscription canceled successfully.", "success")
     else:
-        flash(t_flash("flash.sub_cancel_failed"), "danger")
+        flash("Failed to cancel subscription.", "danger")
 
     return redirect(url_for('plans'))
 
@@ -1571,7 +1414,7 @@ def plan_details(plan_name):
 
     plan = plans_data.get(plan_name)
     if not plan:
-        flash(t_flash("flash.plan_not_found"), "danger")
+        flash("Plan not found!", "danger")
         return redirect(url_for('plans'))
 
     return render_template("plan_details.html", plan_name=plan_name, plan=plan)
@@ -1617,7 +1460,7 @@ def features(plan_name):
         .execute().data
 
     if not subscription:
-        flash(t_flash("flash.feature_sub_required"), "danger")
+        flash("You need to subscribe to access this feature page.", "danger")
         return redirect(url_for('plans'))
 
     # Query doctors based on plan level
@@ -1655,15 +1498,5 @@ def features(plan_name):
         return render_template("feature_premium.html", doctors=doctors, subscription=subscription)
     elif plan_name == "Ultimate Plan":
         return render_template("feature_ultimate.html", doctors=doctors, subscription=subscription)
-
-@app.route('/set_language/<lang>', methods=['POST', 'GET'])
-def set_language(lang):
-    if lang in ('en', 'bn'):
-        session['lang'] = lang
-        resp = make_response('', 204)
-        resp.set_cookie('lang', lang, max_age=31536000, samesite='Lax')
-        return resp
-    return ('', 400)
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
