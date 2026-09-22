@@ -20,8 +20,7 @@
     <div class="gh-grid gh-grid--3" style="gap: 24px; max-width: 1080px; margin: 0 auto;">
         
         <!-- CARD 1: Free -->
-        {% set is_current_free = (current_plan_name == 'Free') %}
-        <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between; {% if is_current_free %}border: 2px solid var(--gh-primary); box-shadow: 0 0 16px rgba(3,105,161,0.25);{% endif %}">
+        <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Free</h3>
                 <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;">Essential diagnostic screening</p>
@@ -56,22 +55,12 @@
             </div>
 
             <div style="margin-top: 24px;">
-                {% if is_current_free %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
-                    {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
-                    {% endif %}
-                {% else %}
-                    <form action="{{ url_for('subscribe_plan', plan_name='Free') }}" method="POST">
-                        <button class="gh-btn gh-btn--primary gh-btn--block" type="submit">Upgrade to Free</button>
-                    </form>
-                {% endif %}
+                <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">Current Plan</button>
             </div>
         </div>
 
         <!-- CARD 2: Plus (POPULAR) -->
-        {% set is_current_plus = (current_plan_name == 'Premium Plan') %}
-        <div class="gh-card" style="border: 2px solid var(--gh-primary); {% if is_current_plus %}box-shadow: 0 0 20px rgba(3,105,161,0.35);{% else %}box-shadow: 0 4px 16px rgba(3,105,161,.15);{% endif %} position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="gh-card" style="border: 2px solid var(--gh-primary); box-shadow: 0 4px 16px rgba(3,105,161,.15); position: relative; display: flex; flex-direction: column; justify-content: space-between;">
             <div style="position: absolute; top: 16px; right: 16px;">
                 <span class="gh-badge gh-badge--info" style="font-weight: 700; letter-spacing: 0.04em;">POPULAR</span>
             </div>
@@ -110,22 +99,14 @@
             </div>
 
             <div style="margin-top: 24px;">
-                {% if is_current_plus %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
-                    {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
-                    {% endif %}
-                {% else %}
-                    <form action="{{ url_for('subscribe_plan', plan_name='Premium Plan') }}" method="POST">
-                        <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" data-i18n="p.plus">Upgrade to Plus</button>
-                    </form>
-                {% endif %}
+                <form action="{{ url_for('subscribe_plan', plan_name='Premium Plan') }}" method="POST">
+                    <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" data-i18n="p.plus">Upgrade to Plus</button>
+                </form>
             </div>
         </div>
 
         <!-- CARD 3: Pro -->
-        {% set is_current_pro = (current_plan_name == 'Ultimate Plan') %}
-        <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between; {% if is_current_pro %}border: 2px solid var(--gh-primary); box-shadow: 0 0 16px rgba(3,105,161,0.25);{% endif %}">
+        <div class="gh-card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Pro</h3>
                 <p class="u-muted" style="font-size: 13px; margin-bottom: 20px;">For families & continuous monitoring</p>
@@ -160,32 +141,13 @@
             </div>
 
             <div style="margin-top: 24px;">
-                {% if is_current_pro %}
-                    <button type="button" class="gh-btn gh-btn--outline gh-btn--block" disabled style="opacity: 0.6; cursor: not-allowed;" data-i18n="p.current">বর্তমান প্ল্যান</button>
-                    {% if current_sub_id and end_date %}
-                    <div class="u-muted" style="font-size: 11px; text-align: center; margin-top: 6px;">Active until {{ end_date }}</div>
-                    {% endif %}
-                {% else %}
-                    <form action="{{ url_for('subscribe_plan', plan_name='Ultimate Plan') }}" method="POST">
-                        <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" data-i18n="p.pro">Upgrade to Pro</button>
-                    </form>
-                {% endif %}
+                <form action="{{ url_for('subscribe_plan', plan_name='Ultimate Plan') }}" method="POST">
+                    <button type="submit" class="gh-btn gh-btn--primary gh-btn--block" data-i18n="p.pro">Upgrade to Pro</button>
+                </form>
             </div>
         </div>
 
     </div>
-
-    <!-- Cancel Subscription Button if active paid subscription exists -->
-    {% if current_sub_id %}
-    <div style="text-align:center; margin-top: 32px;">
-      <form method="POST" action="{{ url_for('cancel_subscription', sub_id=current_sub_id) }}" style="display:inline;">
-        <button type="submit" class="gh-btn gh-btn--ghost"
-                onclick="return confirm('Cancel your current subscription?');">
-          Cancel Subscription
-        </button>
-      </form>
-    </div>
-    {% endif %}
 
     <!-- Footer Note -->
     <div style="text-align: center; margin-top: 32px;">

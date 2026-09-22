@@ -1324,50 +1324,46 @@ def appointments():
 @app.route('/plans')
 @login_required
 def plans():
+    # Mock plans data
     plans_data = [
-        {"name": "Free", "backend_name": "Free", "price": "0",
-         "details": "Essential diagnostic screening"},
-        {"name": "Plus", "backend_name": "Premium Plan", "price": "499",
-         "details": "Comprehensive proactive health care"},
-        {"name": "Pro", "backend_name": "Ultimate Plan", "price": "1299",
-         "details": "For families & continuous monitoring"},
+        {"name": "Basic Plan", "price": "500 BDT", "details": "Access to general consultation."},
+        {"name": "Premium Plan", "price": "1200 BDT", "details": "Includes specialist consultation and reports."},
+        {"name": "Ultimate Plan", "price": "2500 BDT", "details": "All-inclusive consultation, priority support."}
     ]
 
-    # Get the single active subscription (if any)
-    rows = supabase.table("user_subscriptions") \
-        .select("*") \
-        .eq("user_id", str(current_user.id)) \
-        .eq("active", True) \
-        .order("start_date", desc=True) \
-        .limit(1) \
+    # Fetch current user's active subscriptions from Supabase
+    user_subscriptions = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", str(current_user.id))\
+        .eq("active", True)\
         .execute().data
 
-    current_plan_name = rows[0]["plan_name"] if rows else "Free"
-    current_sub_id = rows[0]["id"] if rows else None
-    end_date = rows[0]["end_date"][:10] if rows and rows[0].get("end_date") else None
-
-    return render_template("plans.html",
-                           plans=plans_data,
-                           current_plan_name=current_plan_name,
-                           current_sub_id=current_sub_id,
-                           end_date=end_date)
-
-
+    return render_template("plans.html", plans=plans_data, user_subscriptions=user_subscriptions)
 # Subscribe to a plan (mock payment)
 @app.route('/subscribe/<plan_name>', methods=['POST'])
 @login_required
 def subscribe_plan(plan_name):
-    # Deactivate ALL existing active subscriptions for this user first
-    supabase.table("user_subscriptions") \
-        .update({"active": False, "end_date": datetime.now().isoformat()}) \
-        .eq("user_id", str(current_user.id)) \
-        .eq("active", True) \
-        .execute()
+    # Check if already subscribed
+    existing = supabase.table("user_subscriptions")\
+        .select("*")\
+        .eq("user_id", str(current_user.id))\
+        .eq("plan_name", plan_name)\
+        .eq("active", True)\
+        .execute().data
 
-    # Insert the new active subscription
+    if existing:
+        flash("You are already subscribed to this plan.", "warning")
+        return redirect(url_for('plans'))
+
+    # Save subscription
     start_date = datetime.now()
-    end_date = start_date + timedelta(days=30)
-    plan_points = {"Basic Plan": 1, "Premium Plan": 2, "Ultimate Plan": 5}
+    end_date = start_date + timedelta(days=30)  # Example: 30-day subscription
+
+    plan_points = {
+        "Basic Plan": 1,
+        "Premium Plan": 2,
+        "Ultimate Plan": 5
+    }
 
     supabase.table("user_subscriptions").insert({
         "user_id": str(current_user.id),
