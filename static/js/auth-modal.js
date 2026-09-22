@@ -1,9 +1,6 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('authModal');
-    const modalContainer = document.getElementById('authModalContainer');
-
-    if (!modal || !modalContainer) return;
-
+(function() {
+    let modal = null;
+    let modalContainer = null;
     let currentView = 'signup';
 
     function t(key, fallback) {
@@ -263,6 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderView(view) {
+        modal = modal || document.getElementById('authModal');
+        modalContainer = modalContainer || document.getElementById('authModalContainer');
+        if (!modalContainer) return;
+
         currentView = view || 'signup';
         if (currentView === 'signup') {
             modalContainer.innerHTML = getSignupHTML();
@@ -292,52 +293,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function openModal(view) {
+        modal = modal || document.getElementById('authModal');
+        modalContainer = modalContainer || document.getElementById('authModalContainer');
+        if (!modal || !modalContainer) return;
         renderView(view || 'signup');
         modal.classList.add('is-open');
         document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
+        modal = modal || document.getElementById('authModal');
+        if (!modal) return;
         modal.classList.remove('is-open');
         document.body.style.overflow = '';
     }
 
-    // Re-render modal when language changes dynamically
-    document.addEventListener('gh:langchange', function() {
-        if (modal.classList.contains('is-open')) {
-            renderView(currentView);
-        }
-    });
+    // Expose globally so inline onclick or external scripts can call them directly
+    window.GH_OPEN_AUTH = openModal;
+    window.GH_CLOSE_AUTH = closeModal;
 
-    // Bind triggers from navbar and hero buttons
-    document.querySelectorAll('[data-auth-open]').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            openModal(btn.dataset.authOpen);
+    function initAuthModal() {
+        modal = document.getElementById('authModal');
+        modalContainer = document.getElementById('authModalContainer');
+        if (!modal) return;
+
+        // Close on backdrop click outside container
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
         });
-    });
 
-    // Close on backdrop click outside container
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                closeModal();
+            }
+        });
 
-    // Close on Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-            closeModal();
-        }
-    });
+        // Re-render modal when language changes dynamically
+        document.addEventListener('gh:langchange', function() {
+            if (modal.classList.contains('is-open')) {
+                renderView(currentView);
+            }
+        });
+    }
 
-    // Global delegated listener for any auth modal triggers
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAuthModal);
+    } else {
+        initAuthModal();
+    }
+
+    // Global delegated listener for any auth modal triggers (active immediately)
     document.addEventListener('click', function(e) {
         var trigger = e.target.closest('[data-auth-open]');
         if (trigger) {
             e.preventDefault();
-            openModal(trigger.dataset.authOpen);
+            e.stopPropagation();
+            openModal(trigger.getAttribute('data-auth-open') || 'signup');
         }
     });
 
-});
+})();

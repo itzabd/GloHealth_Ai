@@ -132,8 +132,8 @@
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <!-- Language Switcher Pill -->
-                <button type="button" class="gh-nav__lang-pill" id="langToggle" aria-label="Toggle language">
-                    <span class="gh-lang-en">EN</span> | <span class="gh-lang-bn">বাং</span>
+                <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
+                    <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
                 </button>
 
                 {% if current_user.is_authenticated %}
@@ -176,8 +176,8 @@
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <!-- Language Switcher Pill -->
-                <button type="button" class="gh-nav__lang-pill" id="langToggle" aria-label="Toggle language">
-                    <span class="gh-lang-en">EN</span> | <span class="gh-lang-bn">বাং</span>
+                <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
+                    <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
                 </button>
 
                 <!-- Notifications -->
@@ -816,7 +816,7 @@
         "result.step2":"Track body temperature and heart rate daily.",
         "result.step3":"Avoid unprescribed antibiotics or heavy analgesics.",
         "result.step4":"Schedule a consultation with a registered clinical specialist.",
-        "result.steps":"Recommended Clinical Steps"
+        "result.steps":"Recommended Clinical Steps",
                       "f.platform_desc": "Clinical Telemetry & Predictive Healthcare Platform for Bangladesh.",
                 "f.all_rights": "All rights reserved.",
                 "l.everything_ahead": "Everything you need to stay ahead of illness",
@@ -842,6 +842,12 @@
                 "ad.hipaa_comp": "HIPAA Compliance",
                 "ad.telem_diag": "Telemetry Diagnostics",
                 "ad.footer_enc": "Diagnostic telemetry & clinical records strictly encrypted under ISO-27799.",
+                "l.hero_h1_1": "Know what’s wrong.",
+                "l.already_reg": "Already registered?",
+                "l.trusted_pts": "Trusted by 1,248+ active patients",
+                "l.hipaa_iso": "HIPAA & ISO-27799 Compliant",
+                "l.clin_desc": "Book in-person clinic visits or encrypted video teleconsultations with certified clinicians registered with Bangladesh Medical & Dental Council.",
+                "l.bmdc_reg": "BMDC Reg"
 },
       bn: {
         "a.addr":"ঠিকানার তথ্য",
@@ -1385,7 +1391,7 @@
         "result.step2":"প্রতিদিন শরীরের তাপমাত্রা এবং হৃদস্পন্দন পর্যবেক্ষণ করুন।",
         "result.step3":"অপ্রেসক্রাইবড অ্যান্টিবায়োটিক বা ভারী ব্যথানাশক এড়িয়ে চলুন।",
         "result.step4":"একজন নিবন্ধিত ক্লিনিক্যাল বিশেষজ্ঞের সাথে পরামর্শের সময়সূচি নির্ধারণ করুন।",
-        "result.steps":"প্রস্তাবিত ক্লিনিক্যাল পদক্ষেপ"
+        "result.steps":"প্রস্তাবিত ক্লিনিক্যাল পদক্ষেপ",
                       "f.platform_desc": "বাংলাদেশের জন্য ক্লিনিক্যাল টেলিমেট্রি এবং প্রিডিক্টিভ হেলথকেয়ার প্ল্যাটফর্ম।",
                 "f.all_rights": "সর্বস্বত্ব সংরক্ষিত।",
                 "l.everything_ahead": "অসুস্থতা থেকে এগিয়ে থাকার জন্য আপনার প্রয়োজনীয় সবকিছু",
@@ -1411,6 +1417,12 @@
                 "ad.hipaa_comp": "HIPAA কমপ্লায়েন্স",
                 "ad.telem_diag": "টেলিমেট্রি ডায়াগনস্টিকস",
                 "ad.footer_enc": "ডায়াগনস্টিক টেলিমেট্রি এবং ক্লিনিক্যাল রেকর্ড ISO-27799 এর অধীনে কঠোরভাবে এনক্রিপ্ট করা।",
+                "l.hero_h1_1": "কী হয়েছে জেনে নিন।",
+                "l.already_reg": "ইতিমধ্যে নিবন্ধিত?",
+                "l.trusted_pts": "১,২৪৮+ সক্রিয় রোগীর বিশ্বস্ত",
+                "l.hipaa_iso": "HIPAA এবং ISO-27799 সম্মত",
+                "l.clin_desc": "বাংলাদেশ মেডিকেল ও ডেন্টাল কাউন্সিলের নিবন্ধিত চিকিৎসকদের সাথে চেম্বার ভিজিট বা এনক্রিপ্টেড ভিডিও কনসালটেশন বুক করুন।",
+                "l.bmdc_reg": "বিএমডিসি নিবন্ধন"
 }
     };
     (function() {
@@ -1452,30 +1464,59 @@
           var v = dict[el.getAttribute('data-i18n-aria')];
           if (v) el.setAttribute('aria-label', v);
         });
+        /* data-label-bn / data-label-en support (e.g. division names) */
+        document.querySelectorAll('[data-label-bn]').forEach(function(el) {
+          var bnVal = el.getAttribute('data-label-bn');
+          var enVal = el.getAttribute('data-label-en') || el.textContent;
+          el.textContent = (lang === 'bn') ? bnVal : enVal;
+        });
+        /* Set cookie for server-side persistence */
+        document.cookie = "lang=" + lang + ";path=/;max-age=31536000;SameSite=Lax";
         /* highlight active language in pill */
-        var pill = document.getElementById('langToggle');
-        if (pill) {
+        document.querySelectorAll('#langToggle, .gh-nav__lang-pill').forEach(function(pill) {
           var enSpan = pill.querySelector('.gh-lang-en');
           var bnSpan = pill.querySelector('.gh-lang-bn');
           if (enSpan && bnSpan) {
-            enSpan.style.color = (lang === 'en') ? 'var(--gh-primary)' : 'var(--gh-text-muted)';
+            enSpan.style.color = (lang === 'en') ? '#0369a1' : '#64748b';
             enSpan.style.fontWeight = (lang === 'en') ? '700' : '500';
-            bnSpan.style.color = (lang === 'bn') ? 'var(--gh-primary)' : 'var(--gh-text-muted)';
+            bnSpan.style.color = (lang === 'bn') ? '#0369a1' : '#64748b';
             bnSpan.style.fontWeight = (lang === 'bn') ? '700' : '500';
           }
-        }
+        });
         /* Notify page-level scripts (e.g. prediction.js modal re-render) */
-        document.dispatchEvent(new CustomEvent('gh:langchange', { detail: { lang: lang, dict: dict } }));
+        try {
+          document.dispatchEvent(new CustomEvent('gh:langchange', { detail: { lang: lang, dict: dict } }));
+        } catch(e) {}
       }
       window.GH_APPLY_LANG = applyLang;
       window.GH_LANG = localStorage.getItem('glohealth_lang') || 'en';
-      var toggleBtn = document.getElementById('langToggle');
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', function() {
-          var current = localStorage.getItem('glohealth_lang') || 'en';
-          applyLang(current === 'en' ? 'bn' : 'en');
-        });
+
+      function toggleLang(e) {
+        if (e) {
+          try { e.preventDefault(); e.stopPropagation(); } catch(err){}
+        }
+        var target = e ? e.target : null;
+        if (target && target.closest && target.closest('.gh-lang-en')) {
+          applyLang('en');
+          return;
+        }
+        if (target && target.closest && target.closest('.gh-lang-bn')) {
+          applyLang('bn');
+          return;
+        }
+        var current = window.GH_LANG || localStorage.getItem('glohealth_lang') || 'en';
+        applyLang(current === 'bn' ? 'en' : 'bn');
       }
+      window.GH_TOGGLE_LANG = toggleLang;
+
+      /* Delegated click handler for language toggle */
+      document.addEventListener('click', function(e) {
+        var btn = e.target.closest('#langToggle, .gh-nav__lang-pill');
+        if (btn) {
+          toggleLang(e);
+        }
+      });
+
       applyLang(localStorage.getItem('glohealth_lang') || 'en');
     })();
     </script>
