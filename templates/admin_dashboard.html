@@ -168,78 +168,92 @@
                         <p style="font-size: 14px; color: #64748b; margin: 0;" data-i18n="ad.overview_sub">Platform health &amp; activity telemetry dashboard</p>
                     </div>
                     <div class="gh-row" style="gap: 12px; align-items: center;">
-                        <button type="button" class="gh-chip" style="height: 38px; padding: 0 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; color: #334155; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">calendar_today</span>
-                            <span><span data-i18n="ad.last_30_days">Last 30 days</span></span>
-                            <span class="material-symbols-outlined" style="font-size: 16px; color: #94a3b8;">expand_more</span>
-                        </button>
-                        <button type="button" class="gh-btn gh-btn--primary" style="height: 38px; padding: 0 16px; border-radius: 6px;">
+                        <div style="position: relative;" id="dateRangeContainer">
+                            <button type="button" id="dateRangeBtn" class="gh-chip" style="height: 38px; padding: 0 14px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; color: #334155; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">calendar_today</span>
+                                <span id="dateRangeLabel" data-i18n="ad.last_30_days">Last 30 days</span>
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #94a3b8;">expand_more</span>
+                            </button>
+                            <div id="dateRangeMenu" style="display: none; position: absolute; right: 0; top: 44px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 160px; z-index: 50; padding: 6px 0;">
+                                <button type="button" class="date-range-opt" data-range="Last 7 days" style="width: 100%; text-align: left; padding: 8px 14px; font-size: 13px; background: none; border: none; cursor: pointer; color: #334155; display: flex; align-items: center; justify-content: space-between;">Last 7 days</button>
+                                <button type="button" class="date-range-opt" data-range="Last 30 days" style="width: 100%; text-align: left; padding: 8px 14px; font-size: 13px; background: none; border: none; cursor: pointer; color: #0369a1; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">Last 30 days <span class="material-symbols-outlined" style="font-size: 16px;">check</span></button>
+                                <button type="button" class="date-range-opt" data-range="Last 90 days" style="width: 100%; text-align: left; padding: 8px 14px; font-size: 13px; background: none; border: none; cursor: pointer; color: #334155; display: flex; align-items: center; justify-content: space-between;">Last 90 days</button>
+                                <button type="button" class="date-range-opt" data-range="All Time" style="width: 100%; text-align: left; padding: 8px 14px; font-size: 13px; background: none; border: none; cursor: pointer; color: #334155; display: flex; align-items: center; justify-content: space-between;">All Time</button>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('export_audit') }}" class="gh-btn gh-btn--primary" style="height: 38px; padding: 0 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
-                            <span><span data-i18n="ad.export_audit">Export Audit</span></span>
-                        </button>
+                            <span data-i18n="ad.export_audit">Export Audit (CSV)</span>
+                        </a>
                     </div>
                 </div>
 
                 <!-- KPI Row (4 Cards, exact Stitch Spec) -->
                 <div class="gh-grid gh-grid--4" style="gap: 20px;">
-                    <!-- Card 1 -->
+                    <!-- Card 1: Total Users -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_users">Total Users</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">group</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_users">Total Registered Users</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #0284c7;">group</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
                             <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">
-                                {{ '{:,}'.format(users|length) if users else '1,248' }}
+                                {{ '{:,}'.format(kpi_metrics.total_users) if kpi_metrics and kpi_metrics.total_users is defined else (users|length if users else '0') }}
                             </div>
-                            <div style="display: inline-flex; align-items: center; color: #0d9488; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600;">
-                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">arrow_upward</span>
-                                <span>+42 this month</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 2 -->
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_subs">Active Subscriptions</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">credit_card</span>
-                        </div>
-                        <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
-                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">312</div>
-                            <div style="display: inline-flex; align-items: center; color: #0d9488; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600;">
-                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">arrow_upward</span>
-                                <span>+18 this month</span>
+                            <div style="display: inline-flex; align-items: center; color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">verified_user</span>
+                                <span>Verified Active</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card 3 -->
+                    <!-- Card 2: Appointments -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_pred">Predictions Today</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">psychology</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.appts">Clinical Appointments</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #0d9488;">calendar_month</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
-                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">87</div>
+                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">
+                                {{ kpi_metrics.total_appts if kpi_metrics and kpi_metrics.total_appts is defined else (appointments|length if appointments else '0') }}
+                            </div>
                             <div style="display: inline-flex; align-items: center; color: #0d9488; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600;">
-                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">trending_up</span>
-                                <span>+12% vs yesterday</span>
+                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">done_all</span>
+                                <span>{{ kpi_metrics.confirmed_appts if kpi_metrics else '0' }} confirmed</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card 4 -->
+                    <!-- Card 3: Outbreak Cases -->
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
                         <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
-                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.kpi_uptime">System Uptime</span>
-                            <span class="material-symbols-outlined" style="font-size: 20px; color: #94a3b8;">speed</span>
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.insights">Cases Ingested</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #e11d48;">public</span>
                         </div>
                         <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
-                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">99.97%</div>
-                            <div style="display: inline-flex; align-items: center; color: #0d9488; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600; gap: 4px;">
-                                <span style="width: 6px; height: 6px; border-radius: 50%; background: #0d9488;"></span>
-                                <span><span data-i18n="ad.all_systems_normal">All systems normal</span></span>
+                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">
+                                {{ '{:,}'.format(kpi_metrics.total_cases) if kpi_metrics and kpi_metrics.total_cases is defined else '147' }}
+                            </div>
+                            <div style="display: inline-flex; align-items: center; color: #e11d48; background: #fff1f2; border: 1px solid #fecdd3; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600;">
+                                <span class="material-symbols-outlined" style="font-size: 14px; margin-right: 2px;">map</span>
+                                <span>8 Divisions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Verified Specialists -->
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; color: #64748b;">
+                            <span style="font-size: 12px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;" data-i18n="ad.doctors">Verified Specialists</span>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #7c3aed;">medical_services</span>
+                        </div>
+                        <div style="margin-top: 12px; display: flex; align-items: baseline; justify-content: space-between;">
+                            <div style="font-size: 30px; font-weight: 700; color: #0f172a; font-family: var(--gh-font-heading); letter-spacing: -0.02em;">
+                                {{ kpi_metrics.total_doctors if kpi_metrics and kpi_metrics.total_doctors is defined else (doctors|length if doctors else '4') }}
+                            </div>
+                            <div style="display: inline-flex; align-items: center; color: #7c3aed; background: #f5f3ff; border: 1px solid #ddd6fe; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: monospace; font-weight: 600; gap: 4px;">
+                                <span style="width: 6px; height: 6px; border-radius: 50%; background: #7c3aed;"></span>
+                                <span>BMDC Registry</span>
                             </div>
                         </div>
                     </div>
@@ -334,68 +348,27 @@
                                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #0369a1;"></span>
                             </div>
 
-                            <!-- Feed List -->
+                            <!-- Dynamic Feed List -->
                             <ul style="list-style: none; padding: 0; margin: 8px 0 0 0; display: flex; flex-direction: column;">
-                                <!-- Item 1 -->
-                                <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">person_add</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_new_user">New user registered</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">2 min ago · Patient Portal</p>
-                                    </div>
-                                </li>
-                                <!-- Item 2 -->
-                                <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">medical_services</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_dr_sched">Dr. Rahman updated schedule</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">18 min ago · Cardio Unit</p>
-                                    </div>
-                                </li>
-                                <!-- Item 3 -->
-                                <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">upgrade</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_sub_up">Subscription upgrade (Pro)</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">1 h ago · Clinic Tier #9</p>
-                                    </div>
-                                </li>
-                                <!-- Item 4 -->
-                                <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #f0fdfa; color: #0f766e; border: 1px solid #99f6e4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_doc_ver">New doctor verified</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">3 h ago · Internal Governance</p>
-                                    </div>
-                                </li>
-                                <!-- Item 5 -->
-                                <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #faf5ff; color: #7e22ce; border: 1px solid #e9d5ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">neurology</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_model_retrain">Prediction model retrained</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">6 h ago · Model v2.4a deployed</p>
-                                    </div>
-                                </li>
-                                <!-- Item 6 -->
-                                <li style="padding: 12px 0; display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">backup</span>
-                                    </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;" data-i18n="ad.act_sys_backup">System backup completed</p>
-                                        <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">12 h ago · Encrypted Cold Storage</p>
-                                    </div>
-                                </li>
+                                {% if activity_events %}
+                                    {% for act in activity_events %}
+                                    <li style="padding: 12px 0; border-bottom: 1px solid #f8fafc; display: flex; align-items: flex-start; gap: 12px;">
+                                        <div style="width: 32px; height: 32px; border-radius: 50%; background: {{ act.bg }}; color: {{ act.color }}; border: 1px solid {{ act.color }}33; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">{{ act.icon }}</span>
+                                        </div>
+                                        <div style="flex: 1; min-width: 0;">
+                                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                                                <p style="font-size: 13px; font-weight: 600; color: #1e293b; margin: 0; line-height: 1.3;">{{ act.title }}</p>
+                                                <span style="font-size: 10px; font-family: monospace; background: #f1f5f9; color: #475569; padding: 1px 6px; border-radius: 4px; white-space: nowrap;">{{ act.badge }}</span>
+                                            </div>
+                                            <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ act.subtitle }}</p>
+                                            <p style="font-size: 11px; font-family: monospace; color: #94a3b8; margin: 2px 0 0 0;">{{ act.time }}</p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li style="padding: 24px 0; text-align: center; color: #94a3b8; font-size: 13px;">No recent activity logs available.</li>
+                                {% endif %}
                             </ul>
                         </div>
 
@@ -814,6 +787,45 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (userSearch) userSearch.addEventListener('input', filterUsers);
+
+    // 4. Interactive Date Range Dropdown
+    var dateRangeBtn = document.getElementById('dateRangeBtn');
+    var dateRangeMenu = document.getElementById('dateRangeMenu');
+    var dateRangeLabel = document.getElementById('dateRangeLabel');
+    var dateRangeOpts = document.querySelectorAll('.date-range-opt');
+
+    if (dateRangeBtn && dateRangeMenu) {
+        dateRangeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = dateRangeMenu.style.display === 'block';
+            dateRangeMenu.style.display = isOpen ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function(e) {
+            if (dateRangeMenu && !dateRangeMenu.contains(e.target) && e.target !== dateRangeBtn) {
+                dateRangeMenu.style.display = 'none';
+            }
+        });
+
+        dateRangeOpts.forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                var range = this.getAttribute('data-range');
+                if (dateRangeLabel) {
+                    dateRangeLabel.textContent = range;
+                }
+                dateRangeOpts.forEach(function(o) {
+                    o.style.color = '#334155';
+                    o.style.fontWeight = '400';
+                    var check = o.querySelector('.material-symbols-outlined');
+                    if (check) check.remove();
+                });
+                this.style.color = '#0369a1';
+                this.style.fontWeight = '600';
+                this.innerHTML = range + ' <span class="material-symbols-outlined" style="font-size: 16px;">check</span>';
+                dateRangeMenu.style.display = 'none';
+            });
+        });
+    }
 });
 </script>
 {% endblock %}

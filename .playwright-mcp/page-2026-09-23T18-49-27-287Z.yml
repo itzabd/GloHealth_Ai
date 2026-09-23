@@ -1,0 +1,214 @@
+- generic [active] [ref=f1e1]:
+  - link "Skip to main content" [ref=f1e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=f1e3]:
+    - generic [ref=f1e4]:
+      - link "GloHealth AI" [ref=f1e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=f1e8]: GloHealth
+        - generic [ref=f1e9]: AI
+      - navigation [ref=f1e10]:
+        - link "Dashboard" [ref=f1e11] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Symptom Checker" [ref=f1e12] [cursor=pointer]:
+          - /url: /prediction
+        - link "Geo Insights" [ref=f1e13] [cursor=pointer]:
+          - /url: /geo_insights
+        - link "Doctors" [ref=f1e14] [cursor=pointer]:
+          - /url: /doctors
+        - link "Appointments" [ref=f1e15] [cursor=pointer]:
+          - /url: /appointments
+        - link "Plans" [ref=f1e16] [cursor=pointer]:
+          - /url: /plans
+        - link "Admin" [ref=f1e17] [cursor=pointer]:
+          - /url: /admin/dashboard
+        - link "System Settings" [ref=f1e18] [cursor=pointer]:
+          - /url: /admin/settings
+      - generic [ref=f1e19]:
+        - button "Toggle language" [ref=f1e20] [cursor=pointer]: EN | বাং
+        - generic [ref=f1e21]:
+          - button "Notifications" [ref=f1e22] [cursor=pointer]:
+            - generic [ref=f1e23]: notifications
+          - button "Help" [ref=f1e24] [cursor=pointer]:
+            - generic [ref=f1e25]: help_outline
+          - generic [ref=f1e27]:
+            - generic [ref=f1e28]: AB
+            - generic [ref=f1e29]:
+              - generic [ref=f1e30]: "ID: CBA81634"
+              - generic [ref=f1e31]: ADMIN TIER
+            - link "logout" [ref=f1e32] [cursor=pointer]:
+              - /url: /logout
+  - main [ref=f1e34]:
+    - generic [ref=f1e35]:
+      - generic [ref=f1e36]:
+        - generic [ref=f1e37]:
+          - heading "Dashboard" [level=1] [ref=f1e38]
+          - paragraph [ref=f1e39]: Your clinical health overview and telemetry at a glance
+        - generic [ref=f1e40]:
+          - generic [ref=f1e41]: sensors
+          - text: SYS ACTIVE · NODE_DHK_01
+      - generic [ref=f1e42]:
+        - generic [ref=f1e43]:
+          - generic [ref=f1e44]:
+            - generic [ref=f1e45]: Total Predictions
+            - generic [ref=f1e46]: monitor_heart
+          - generic [ref=f1e48]: "5"
+          - generic [ref=f1e49]: +5 this week
+        - generic [ref=f1e51]:
+          - generic [ref=f1e52]:
+            - generic [ref=f1e53]: Upcoming Appointments
+            - generic [ref=f1e54]: event
+          - generic [ref=f1e56]: "1"
+          - generic [ref=f1e57]: 2026-09-22T09:00
+        - generic [ref=f1e59]:
+          - generic [ref=f1e60]:
+            - generic [ref=f1e61]: Active Coverage
+            - generic [ref=f1e62]: shield
+          - generic [ref=f1e64]: Premium Plan
+          - generic [ref=f1e65]: Active member
+        - generic [ref=f1e67]:
+          - generic [ref=f1e68]:
+            - generic [ref=f1e69]: Health Index
+            - generic [ref=f1e70]: favorite
+          - generic [ref=f1e72]: 82/100
+      - generic [ref=f1e75]:
+        - generic [ref=f1e76]:
+          - generic [ref=f1e77]:
+            - generic [ref=f1e78]:
+              - heading "Recent Predictions" [level=2] [ref=f1e79]
+              - generic [ref=f1e80]: Historical telemetry outputs from clinical models
+            - link "View all →" [ref=f1e81] [cursor=pointer]:
+              - /url: /prediction
+              - generic [ref=f1e82]: View all
+              - text: →
+          - table [ref=f1e83]:
+            - rowgroup [ref=f1e84]:
+              - row [ref=f1e85]:
+                - columnheader "DATE" [ref=f1e86]
+                - columnheader "Symptoms" [ref=f1e87]
+                - columnheader "Condition" [ref=f1e88]
+                - columnheader "Confidence" [ref=f1e89]
+                - columnheader [ref=f1e90]
+            - rowgroup [ref=f1e91]:
+              - row [ref=f1e92]:
+                - cell "2026-09-23" [ref=f1e93]
+                - cell "itching, skin_rash, chills" [ref=f1e94]
+                - cell "Allergy" [ref=f1e95]
+                - cell "31%" [ref=f1e97]
+                - cell [ref=f1e102]:
+                  - link "View" [ref=f1e103] [cursor=pointer]:
+                    - /url: /prediction
+              - row [ref=f1e104]:
+                - cell "2026-09-23" [ref=f1e105]
+                - cell "itching, skin_rash, chills" [ref=f1e106]
+                - cell "Allergy" [ref=f1e107]
+                - cell "32%" [ref=f1e109]
+                - cell [ref=f1e114]:
+                  - link "View" [ref=f1e115] [cursor=pointer]:
+                    - /url: /prediction
+              - row [ref=f1e116]:
+                - cell "2026-09-23" [ref=f1e117]
+                - cell "sweating" [ref=f1e118]
+                - cell "Heart Attack" [ref=f1e119]
+                - cell "29%" [ref=f1e121]
+                - cell [ref=f1e126]:
+                  - link "View" [ref=f1e127] [cursor=pointer]:
+                    - /url: /prediction
+              - row [ref=f1e128]:
+                - cell "2026-09-23" [ref=f1e129]
+                - cell "headache" [ref=f1e130]
+                - cell "Paralysis (brain hemorrhage)" [ref=f1e131]
+                - cell "32%" [ref=f1e133]
+                - cell [ref=f1e138]:
+                  - link "View" [ref=f1e139] [cursor=pointer]:
+                    - /url: /prediction
+              - row [ref=f1e140]:
+                - cell "2026-09-21" [ref=f1e141]
+                - cell "itching, joint_pain" [ref=f1e142]
+                - cell "Osteoarthritis" [ref=f1e143]
+                - cell "42%" [ref=f1e145]
+                - cell [ref=f1e150]:
+                  - link "View" [ref=f1e151] [cursor=pointer]:
+                    - /url: /prediction
+        - generic [ref=f1e152]:
+          - generic [ref=f1e153]:
+            - heading "Quick Actions" [level=2] [ref=f1e154]
+            - generic [ref=f1e155]: Rapid triage & care coordination
+          - generic [ref=f1e156]:
+            - link "stethoscope New Symptom Check" [ref=f1e157] [cursor=pointer]:
+              - /url: /prediction
+              - generic [ref=f1e158]: stethoscope
+              - generic [ref=f1e159]: New Symptom Check
+            - link "person_add Book a Doctor" [ref=f1e160] [cursor=pointer]:
+              - /url: /doctors
+              - generic [ref=f1e161]: person_add
+              - generic [ref=f1e162]: Book a Doctor
+            - link "map View Outbreak Map" [ref=f1e163] [cursor=pointer]:
+              - /url: /geo_insights
+              - generic [ref=f1e164]: map
+              - generic [ref=f1e165]: View Outbreak Map
+      - generic [ref=f1e166]:
+        - generic [ref=f1e167]:
+          - generic [ref=f1e168]:
+            - heading "Next Appointment" [level=2] [ref=f1e169]
+            - generic [ref=f1e170]: calendar_today
+          - generic [ref=f1e171]:
+            - generic [ref=f1e172]:
+              - generic [ref=f1e173]: DR
+              - generic [ref=f1e174]:
+                - generic [ref=f1e175]:
+                  - strong [ref=f1e176]: Dr. Fatima Akter
+                  - generic [ref=f1e177]: pending
+                - generic [ref=f1e178]: General Physician
+            - generic [ref=f1e179]:
+              - generic [ref=f1e180]: schedule
+              - generic [ref=f1e181]: 2026-09-22T09:00
+              - generic [ref=f1e182]: ·
+              - generic [ref=f1e183]: location_on
+              - generic [ref=f1e184]: Dhaka Central Clinic
+            - generic [ref=f1e185]:
+              - link "Reschedule" [ref=f1e186] [cursor=pointer]:
+                - /url: /appointments
+              - link "videocam Join Video Call" [ref=f1e187] [cursor=pointer]:
+                - /url: /appointments
+                - generic [ref=f1e188]: videocam
+                - generic [ref=f1e189]: Join Video Call
+        - generic [ref=f1e190]:
+          - generic [ref=f1e191]:
+            - heading "Clinical Health Guidelines" [level=2] [ref=f1e192]
+            - generic [ref=f1e193]: lightbulb
+          - list [ref=f1e194]:
+            - listitem [ref=f1e195]:
+              - generic [ref=f1e196]: water_drop
+              - generic [ref=f1e197]: Drink 2-3L water daily
+            - listitem [ref=f1e198]:
+              - generic [ref=f1e199]: directions_walk
+              - generic [ref=f1e200]: 30 min walk after meals
+            - listitem [ref=f1e201]:
+              - generic [ref=f1e202]: bedtime
+              - generic [ref=f1e203]: Sleep 7-8 hours
+  - contentinfo [ref=f1e204]:
+    - generic [ref=f1e206]:
+      - generic [ref=f1e207]:
+        - generic [ref=f1e208]:
+          - generic [ref=f1e209]: GloHealth
+          - generic [ref=f1e210]: AI
+        - paragraph [ref=f1e211]: Clinical Telemetry & Predictive Healthcare Platform for Bangladesh.
+      - generic [ref=f1e212]:
+        - heading "Platform Services" [level=4] [ref=f1e213]
+        - list [ref=f1e214]:
+          - listitem [ref=f1e215]:
+            - link "AI Diagnostic Screening" [ref=f1e216] [cursor=pointer]:
+              - /url: /prediction
+          - listitem [ref=f1e217]:
+            - link "Epidemiological Surveillance" [ref=f1e218] [cursor=pointer]:
+              - /url: /geo_insights
+          - listitem [ref=f1e219]:
+            - link "Clinical Specialist Network" [ref=f1e220] [cursor=pointer]:
+              - /url: /doctors
+      - generic [ref=f1e221]:
+        - heading "System Node Status" [level=4] [ref=f1e222]
+        - generic [ref=f1e223]:
+          - generic [ref=f1e224]: "NODE: DHK_CENTRAL_01"
+          - generic [ref=f1e225]: "TELEMETRY: STABLE 99.9%"
+          - generic [ref=f1e226]: © 2026 GloHealth AI. All rights reserved.

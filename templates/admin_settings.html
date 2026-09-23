@@ -1,83 +1,391 @@
+{% set hide_nav = true %}
 {% extends "base.html" %}
 
-{% block title %}
-<span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
-<span class="lang-en" lang="en" data-i18n="ad.settings">System Settings</span>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.card-hover {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(12px) saturate(150%);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    padding: 1rem;
-}
-.card-hover:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.25);
-}
-.btn-accent {
-    background: linear-gradient(90deg, #FF9149, #FF6B6B);
-    border: none;
-    color: white;
-    font-weight: 500;
-    border-radius: 10px;
-    padding: 0.45rem 1.2rem;
-    transition: 0.3s;
-}
-.btn-accent:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
-}
-</style>
-{% endblock %}
+{% block title %}System Settings · GloHealth AI Admin Cockpit{% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
-    <div class="row mb-4">
-        <div class="col text-center">
-            <h2 class="section-header">
-                <span class="lang-bn" lang="bn">সিস্টেম সেটিংস</span>
-                <span class="lang-en" lang="en" data-i18n="ad.settings">System Settings</span>
-            </h2>
-        </div>
-    </div>
+<!-- Full-Height Admin Cockpit Shell -->
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: #faf8ff; color: #0f172a; font-family: var(--gh-font-body);">
 
-    <div class="row justify-content-center g-4">
-        <!-- Example setting card -->
-        <div class="col-md-4 d-flex">
-            <div class="card card-hover w-100 card-centered h-100">
-                <div class="card-body">
-                    <h5 class="section-title">
-                        <span class="lang-bn" lang="bn">সাধারণ সেটিংস</span>
-                        <span class="lang-en" lang="en" data-i18n="c.general_settings">General Settings</span>
-                    </h5>
-                    <p data-i18n="c.change_sys_config">Change system configurations.</p>
-                    <a href="{{ url_for('update_settings') }}" class="btn btn-accent">
-                        <span class="lang-bn" lang="bn">আপডেট করুন</span>
-                        <span data-i18n="c.update">Update</span>
-                    </a>
+    <!-- 1. Dedicated Admin Telemetry Top Bar -->
+    <header style="width: 100%; height: 56px; background: #ffffff; border-bottom: 1px solid var(--gh-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 30; flex-shrink: 0;">
+        <!-- Left: Brand & Operational Status Indicator -->
+        <div class="gh-row" style="gap: 20px; align-items: center;">
+            <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                <div class="gh-nav__brand-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
                 </div>
+                <span class="gh-nav__brand-name" style="font-size: 18px; font-weight: 700; color: var(--gh-primary); letter-spacing: -0.02em;">GloHealth</span>
+                <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
+                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
+            </a>
+            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+            <div class="gh-row" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block;"></span>
+                <span data-i18n="ad.cluster">HQ CLUSTER : PROD · ACTIVE</span>
             </div>
         </div>
-        <!-- Add more cards for settings -->
+
+        <!-- Right: Admin Controls & User Info -->
+        <div class="gh-row" style="gap: 16px; align-items: center;">
+            <span class="gh-chip" style="font-size: 11px; padding: 3px 8px; font-family: monospace;">EN | বাং</span>
+
+            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+
+            <!-- Admin Profile Badge -->
+            <div class="gh-row" style="gap: 10px; align-items: center;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: monospace;">
+                    AD
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">Dr. S. Ahmed</span>
+                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">SA ID: GLH-9042 · CLINICAL DIR</span>
+                </div>
+            </div>
+
+            <!-- Exit to Patient Portal Link -->
+            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
+                <span data-i18n="ad.patient_portal">Patient Portal</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
+                <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. Shell Layout: Sidebar + Main Workspace -->
+    <div style="flex: 1; display: flex; overflow: hidden;">
+        
+        <!-- SIDEBAR (240px) -->
+        <aside style="width: 240px; background: #ffffff; border-right: 1px solid var(--gh-border); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; user-select: none; z-index: 20;">
+            <div style="display: flex; flex-direction: column;">
+                <div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                    <div class="gh-row" style="gap: 8px; align-items: center;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span style="font-size: 11px; font-family: monospace; font-weight: 600; color: #64748b; letter-spacing: 0.05em;">HQ CLUSTER : PROD</span>
+                    </div>
+                    <span style="font-size: 10px; font-family: monospace; background: #f1f5f9; color: #475569; padding: 2px 6px; border: 1px solid #e2e8f0; border-radius: 4px;">v2.4</span>
+                </div>
+
+                <div style="padding: 16px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
+                    <span data-i18n="ad.mgmt">MANAGEMENT</span>
+                </div>
+
+                <nav style="display: flex; flex-direction: column; gap: 4px; padding: 0 8px;">
+                    <a href="{{ url_for('admin_dashboard') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">dashboard</span>
+                        <span data-i18n="nav.dashboard">Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}#doctors" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">medical_services</span>
+                        <span data-i18n="ad.doctors">Doctors</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}#users" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">group</span>
+                        <span data-i18n="ad.users">Users</span>
+                    </a>
+                    <a href="{{ url_for('admin_appointments') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">calendar_today</span>
+                        <span data-i18n="ad.appts">Appointments</span>
+                    </a>
+                    <a href="{{ url_for('geo_insights') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">insights</span>
+                        <span data-i18n="ad.insights">Insights</span>
+                    </a>
+                    <!-- System Settings (Active) -->
+                    <a href="{{ url_for('admin_settings') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 600; border-radius: 6px; background-color: #f0f9ff; color: #0369a1; border-left: 4px solid #0369a1; text-decoration: none; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="color: #0369a1; font-size: 20px;">settings</span>
+                        <span data-i18n="ad.settings">System Settings</span>
+                    </a>
+                </nav>
+
+                <div style="padding: 24px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
+                    TELEMETRY LOGS
+                </div>
+                <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 4px; font-size: 12px;">
+                    <div style="padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; color: #64748b; font-family: monospace; border-radius: 4px; background: #f8fafc;">
+                        <span>ISO-27799 Guard</span>
+                        <span style="font-size: 10px; color: #059669; font-weight: 700;">PASS</span>
+                    </div>
+                    <div style="padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; color: #64748b; font-family: monospace; border-radius: 4px; background: #f8fafc;">
+                        <span>Cluster Nodes</span>
+                        <span style="font-size: 10px; color: #0284c7; font-weight: 700;">ACTIVE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Anchored User Bar -->
+            <div style="border-top: 1px solid var(--gh-border); padding: 16px; display: flex; align-items: center; gap: 12px; background: #ffffff;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-family: monospace; font-size: 12px; font-weight: 700; flex-shrink: 0;">
+                    AD
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 13px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dr. S. Ahmed</div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                        <span style="background: #ecfdf5; color: #047857; font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; border: 1px solid #a7f3d0;">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main style="flex: 1; background: #faf8ff; padding: 32px; overflow-y: auto;">
+            <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="gh-alert gh-alert--{{ 'success' if category == 'success' else ('alert' if category == 'danger' else 'info') }}" style="display: flex; align-items: center; justify-content: space-between; border-radius: 8px; padding: 12px 16px; margin: 0;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">
+                                    {{ 'check_circle' if category == 'success' else ('error' if category == 'danger' else 'info') }}
+                                </span>
+                                <span style="font-size: 14px; font-weight: 500;">{{ message }}</span>
+                            </div>
+                            <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; color: inherit; display: flex; align-items: center;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Form Header -->
+                <form method="POST" action="{{ url_for('admin_settings') }}" id="settingsForm">
+                    <div class="gh-row" style="justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+                        <div>
+                            <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
+                                <h1 class="font-headline-lg" style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0; letter-spacing: -0.02em;">System Settings &amp; Telemetry Config</h1>
+                                <span class="gh-badge gh-badge--accent" style="font-size: 11px; padding: 2px 8px;">CLUSTER GOVERNANCE</span>
+                            </div>
+                            <p style="font-size: 14px; color: #64748b; margin: 0;">Configure platform parameters, clinical triage thresholds, security policies, and payment routing</p>
+                        </div>
+                        <div class="gh-row" style="gap: 12px; align-items: center;">
+                            <button type="button" onclick="window.location.reload();" class="gh-btn gh-btn--outline" style="height: 40px; padding: 0 16px; border-radius: 8px; font-weight: 600;">
+                                Reset
+                            </button>
+                            <button type="submit" class="gh-btn gh-btn--primary" style="height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Grid of 4 Settings Cards -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+
+                        <!-- Card 1: Clinical Telehealth Protocols -->
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #f0f9ff; color: #0284c7; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">clinical_notes</span>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Clinical &amp; Telehealth Protocol</h2>
+                                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Consultation timings, AI intake and baseline fee schedule</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Hospital / Clinic System Name</label>
+                                    <input type="text" name="site_name" value="{{ settings.site_name or 'GloHealth AI Clinical Matrix' }}" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; font-size: 14px;">
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Platform brand name displayed on clinical headers, audit records, and medical receipts</span>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Standard Telehealth Session (Minutes)</label>
+                                    <select name="telehealth_session_duration" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; font-size: 14px;">
+                                        <option value="15" {% if settings.telehealth_session_duration == 15 %}selected{% endif %}>15 Minutes · Quick Assessment</option>
+                                        <option value="20" {% if settings.telehealth_session_duration == 20 %}selected{% endif %}>20 Minutes · Standard Consult</option>
+                                        <option value="30" {% if settings.telehealth_session_duration == 30 or not settings.telehealth_session_duration %}selected{% endif %}>30 Minutes · Comprehensive Evaluation (Recommended)</option>
+                                        <option value="45" {% if settings.telehealth_session_duration == 45 %}selected{% endif %}>45 Minutes · Specialized Multi-Disciplinary</option>
+                                        <option value="60" {% if settings.telehealth_session_duration == 60 %}selected{% endif %}>60 Minutes · Extended Review</option>
+                                    </select>
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Default slot allocation duration across specialist calendar slots</span>
+                                </div>
+
+                                <div>
+                                    <label style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">
+                                        <span>AI Auto-Triage Severity Sensitivity</span>
+                                        <span id="sensitivityVal" style="font-family: monospace; color: #0284c7; font-weight: 700;">{{ (settings.auto_triage_sensitivity * 100)|round|int }}%</span>
+                                    </label>
+                                    <input type="range" name="auto_triage_sensitivity" min="0.50" max="0.99" step="0.01" value="{{ settings.auto_triage_sensitivity or 0.85 }}" style="width: 100%; cursor: pointer;" oninput="document.getElementById('sensitivityVal').innerText = Math.round(this.value * 100) + '%'">
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Higher threshold flags subtle multi-symptom clusters for emergency doctor escalation</span>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Default Specialist Consultation Fee (BDT)</label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 12px; top: 11px; font-size: 14px; color: #64748b; font-weight: 600;">৳</span>
+                                        <input type="number" name="default_consultation_fee" id="default_consultation_fee" value="{{ settings.default_consultation_fee or 500 }}" min="0" step="50" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px 0 30px; font-size: 14px;">
+                                    </div>
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Standard benchmark fee prefilled when onboarding newly verified doctors</span>
+                                    
+                                    <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px; cursor: pointer; font-size: 12px; color: #0369a1; background: #f0f9ff; padding: 9px 12px; border-radius: 6px; border: 1px solid #bae6fd;">
+                                        <input type="checkbox" name="sync_all_doctors_fee" value="1" checked style="width: 16px; height: 16px; accent-color: #0284c7; cursor: pointer;">
+                                        <span><strong>Apply &amp; sync this fee (৳) to all doctors</strong> in directory &amp; database</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Security & ISO-27799 Guard -->
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #ecfdf5; color: #047857; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">shield</span>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Security &amp; Health Data Protection</h2>
+                                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">ISO-27799, token encryption &amp; clinical session timeouts</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
+                                    <div style="flex: 1; margin-right: 12px;">
+                                        <div style="font-size: 13px; font-weight: 600; color: #1e293b;">ISO-27799 In-Flight Patient Encryption</div>
+                                        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Enforces end-to-end cryptographic hashing of patient records and symptom logs.</div>
+                                    </div>
+                                    <input type="checkbox" name="iso_encryption_enforced" value="1" {% if settings.iso_encryption_enforced %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #047857; cursor: pointer; margin-top: 4px;">
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Clinical Inactivity Lock Timeout (Minutes)</label>
+                                    <select name="session_lock_timeout" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; font-size: 14px;">
+                                        <option value="5" {% if settings.session_lock_timeout == 5 %}selected{% endif %}>5 Minutes · High Strictness</option>
+                                        <option value="15" {% if settings.session_lock_timeout == 15 or not settings.session_lock_timeout %}selected{% endif %}>15 Minutes · Clinical Workstation Recommended</option>
+                                        <option value="30" {% if settings.session_lock_timeout == 30 %}selected{% endif %}>30 Minutes · Standard Lab Staff</option>
+                                        <option value="60" {% if settings.session_lock_timeout == 60 %}selected{% endif %}>60 Minutes · Extended Administrative</option>
+                                    </select>
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Forces re-authentication when a workstation is left unattended</span>
+                                </div>
+
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px;">
+                                    <div class="gh-row" style="gap: 8px; align-items: center;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; color: #047857;">verified</span>
+                                        <span style="font-size: 12px; font-weight: 600; color: #047857;">BMDC Digital Signature Verified</span>
+                                    </div>
+                                    <span style="font-size: 11px; font-family: monospace; color: #065f46; font-weight: 700;">ENFORCED</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Billing & Community Subsidy -->
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #fff1f2; color: #e11d48; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">payments</span>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Payment Gateway &amp; Community Care</h2>
+                                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">bKash integration and rural patient subsidy pool</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">bKash Merchant Payment Gateway Mode</label>
+                                    <select name="bkash_gateway_status" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; font-size: 14px;">
+                                        <option value="active" {% if settings.bkash_gateway_status == 'active' %}selected{% endif %}>Active · Production Processing (Live MFS Routing)</option>
+                                        <option value="sandbox" {% if settings.bkash_gateway_status == 'sandbox' %}selected{% endif %}>Sandbox · Test Simulation Mode</option>
+                                        <option value="maintenance" {% if settings.bkash_gateway_status == 'maintenance' %}selected{% endif %}>Maintenance · Queue Outgoing Transactions</option>
+                                    </select>
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Instant appointment confirmation upon bKash webhook verification</span>
+                                </div>
+
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">
+                                    <div style="flex: 1; margin-right: 12px;">
+                                        <div style="font-size: 13px; font-weight: 600; color: #1e293b;">Enable Rural &amp; Underprivileged Subsidy Pool</div>
+                                        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Automatically grants 100% free consult waivers for low-income triage cases in vulnerable divisions.</div>
+                                    </div>
+                                    <input type="checkbox" name="community_subsidy_enabled" value="1" {% if settings.community_subsidy_enabled %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #0369a1; cursor: pointer; margin-top: 4px;">
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Monthly Community Subsidy Budget (BDT)</label>
+                                    <div style="position: relative;">
+                                        <span style="position: absolute; left: 12px; top: 11px; font-size: 14px; color: #64748b; font-weight: 600;">৳</span>
+                                        <input type="number" name="monthly_subsidy_budget" value="{{ settings.monthly_subsidy_budget or 100000 }}" min="10000" step="5000" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px 0 30px; font-size: 14px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Operations & Node Infrastructure -->
+                        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 20px;">
+                            <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 14px;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: #ede9fe; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">dns</span>
+                                </div>
+                                <div>
+                                    <h2 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 0;">Cluster Nodes &amp; Emergency Dispatch</h2>
+                                    <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Direct escalation hotlines and production node binding</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">24/7 Clinical Emergency Hotline</label>
+                                    <div style="position: relative;">
+                                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 11px; font-size: 18px; color: #94a3b8;">call</span>
+                                        <input type="text" name="emergency_hotline" value="{{ settings.emergency_hotline or '+880 1800-GLO-HLTH' }}" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px 0 36px; font-size: 14px; font-family: monospace;">
+                                    </div>
+                                    <span style="font-size: 11px; color: #94a3b8; margin-top: 4px; display: block;">Rendered in critical patient assessment alerts &amp; urgent escalation modals</span>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Clinical Operations Governance Email</label>
+                                    <div style="position: relative;">
+                                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 11px; font-size: 18px; color: #94a3b8;">mail</span>
+                                        <input type="email" name="support_email" value="{{ settings.support_email or 'clinical-ops@glohealth.ai' }}" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px 0 36px; font-size: 14px;">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px;">Active Primary Data Node</label>
+                                    <select name="active_cluster_node" class="gh-input" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; font-size: 14px; font-family: monospace;">
+                                        <option value="DHK_CENTRAL_01 · PRIMARY" {% if 'DHK' in (settings.active_cluster_node or '') %}selected{% endif %}>DHK_CENTRAL_01 · PRIMARY (Dhaka DC)</option>
+                                        <option value="CTG_EDGE_02 · STANDBY" {% if 'CTG' in (settings.active_cluster_node or '') %}selected{% endif %}>CTG_EDGE_02 · STANDBY (Chattogram Node)</option>
+                                        <option value="SYL_EDGE_03 · REGIONAL" {% if 'SYL' in (settings.active_cluster_node or '') %}selected{% endif %}>SYL_EDGE_03 · REGIONAL (Sylhet Point)</option>
+                                    </select>
+                                </div>
+
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; padding: 12px; border: 1px solid #fecaca; border-radius: 8px; background: #fff5f5;">
+                                    <div style="flex: 1; margin-right: 12px;">
+                                        <div style="font-size: 13px; font-weight: 600; color: #b91c1c;">Maintenance Emergency Lockout</div>
+                                        <div style="font-size: 11px; color: #dc2626; margin-top: 2px;">Restricts non-admin clinical users and displays cluster maintenance banner.</div>
+                                    </div>
+                                    <input type="checkbox" name="maintenance_mode" value="1" {% if settings.maintenance_mode %}checked{% endif %} style="width: 18px; height: 18px; accent-color: #b91c1c; cursor: pointer; margin-top: 4px;">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Bottom Bar Action Confirmation -->
+                    <div style="margin-top: 24px; padding: 16px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+                        <div class="gh-row" style="gap: 8px; align-items: center; font-size: 13px; color: #64748b;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #0d9488;">info</span>
+                            <span>Changes are logged to clinical audit trail immediately upon saving.</span>
+                        </div>
+                        <div class="gh-row" style="gap: 12px;">
+                            <button type="submit" class="gh-btn gh-btn--primary" style="height: 40px; padding: 0 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </main>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function toggleLanguage(lang) {
-    localStorage.setItem("lang", lang);
-    document.querySelectorAll('.lang-bn').forEach(el => el.style.display = lang === 'bn' ? '' : 'none');
-    document.querySelectorAll('.lang-en').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
-}
-document.addEventListener('DOMContentLoaded', function() {
-    const savedLang = localStorage.getItem("lang") || (navigator.language.startsWith('bn') ? 'bn' : 'en');
-    toggleLanguage(savedLang);
-});
-</script>
 {% endblock %}

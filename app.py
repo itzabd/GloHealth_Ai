@@ -1,4 +1,5 @@
 import os
+import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 from functools import wraps
@@ -386,6 +387,7 @@ def admin_required(f):
             abort(403)  # Forbidden
         return f(*args, **kwargs)
     return decorated_function
+
 @app.route('/admin/dashboard')
 @login_required
 @admin_required
@@ -408,7 +410,179 @@ def admin_dashboard():
     except Exception:
         doctors = []
 
-    return render_template('admin_dashboard.html', users=users, appointments=appointments, doctors=doctors, hide_nav=True)
+    try:
+        cases_resp = supabase.from_('location_insights').select('id, disease, division, last_updated').execute()
+        location_cases = cases_resp.data if hasattr(cases_resp, 'data') else []
+    except Exception:
+        location_cases = []
+
+    # Real Metrics Aggregation
+    total_users = len(users)
+    total_appts = len(appointments)
+    confirmed_appts = len([a for a in appointments if a.get('status') == 'confirmed'])
+    pending_appts = len([a for a in appointments if a.get('status') == 'pending'])
+    paid_appts = len([a for a in appointments if a.get('payment_status') == 'paid'])
+    free_appts = len([a for a in appointments if a.get('payment_status') == 'free'])
+    total_doctors = len(doctors)
+    total_cases = len(location_cases)
+
+    # Estimate total revenue from paid consultations (assuming doctor fee or default ৳500)
+    total_revenue = sum([500 for a in appointments if a.get('payment_status') == 'paid'])
+
+    # Build Real Activity Feed from database events
+    activity_events = []
+
+    # 1. Latest appointments
+    for a in sorted(appointments, key=lambda x: str(x.get('created_at') or x.get('scheduled_time') or ''), reverse=True)[:5]:
+        activity_events.append({
+            'type': 'appointment',
+            'title': f"Consultation: {a.get('user_name') or 'Patient'}",
+            'subtitle': f"Assigned to {a.get('doctor_name') or 'Clinician'} · Status: {a.get('status', 'Confirmed').capitalize()}",
+            'time': a.get('scheduled_time') or 'Recent',
+            'icon': 'calendar_today',
+            'bg': '#ecfdf5' if a.get('status') == 'confirmed' else '#fffbeb',
+            'color': '#059669' if a.get('status') == 'confirmed' else '#d97706',
+            'badge': a.get('status', 'confirmed').capitalize()
+        })
+
+    # 2. Latest registered users
+    for u in sorted(users, key=lambda x: str(x.get('created_at') or x.get('id') or ''), reverse=True)[:4]:
+        activity_events.append({
+            'type': 'user',
+            'title': f"Patient Profile Registered",
+            'subtitle': f"{u.get('full_name') or 'Patient'} · {u.get('email')} ({u.get('division') or 'Dhaka'})",
+            'time': u.get('created_at') or 'Active Account',
+            'icon': 'person_add',
+            'bg': '#f0f9ff',
+            'color': '#0284c7',
+            'badge': 'Registered'
+        })
+
+    # 3. Latest doctors
+    for d in sorted(doctors, key=lambda x: str(x.get('created_at') or x.get('id') or ''), reverse=True)[:3]:
+        activity_events.append({
+            'type': 'doctor',
+            'title': f"Specialist Credentialed",
+            'subtitle': f"{d.get('name')} · {d.get('specialty')} ({d.get('hospital') or 'Medical Center'})",
+            'time': 'BMDC Verified',
+            'icon': 'medical_services',
+            'bg': '#ede9fe',
+            'color': '#6d28d9',
+            'badge': 'BMDC Verified'
+        })
+
+    # 4. Surveillance intake notice
+    if location_cases:
+        activity_events.append({
+            'type': 'surveillance',
+            'title': f"Epidemiological Telemetry Ingested",
+            'subtitle': f"{total_cases} regional disease cases mapped across 8 divisions",
+            'time': 'Real-time Matrix',
+            'icon': 'public',
+            'bg': '#fef2f2',
+            'color': '#e11d48',
+            'badge': 'Surveillance'
+        })
+
+    # Sort combined activity chronologically or prioritize appointments
+    kpi_metrics = {
+        'total_users': total_users,
+        'total_appts': total_appts,
+        'confirmed_appts': confirmed_appts,
+        'pending_appts': pending_appts,
+        'paid_appts': paid_appts,
+        'free_appts': free_appts,
+        'total_doctors': total_doctors,
+        'total_cases': total_cases,
+        'total_revenue': total_revenue
+    }
+
+    return render_template(
+        'admin_dashboard.html',
+        users=users,
+        appointments=appointments,
+        doctors=doctors,
+        kpi_metrics=kpi_metrics,
+        activity_events=activity_events,
+        hide_nav=True
+    )
+
+
+@app.route('/admin/export_audit')
+@login_required
+@admin_required
+def export_audit():
+    import csv
+    import io
+    from flask import Response
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['GLOHEALTH AI - CLINICAL TELEMETRY AND AUDIT EXPORT'])
+    writer.writerow(['Exported At (UTC)', datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')])
+    writer.writerow([])
+
+    # Appointments
+    writer.writerow(['=== APPOINTMENTS REGISTRY ==='])
+    writer.writerow(['ID', 'Patient Name', 'Patient Email', 'Assigned Doctor', 'Scheduled Time', 'Status', 'Payment Status'])
+    try:
+        appts = supabase.from_('appointments').select('*').execute().data or []
+        for a in appts:
+            writer.writerow([
+                a.get('id'),
+                a.get('user_name', 'N/A'),
+                a.get('user_email', 'N/A'),
+                a.get('doctor_name', 'N/A'),
+                a.get('scheduled_time', 'N/A'),
+                a.get('status', 'N/A'),
+                a.get('payment_status', 'N/A')
+            ])
+    except Exception as e:
+        writer.writerow(['Error exporting appointments', str(e)])
+    writer.writerow([])
+
+    # Doctors
+    writer.writerow(['=== VERIFIED MEDICAL SPECIALISTS ==='])
+    writer.writerow(['ID', 'Name', 'Specialty', 'Division', 'Hospital', 'Consultation Fee (BDT)', 'Contact'])
+    try:
+        docs = supabase.from_('doctors').select('*').execute().data or []
+        for d in docs:
+            writer.writerow([
+                d.get('id'),
+                d.get('name'),
+                d.get('specialty'),
+                d.get('division'),
+                d.get('hospital'),
+                d.get('consultation_fee'),
+                d.get('contact')
+            ])
+    except Exception as e:
+        writer.writerow(['Error exporting doctors', str(e)])
+    writer.writerow([])
+
+    # Users
+    writer.writerow(['=== REGISTERED PATIENTS ==='])
+    writer.writerow(['ID', 'Full Name', 'Email', 'City', 'Division', 'Admin Role'])
+    try:
+        usrs = supabase.from_('user_profiles').select('*').execute().data or []
+        for u in usrs:
+            writer.writerow([
+                u.get('id'),
+                u.get('full_name'),
+                u.get('email'),
+                u.get('city'),
+                u.get('division'),
+                u.get('is_admin')
+            ])
+    except Exception as e:
+        writer.writerow(['Error exporting users', str(e)])
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=glohealth_clinical_audit_report.csv"}
+    )
 
 
 @app.route('/admin/users')
@@ -688,6 +862,59 @@ def delete_user(user_id):
 
 # Add Doctor
 
+SETTINGS_FILE = os.path.join(os.path.dirname(__file__), 'config', 'system_settings.json')
+
+def load_system_settings():
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {
+        "site_name": "GloHealth AI Clinical Matrix",
+        "support_email": "clinical-ops@glohealth.ai",
+        "emergency_hotline": "+880 1800-GLO-HLTH",
+        "telehealth_session_duration": 30,
+        "auto_triage_sensitivity": 0.85,
+        "community_subsidy_enabled": True,
+        "monthly_subsidy_budget": 100000,
+        "default_consultation_fee": 500,
+        "bkash_gateway_status": "active",
+        "iso_encryption_enforced": True,
+        "session_lock_timeout": 15,
+        "active_cluster_node": "DHK_CENTRAL_01 · PRIMARY",
+        "maintenance_mode": False
+    }
+
+def save_system_settings(settings_data):
+    os.makedirs(os.path.dirname(SETTINGS_FILE), exist_ok=True)
+    with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(settings_data, f, indent=2)
+
+def safe_int(val, default=0):
+    try:
+        if val is None or str(val).strip() == '':
+            return default
+        return int(float(str(val).strip()))
+    except (ValueError, TypeError):
+        return default
+
+def safe_float(val, default=0.0):
+    try:
+        if val is None or str(val).strip() == '':
+            return default
+        return float(str(val).strip())
+    except (ValueError, TypeError):
+        return default
+
+@app.context_processor
+def inject_system_settings():
+    """Inject system_settings globally into all templates"""
+    return {
+        'system_settings': load_system_settings()
+    }
+
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 def admin_settings():
@@ -695,30 +922,39 @@ def admin_settings():
         flash(t_flash("flash.unauthorized"), "danger")
         return redirect(url_for('dashboard'))
 
-    try:
-        # Fetch current settings
-        resp = supabase.from_('system_settings').select('*').maybe_single().execute()
-        settings = resp.data or {}
+    settings = load_system_settings()
 
-        if request.method == 'POST':
-            updated_settings = {
-                "site_name": request.form.get("site_name"),
-                "support_email": request.form.get("support_email"),
-                "checkup_fee": request.form.get("checkup_fee")
-            }
-            if settings.get("id"):
-                supabase.from_('system_settings').update(updated_settings).eq('id', settings["id"]).execute()
-            else:
-                supabase.from_('system_settings').insert(updated_settings).execute()
+    if request.method == 'POST':
+        try:
+            settings['site_name'] = request.form.get("site_name", settings.get("site_name", "GloHealth AI Clinical Matrix")).strip() or "GloHealth AI Clinical Matrix"
+            settings['support_email'] = request.form.get("support_email", settings.get("support_email", "clinical-ops@glohealth.ai")).strip() or "clinical-ops@glohealth.ai"
+            settings['emergency_hotline'] = request.form.get("emergency_hotline", settings.get("emergency_hotline", "+880 1800-GLO-HLTH")).strip() or "+880 1800-GLO-HLTH"
+            settings['telehealth_session_duration'] = safe_int(request.form.get("telehealth_session_duration"), 30)
+            settings['auto_triage_sensitivity'] = safe_float(request.form.get("auto_triage_sensitivity"), 0.85)
+            settings['community_subsidy_enabled'] = bool(request.form.get("community_subsidy_enabled"))
+            settings['monthly_subsidy_budget'] = safe_int(request.form.get("monthly_subsidy_budget"), 100000)
+            new_fee = safe_int(request.form.get("default_consultation_fee"), 500)
+            settings['default_consultation_fee'] = new_fee
+            sync_doctors = request.form.get("sync_all_doctors_fee") == "1"
+            if sync_doctors:
+                try:
+                    supabase.from_("doctors").update({"consultation_fee": float(new_fee)}).neq("id", "00000000-0000-0000-0000-000000000000").execute()
+                except Exception as doc_err:
+                    print("Doctor fee bulk update note:", doc_err)
+            settings['bkash_gateway_status'] = request.form.get("bkash_gateway_status", "active")
+            settings['iso_encryption_enforced'] = bool(request.form.get("iso_encryption_enforced"))
+            settings['session_lock_timeout'] = safe_int(request.form.get("session_lock_timeout"), 15)
+            settings['active_cluster_node'] = request.form.get("active_cluster_node", "DHK_CENTRAL_01 · PRIMARY")
+            settings['maintenance_mode'] = bool(request.form.get("maintenance_mode"))
+            settings['last_updated'] = datetime.utcnow().isoformat() + 'Z'
 
-            flash(t_flash("flash.settings_updated"), "success")
+            save_system_settings(settings)
+            flash(t_flash("flash.settings_updated") or "Settings updated successfully", "success")
             return redirect(url_for('admin_settings'))
+        except Exception as e:
+            flash(f"Failed to update settings: {str(e)}", "danger")
 
-        return render_template('admin_settings.html', settings=settings)
-    except Exception as e:
-        print(f"Update settings error: {str(e)}")
-        flash(t_flash("flash.err_settings"), "danger")
-        return redirect(url_for('admin_dashboard'))
+    return render_template('admin_settings.html', settings=settings, hide_nav=True)
 
 
 
@@ -1369,7 +1605,8 @@ def geo_insights():
         current_user=current_user,
         kpis=kpis,
         division_data=division_data,
-        top_diseases=top_diseases
+        top_diseases=top_diseases,
+        hide_nav=getattr(current_user, 'is_admin', False)
     )
 
 # THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
@@ -1403,11 +1640,18 @@ def doctors():
     response = query.execute()
     doctors_list = response.data if hasattr(response, 'data') else []
 
+    sys_settings = load_system_settings()
+    default_fee = sys_settings.get('default_consultation_fee', 500)
+    subsidy_enabled = sys_settings.get('community_subsidy_enabled', True)
+
     for d in doctors_list:
         d['specialty_bn'] = specialty_bn(d.get('specialty', ''))
         d['division_bn'] = division_bn(d.get('division', ''))
+        if not d.get('consultation_fee') or str(d.get('consultation_fee')).strip() in ('0', '', 'None'):
+            d['consultation_fee'] = default_fee
+        d['subsidy_eligible'] = subsidy_enabled
 
-    return render_template('doctors.html', doctors=doctors_list)
+    return render_template('doctors.html', doctors=doctors_list, sys_settings=sys_settings)
 # Book appointment route
 @app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
 @login_required

@@ -41,7 +41,7 @@
                 </div>
                 <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">payments</span>
-                    <span>৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }} <span data-i18n="book.consult">consultation</span></span>
+                    <span>৳{{ (doctor.get('consultation_fee') if doctor.get and doctor.get('consultation_fee') else (doctor.consultation_fee if doctor.consultation_fee is defined and doctor.consultation_fee else (doctor.get('fee') if doctor.get and doctor.get('fee') else (doctor.fee if doctor.fee is defined and doctor.fee else (system_settings.default_consultation_fee or 500)))))|round|int }} <span data-i18n="book.consult">consultation</span></span>
                 </div>
                 <div class="gh-row u-muted" style="gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" style="font-size: 18px;">schedule</span>
@@ -119,7 +119,7 @@
                 <div class="gh-row gh-row--between book-bottom-row" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--gh-border); align-items: center;">
                     <div>
                         <div class="u-muted" style="font-size: 12px;" data-i18n="book.total">Total</div>
-                        <div style="font-size: 20px; font-weight: 700; color: var(--gh-text-main);">৳{{ doctor.get('fee', '1200') if doctor.get else (doctor.fee if doctor.fee else (doctor.consultation_fee if doctor.consultation_fee else '1200')) }}</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--gh-text-main);">৳{{ (doctor.get('consultation_fee') if doctor.get and doctor.get('consultation_fee') else (doctor.consultation_fee if doctor.consultation_fee is defined and doctor.consultation_fee else (doctor.get('fee') if doctor.get and doctor.get('fee') else (doctor.fee if doctor.fee is defined and doctor.fee else (system_settings.default_consultation_fee or 500)))))|round|int }}</div>
                     </div>
                     <div class="gh-row" style="gap: 12px; align-items: center;">
                         <a href="{{ url_for('doctors') }}" class="gh-btn gh-btn--ghost" data-i18n="c.cancel">Cancel</a>

@@ -71,6 +71,14 @@
     <!-- Accessible Skip Link (UI/UX Pro Max WCAG AAA) -->
     <a href="#main-content" class="gh-skip-link">Skip to main content</a>
 
+    <!-- Maintenance Banner if activated in System Settings -->
+    {% if system_settings and system_settings.maintenance_mode %}
+    <div class="gh-maintenance-banner" style="background: linear-gradient(90deg, #991b1b, #dc2626); color: #ffffff; text-align: center; padding: 10px 16px; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 10000; box-shadow: 0 2px 8px rgba(185,28,28,0.25);">
+        <span class="material-symbols-outlined" style="font-size: 18px;">warning</span>
+        <span>SYSTEM NOTICE: Cluster Maintenance Mode is Active. Patient intake is prioritized for critical triage. 24/7 Clinical Hotline: <strong>{{ system_settings.emergency_hotline or '+880 1800-GLO-HLTH' }}</strong></span>
+    </div>
+    {% endif %}
+
     <!-- Top Telemetry Navigation Bar (Stitch Design) -->
     {% if not hide_nav and request.endpoint != 'admin_dashboard' %}
     <header class="gh-nav">
@@ -129,7 +137,8 @@
                 <a href="{{ url_for('appointments') }}" class="gh-nav__link {% if request.endpoint == 'appointments' %}is-active{% endif %}" data-i18n="nav.appointments">Appointments</a>
                 <a href="{{ url_for('plans') }}" class="gh-nav__link {% if request.endpoint == 'plans' %}is-active{% endif %}" data-i18n="nav.plans">Plans</a>
                 {% if current_user.is_authenticated and current_user.is_admin %}
-                <a href="{{ url_for('admin_dashboard') }}" class="gh-nav__link {% if request.endpoint == 'admin_dashboard' %}is-active{% endif %}" data-i18n="nav.admin">Admin</a>
+                <a href="{{ url_for('admin_dashboard') }}" class="gh-nav__link {% if request.endpoint in ('admin_dashboard', 'admin_doctors', 'admin_users') %}is-active{% endif %}" data-i18n="nav.admin">Admin</a>
+                <a href="{{ url_for('admin_settings') }}" class="gh-nav__link {% if request.endpoint == 'admin_settings' %}is-active{% endif %}" data-i18n="ad.settings">System Settings</a>
                 {% endif %}
             </nav>
 

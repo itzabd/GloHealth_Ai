@@ -1,0 +1,202 @@
+- generic [active] [ref=f2e1]:
+  - link "Skip to main content" [ref=f2e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - generic [ref=f2e5]:
+        - generic [ref=f2e6]:
+          - link "GloHealth AI Admin Console" [ref=f2e7] [cursor=pointer]:
+            - /url: /admin/dashboard
+            - generic [ref=f2e10]: GloHealth
+            - generic [ref=f2e11]: AI
+            - generic [ref=f2e12]: Admin Console
+          - generic [ref=f2e14]: "HQ Cluster: Prod · Active"
+        - generic [ref=f2e17]:
+          - generic [ref=f2e18] [cursor=pointer]: EN | বাং
+          - generic [ref=f2e20]:
+            - generic [ref=f2e21]: AD
+            - generic [ref=f2e22]:
+              - generic [ref=f2e23]: Dr. S. Ahmed
+              - generic [ref=f2e24]: "SA ID: GLH-9042 · CLINICAL DIR"
+          - link "exit_to_app Patient Portal" [ref=f2e25] [cursor=pointer]:
+            - /url: /dashboard
+            - generic [ref=f2e26]: exit_to_app
+            - generic [ref=f2e27]: Patient Portal
+          - link "logout" [ref=f2e28] [cursor=pointer]:
+            - /url: /logout
+      - generic [ref=f2e30]:
+        - complementary [ref=f2e31]:
+          - generic [ref=f2e32]:
+            - generic [ref=f2e33]:
+              - generic [ref=f2e34]: "HQ CLUSTER : PROD"
+              - generic [ref=f2e37]: v2.4
+            - generic [ref=f2e38]: MANAGEMENT
+            - navigation [ref=f2e39]:
+              - link "dashboard Dashboard" [ref=f2e40] [cursor=pointer]:
+                - /url: /admin/dashboard
+                - generic [ref=f2e41]: dashboard
+                - generic [ref=f2e42]: Dashboard
+              - link "medical_services Doctors" [ref=f2e43] [cursor=pointer]:
+                - /url: /admin/dashboard#doctors
+                - generic [ref=f2e44]: medical_services
+                - generic [ref=f2e45]: Doctors
+              - link "group Users" [ref=f2e46] [cursor=pointer]:
+                - /url: /admin/dashboard#users
+                - generic [ref=f2e47]: group
+                - generic [ref=f2e48]: Users
+              - link "calendar_today Appointments" [ref=f2e49] [cursor=pointer]:
+                - /url: /admin/appointments
+                - generic [ref=f2e50]: calendar_today
+                - generic [ref=f2e51]: Appointments
+              - link "insights Insights" [ref=f2e52] [cursor=pointer]:
+                - /url: /geo_insights
+                - generic [ref=f2e53]: insights
+                - generic [ref=f2e54]: Insights
+              - link "settings System Settings" [ref=f2e55] [cursor=pointer]:
+                - /url: /admin/settings
+                - generic [ref=f2e56]: settings
+                - generic [ref=f2e57]: System Settings
+            - generic [ref=f2e58]: TELEMETRY LOGS
+            - generic [ref=f2e59]:
+              - generic [ref=f2e60]:
+                - generic [ref=f2e61]: ISO-27799 Guard
+                - generic [ref=f2e62]: PASS
+              - generic [ref=f2e63]:
+                - generic [ref=f2e64]: Cluster Nodes
+                - generic [ref=f2e65]: ACTIVE
+          - generic [ref=f2e66]:
+            - generic [ref=f2e67]: AD
+            - generic [ref=f2e68]:
+              - generic [ref=f2e69]: Dr. S. Ahmed
+              - generic [ref=f2e70]: Admin
+        - main [ref=f2e72]:
+          - generic [ref=f2e74]:
+            - generic [ref=f2e75]:
+              - generic [ref=f2e76]:
+                - generic [ref=f2e77]:
+                  - heading "System Settings & Telemetry Config" [level=1] [ref=f2e78]
+                  - generic [ref=f2e79]: CLUSTER GOVERNANCE
+                - paragraph [ref=f2e80]: Configure platform parameters, clinical triage thresholds, security policies, and payment routing
+              - generic [ref=f2e81]:
+                - button "Reset" [ref=f2e82] [cursor=pointer]
+                - button "save Save Changes" [ref=f2e83] [cursor=pointer]:
+                  - generic [ref=f2e84]: save
+                  - generic [ref=f2e85]: Save Changes
+            - generic [ref=f2e86]:
+              - generic [ref=f2e87]:
+                - generic [ref=f2e88]:
+                  - generic [ref=f2e89]: clinical_notes
+                  - generic [ref=f2e91]:
+                    - heading "Clinical & Telehealth Protocol" [level=2] [ref=f2e92]
+                    - paragraph [ref=f2e93]: Consultation timings, AI intake and baseline fee schedule
+                - generic [ref=f2e94]:
+                  - generic [ref=f2e95]:
+                    - generic [ref=f2e96]: Hospital / Clinic System Name
+                    - textbox [ref=f2e97]: GloHealth AI Clinical Matrix
+                    - generic [ref=f2e98]: Platform brand name displayed on clinical headers, audit records, and medical receipts
+                  - generic [ref=f2e99]:
+                    - generic [ref=f2e100]: Standard Telehealth Session (Minutes)
+                    - combobox [ref=f2e101] [cursor=pointer]:
+                      - option "15 Minutes · Quick Assessment"
+                      - option "20 Minutes · Standard Consult"
+                      - option "30 Minutes · Comprehensive Evaluation (Recommended)" [selected]
+                      - option "45 Minutes · Specialized Multi-Disciplinary"
+                      - option "60 Minutes · Extended Review"
+                    - generic [ref=f2e102]: Default slot allocation duration across specialist calendar slots
+                  - generic [ref=f2e103]:
+                    - generic [ref=f2e104]:
+                      - generic [ref=f2e105]: AI Auto-Triage Severity Sensitivity
+                      - generic [ref=f2e106]: 85%
+                    - slider [ref=f2e107] [cursor=pointer]: "0.85"
+                    - generic [ref=f2e108]: Higher threshold flags subtle multi-symptom clusters for emergency doctor escalation
+                  - generic [ref=f2e109]:
+                    - generic [ref=f2e110]: Default Specialist Consultation Fee (BDT)
+                    - generic [ref=f2e111]:
+                      - generic [ref=f2e112]: ৳
+                      - spinbutton [ref=f2e113]: "500"
+                    - generic [ref=f2e114]: Standard benchmark fee prefilled when onboarding newly verified doctors
+              - generic [ref=f2e115]:
+                - generic [ref=f2e116]:
+                  - generic [ref=f2e117]: shield
+                  - generic [ref=f2e119]:
+                    - heading "Security & Health Data Protection" [level=2] [ref=f2e120]
+                    - paragraph [ref=f2e121]: ISO-27799, token encryption & clinical session timeouts
+                - generic [ref=f2e122]:
+                  - generic [ref=f2e123]:
+                    - generic [ref=f2e124]:
+                      - generic [ref=f2e125]: ISO-27799 In-Flight Patient Encryption
+                      - generic [ref=f2e126]: Enforces end-to-end cryptographic hashing of patient records and symptom logs.
+                    - checkbox [checked] [ref=f2e127] [cursor=pointer]
+                  - generic [ref=f2e128]:
+                    - generic [ref=f2e129]: Clinical Inactivity Lock Timeout (Minutes)
+                    - combobox [ref=f2e130] [cursor=pointer]:
+                      - option "5 Minutes · High Strictness"
+                      - option "15 Minutes · Clinical Workstation Recommended" [selected]
+                      - option "30 Minutes · Standard Lab Staff"
+                      - option "60 Minutes · Extended Administrative"
+                    - generic [ref=f2e131]: Forces re-authentication when a workstation is left unattended
+                  - generic [ref=f2e132]:
+                    - generic [ref=f2e133]:
+                      - generic [ref=f2e134]: verified
+                      - generic [ref=f2e135]: BMDC Digital Signature Verified
+                    - generic [ref=f2e136]: ENFORCED
+              - generic [ref=f2e137]:
+                - generic [ref=f2e138]:
+                  - generic [ref=f2e139]: payments
+                  - generic [ref=f2e141]:
+                    - heading "Payment Gateway & Community Care" [level=2] [ref=f2e142]
+                    - paragraph [ref=f2e143]: bKash integration and rural patient subsidy pool
+                - generic [ref=f2e144]:
+                  - generic [ref=f2e145]:
+                    - generic [ref=f2e146]: bKash Merchant Payment Gateway Mode
+                    - combobox [ref=f2e147] [cursor=pointer]:
+                      - option "Active · Production Processing (Live MFS Routing)" [selected]
+                      - option "Sandbox · Test Simulation Mode"
+                      - option "Maintenance · Queue Outgoing Transactions"
+                    - generic [ref=f2e148]: Instant appointment confirmation upon bKash webhook verification
+                  - generic [ref=f2e149]:
+                    - generic [ref=f2e150]:
+                      - generic [ref=f2e151]: Enable Rural & Underprivileged Subsidy Pool
+                      - generic [ref=f2e152]: Automatically grants 100% free consult waivers for low-income triage cases in vulnerable divisions.
+                    - checkbox [checked] [ref=f2e153] [cursor=pointer]
+                  - generic [ref=f2e154]:
+                    - generic [ref=f2e155]: Monthly Community Subsidy Budget (BDT)
+                    - generic [ref=f2e156]:
+                      - generic [ref=f2e157]: ৳
+                      - spinbutton [ref=f2e158]: "100000"
+              - generic [ref=f2e159]:
+                - generic [ref=f2e160]:
+                  - generic [ref=f2e161]: dns
+                  - generic [ref=f2e163]:
+                    - heading "Cluster Nodes & Emergency Dispatch" [level=2] [ref=f2e164]
+                    - paragraph [ref=f2e165]: Direct escalation hotlines and production node binding
+                - generic [ref=f2e166]:
+                  - generic [ref=f2e167]:
+                    - generic [ref=f2e168]: 24/7 Clinical Emergency Hotline
+                    - generic [ref=f2e169]:
+                      - generic [ref=f2e170]: call
+                      - textbox [ref=f2e171]: +880 1800-GLO-HLTH
+                    - generic [ref=f2e172]: Rendered in critical patient assessment alerts & urgent escalation modals
+                  - generic [ref=f2e173]:
+                    - generic [ref=f2e174]: Clinical Operations Governance Email
+                    - generic [ref=f2e175]:
+                      - generic [ref=f2e176]: mail
+                      - textbox [ref=f2e177]: clinical-ops@glohealth.ai
+                  - generic [ref=f2e178]:
+                    - generic [ref=f2e179]: Active Primary Data Node
+                    - combobox [ref=f2e180] [cursor=pointer]:
+                      - option "DHK_CENTRAL_01 · PRIMARY (Dhaka DC)" [selected]
+                      - option "CTG_EDGE_02 · STANDBY (Chattogram Node)"
+                      - option "SYL_EDGE_03 · REGIONAL (Sylhet Point)"
+                  - generic [ref=f2e181]:
+                    - generic [ref=f2e182]:
+                      - generic [ref=f2e183]: Maintenance Emergency Lockout
+                      - generic [ref=f2e184]: Restricts non-admin clinical users and displays cluster maintenance banner.
+                    - checkbox [ref=f2e185] [cursor=pointer]
+            - generic [ref=f2e186]:
+              - generic [ref=f2e187]:
+                - generic [ref=f2e188]: info
+                - generic [ref=f2e189]: Changes are logged to clinical audit trail immediately upon saving.
+              - button "save Save Changes" [ref=f2e191] [cursor=pointer]:
+                - generic [ref=f2e192]: save
+                - generic [ref=f2e193]: Save Changes

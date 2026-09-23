@@ -26,7 +26,7 @@
         </div>
         <div>
           <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Consultation Fee (BDT) *</label>
-          <input type="number" step="0.01" name="consultation_fee" class="gh-input" placeholder="e.g. 1000" required>
+          <input type="number" step="1" name="consultation_fee" class="gh-input" value="{{ system_settings.default_consultation_fee or 500 }}" placeholder="e.g. 700" required>
         </div>
       </div>
 
