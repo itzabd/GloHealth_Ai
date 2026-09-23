@@ -725,13 +725,20 @@ def admin_settings():
 # Custom datetime filter
 
 @app.template_filter('datetimeformat')
-def format_datetime(value, format="%Y-%m-%d %H:%M"):
-    if value is None:
+def format_datetime(value, format="%d %b %Y · %I:%M %p"):
+    if not value:
         return ""
     try:
-        return datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f%z").strftime(format)
+        clean_val = str(value).replace('Z', '+00:00')
+        dt = datetime.fromisoformat(clean_val)
+        return dt.strftime(format)
     except:
-        return value  # fallback to raw value
+        for fmt in ("%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+            try:
+                return datetime.strptime(str(value), fmt).strftime(format)
+            except:
+                pass
+        return str(value)
 
 
 # Routes

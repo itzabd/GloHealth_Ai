@@ -72,7 +72,6 @@
         <!-- SIDEBAR (240px) -->
         <aside style="width: 240px; background: #ffffff; border-right: 1px solid var(--gh-border); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; user-select: none; z-index: 20;">
             <div style="display: flex; flex-direction: column;">
-                <!-- Sub-Header Workspace Switcher -->
                 <div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
                     <div class="gh-row" style="gap: 8px; align-items: center;">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
@@ -81,12 +80,10 @@
                     <span style="font-size: 10px; font-family: monospace; background: #f1f5f9; color: #475569; padding: 2px 6px; border: 1px solid #e2e8f0; border-radius: 4px;">v2.4</span>
                 </div>
 
-                <!-- Section Label -->
                 <div style="padding: 16px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
                     <span data-i18n="ad.mgmt">MANAGEMENT</span>
                 </div>
 
-                <!-- Nav items list -->
                 <nav id="adminNav" style="display: flex; flex-direction: column; gap: 4px; padding: 0 8px;">
                     <a href="{{ url_for('admin_dashboard') }}#overview" class="gh-admin-nav-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">dashboard</span>
@@ -114,7 +111,6 @@
                     </a>
                 </nav>
 
-                <!-- Telemetry Logs -->
                 <div style="padding: 24px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
                     TELEMETRY LOGS
                 </div>
@@ -128,8 +124,8 @@
 
             <div style="padding: 16px; border-top: 1px solid var(--gh-border); background: #fafafa;">
                 <div style="font-size: 11px; color: var(--gh-text-muted); font-family: monospace; line-height: 1.4;">
-                    <div>APPOINTMENT #{{ appointment.id }}</div>
-                    <div>AUDIT TRACE: LOCKED</div>
+                    <div>SESSION #{{ appointment.id }}</div>
+                    <div>STATUS: LOCKED RECORD</div>
                 </div>
             </div>
         </aside>
@@ -150,10 +146,10 @@
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
                 <div>
                     <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
-                        <h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0;">Edit Clinical Consultation Details</h1>
+                        <h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0;">Edit Clinical Consultation #{{ appointment.id }}</h1>
                         <span class="gh-badge gh-badge--accent" style="font-size: 11px; font-family: monospace;">RECORD ID: #{{ appointment.id }}</span>
                     </div>
-                    <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0;">Update specialist allocation, consultation schedule, and payment reconciliation telemetry.</p>
+                    <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0;">Modify specialist allocation, time schedule, and payment reconciliation telemetry.</p>
                 </div>
                 <div class="gh-row" style="gap: 12px;">
                     <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="gap: 6px;">
@@ -163,65 +159,173 @@
                 </div>
             </div>
 
-            <!-- Form & Live Details Grid -->
-            <div style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 28px; align-items: start;">
+            <!-- Find Current User and Doctor Records -->
+            {% set current_u = namespace(user=none) %}
+            {% for u in users %}
+                {% if u.id == appointment.user_id %}{% set current_u.user = u %}{% endif %}
+            {% endfor %}
 
-                <!-- LEFT COLUMN: Edit Form -->
-                <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: var(--gh-radius-lg); padding: 28px; background: #ffffff;">
-                    <form method="POST" id="appointmentEditForm" style="display: flex; flex-direction: column; gap: 20px;">
-                        
-                        <!-- 1. Patient Record Selection -->
-                        <div>
-                            <label for="apptUserId" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
-                                Patient Profile <span style="color: #e11d48;">*</span>
-                            </label>
-                            <select id="apptUserId" name="user_id" class="gh-input" required style="height: 44px; font-size: 13.5px; font-weight: 500;">
+            {% set current_d = namespace(doc=none) %}
+            {% for d in doctors %}
+                {% if d.id == appointment.doctor_id %}{% set current_d.doc = d %}{% endif %}
+            {% endfor %}
+
+            <!-- 2-Column Responsive Workspace -->
+            <form method="POST" id="appointmentEditForm" style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 28px; align-items: start;">
+                
+                <input type="hidden" name="user_id" id="selectedUserId" value="{{ appointment.user_id }}" required>
+                <input type="hidden" name="doctor_id" id="selectedDoctorId" value="{{ appointment.doctor_id }}" required>
+                <input type="hidden" name="scheduled_time" id="finalScheduledTime" value="{{ appointment.scheduled_time }}" required>
+
+                <!-- LEFT COLUMN: Step-by-Step Clinical Scheduling -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+
+                    <!-- STEP 1: PATIENT PROFILE -->
+                    <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: 12px; padding: 24px; background: #ffffff; border: 1px solid var(--gh-border);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">1</div>
+                                <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">Assigned Patient Profile</h3>
+                            </div>
+                            <span style="font-size: 11px; font-family: monospace; color: #64748b;">Record Verified</span>
+                        </div>
+
+                        <!-- Active Locked-In Patient Card -->
+                        <div id="patientSelectedCard" style="display: flex; padding: 14px 16px; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div id="selectedPatientAvatar" style="width: 42px; height: 42px; border-radius: 50%; background: #16a34a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; font-family: monospace;">
+                                    {{ ((current_u.user.full_name or appointment.user_name or 'PT')[:2])|upper }}
+                                </div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span id="selectedPatientName" style="font-size: 15px; font-weight: 700; color: #14532d;">{{ current_u.user.full_name if current_u.user else (appointment.user_name or 'Patient Record') }}</span>
+                                        <span style="font-size: 10px; background: #dcfce7; color: #166534; font-weight: 700; padding: 1px 6px; border-radius: 4px; border: 1px solid #bbf7d0;">✓ ASSIGNED</span>
+                                    </div>
+                                    <div id="selectedPatientEmail" style="font-size: 12.5px; color: #15803d; margin-top: 2px;">{{ current_u.user.email if current_u.user else (appointment.user_email or 'Patient Email') }}</div>
+                                    <div id="selectedPatientLocation" style="font-size: 11.5px; color: #166534; font-family: monospace; margin-top: 2px;">{{ current_u.user.division + ' Division' if (current_u.user and current_u.user.division) else 'Registered Profile' }}</div>
+                                </div>
+                            </div>
+                            <button type="button" class="gh-btn gh-btn--outline gh-btn--sm" onclick="clearSelectedPatient()" style="font-size: 12px; background: #ffffff;">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">swap_horiz</span>
+                                Change Patient
+                            </button>
+                        </div>
+
+                        <!-- Search Area (Initially Hidden in Edit) -->
+                        <div id="patientSearchArea" style="display: none; margin-top: 14px;">
+                            <div style="position: relative; margin-bottom: 12px;">
+                                <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 11px; font-size: 20px; color: #94a3b8;">search</span>
+                                <input type="text" id="patientSearchInput" placeholder="Search patient by name, email, or division..." style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 16px 0 44px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 13.5px; outline: none;" oninput="filterPatientList()">
+                            </div>
+                            <div id="patientListContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto;">
                                 {% for u in users %}
-                                <option value="{{ u.id }}" 
-                                        {% if u.id == appointment.user_id %}selected{% endif %}
-                                        data-name="{{ u.full_name or 'Patient' }}" 
-                                        data-email="{{ u.email or '' }}" 
-                                        data-division="{{ u.division or '' }}">
-                                    {{ u.full_name or 'Patient' }} &nbsp;·&nbsp; {{ u.email }} {% if u.division %}({{ u.division }}){% endif %}
-                                </option>
+                                <div class="patient-tile" 
+                                     data-id="{{ u.id }}" 
+                                     data-name="{{ u.full_name or 'Patient Record' }}" 
+                                     data-email="{{ u.email or '' }}" 
+                                     data-division="{{ u.division or '' }}" 
+                                     onclick="selectPatient('{{ u.id }}', '{{ (u.full_name or 'Patient')|replace("'", "\\'") }}', '{{ (u.email or '')|replace("'", "\\'") }}', '{{ (u.division or '')|replace("'", "\\'") }}')"
+                                     style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; background: #ffffff; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px;">
+                                        {{ (u.full_name[:2] if u.full_name else 'PT')|upper }}
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-size: 13px; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ u.full_name or 'Patient' }}</div>
+                                        <div style="font-size: 11.5px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ u.email }}</div>
+                                    </div>
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">check_circle</span>
+                                </div>
                                 {% endfor %}
-                            </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: ASSIGNED MEDICAL SPECIALIST -->
+                    <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: 12px; padding: 24px; background: #ffffff; border: 1px solid var(--gh-border);">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 24px; height: 24px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">2</div>
+                                <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">Assigned Medical Specialist</h3>
+                            </div>
+                            <span style="font-size: 11px; font-family: monospace; color: #64748b;">{{ doctors|length }} Verified Doctors</span>
                         </div>
 
-                        <!-- 2. Clinician Selection -->
-                        <div>
-                            <label for="apptDoctorId" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
-                                Assigned Medical Specialist <span style="color: #e11d48;">*</span>
-                            </label>
-                            <select id="apptDoctorId" name="doctor_id" class="gh-input" required style="height: 44px; font-size: 13.5px; font-weight: 500;">
-                                {% for d in doctors %}
-                                <option value="{{ d.id }}" 
-                                        {% if d.id == appointment.doctor_id %}selected{% endif %}
-                                        data-name="{{ d.name }}" 
-                                        data-specialty="{{ d.specialty or 'General Medicine' }}" 
-                                        data-fee="{{ d.consultation_fee or 500 }}" 
-                                        data-hospital="{{ d.hospital or 'Medical Center' }}">
-                                    {{ d.name }} &nbsp;·&nbsp; {{ d.specialty }} &nbsp;(Fee: ৳{{ d.consultation_fee or 500 }}) {% if d.hospital %}[{{ d.hospital }}]{% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
+                        <!-- Doctor Grid Cards -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; max-height: 280px; overflow-y: auto; padding-right: 4px;" id="doctorsGrid">
+                            {% for d in doctors %}
+                            <div class="doctor-card-item {% if d.id == appointment.doctor_id %}is-selected{% endif %}" 
+                                 id="doctorCard_{{ d.id }}"
+                                 onclick="selectDoctor('{{ d.id }}', '{{ (d.name)|replace("'", "\\'") }}', '{{ (d.specialty or 'General Medicine')|replace("'", "\\'") }}', '{{ d.consultation_fee or 500 }}', '{{ (d.hospital or 'Medical Center')|replace("'", "\\'") }}', '{{ (d.district or d.division or 'Dhaka')|replace("'", "\\'") }}')"
+                                 style="border: 1.5px solid {% if d.id == appointment.doctor_id %}#0284c7{% else %}#e2e8f0{% endif %}; border-radius: 10px; padding: 14px; background: {% if d.id == appointment.doctor_id %}#f0f9ff{% else %}#ffffff{% endif %}; cursor: pointer; transition: all 0.15s; position: relative;">
+                                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #ede9fe; color: #6d28d9; display: flex; align-items: center; justify-content: center;">
+                                            <span class="material-symbols-outlined" style="font-size: 20px;">stethoscope</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 13.5px; font-weight: 700; color: #0f172a;">{{ d.name }}</div>
+                                            <div style="font-size: 11.5px; color: #6d28d9; font-weight: 600;">{{ d.specialty or 'General' }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="doc-check-icon material-symbols-outlined" style="{% if d.id == appointment.doctor_id %}display: inline-block;{% else %}display: none;{% endif %} font-size: 20px; color: #0284c7;">check_circle</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: #64748b; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+                                    <span>{{ d.hospital or 'Hospital' }}</span>
+                                    <span style="font-weight: 700; color: #059669; font-family: monospace;">৳{{ d.consultation_fee or 500 }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: SCHEDULE DATE & TIME -->
+                    <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: 12px; padding: 24px; background: #ffffff; border: 1px solid var(--gh-border);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">3</div>
+                            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">Consultation Schedule</h3>
                         </div>
 
-                        <!-- 3. Scheduled Date & Time -->
-                        <div>
-                            <label for="apptScheduledTime" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
-                                Scheduled Date & Time <span style="color: #e11d48;">*</span>
-                            </label>
-                            <input type="datetime-local" id="apptScheduledTime" name="scheduled_time" class="gh-input" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required style="height: 44px; font-size: 13.5px; font-family: monospace;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                            <div>
+                                <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; margin-bottom: 6px;">
+                                    Consultation Date <span style="color: #e11d48;">*</span>
+                                </label>
+                                <input type="date" id="scheduleDateInput" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13.5px; background: #f8fafc;" onchange="syncFinalDateTime()">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; margin-bottom: 6px;">
+                                    Selected Time Slot <span style="color: #e11d48;">*</span>
+                                </label>
+                                <input type="time" id="scheduleTimeInput" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13.5px; background: #f8fafc;" onchange="syncFinalDateTime()">
+                            </div>
                         </div>
 
-                        <!-- 4. Consultation Status & Payment Status -->
+                        <div style="font-size: 11.5px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                            Quick Time Slots:
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('10:00')">10:00 AM</button>
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('11:30')">11:30 AM</button>
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('14:30')">02:30 PM</button>
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('16:00')">04:00 PM</button>
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('17:30')">05:30 PM</button>
+                            <button type="button" class="gh-slot-chip" onclick="setTimeSlot('19:00')">07:00 PM</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: STATUS & PAYMENT -->
+                    <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: 12px; padding: 24px; background: #ffffff; border: 1px solid var(--gh-border);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                            <div style="width: 24px; height: 24px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">4</div>
+                            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #0f172a;">Status & Financial Telemetry</h3>
+                        </div>
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                             <div>
-                                <label for="apptStatus" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; margin-bottom: 6px;">
                                     Consultation Status
                                 </label>
-                                <select id="apptStatus" name="status" class="gh-input" style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                <select id="apptStatus" name="status" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13.5px; background: #ffffff;" onchange="updateTicketPreview()">
                                     <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %}>✓ Confirmed</option>
                                     <option value="pending" {% if appointment.status=='pending' %}selected{% endif %}>⏱ Pending Review</option>
                                     <option value="completed" {% if appointment.status=='completed' %}selected{% endif %}>Completed</option>
@@ -230,35 +334,34 @@
                             </div>
 
                             <div>
-                                <label for="apptPaymentStatus" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                <label style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; color: #475569; margin-bottom: 6px;">
                                     Payment Telemetry
                                 </label>
-                                <select id="apptPaymentStatus" name="payment_status" class="gh-input" style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                <select id="apptPaymentStatus" name="payment_status" style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13.5px; background: #ffffff;" onchange="updateTicketPreview()">
                                     <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %}>✓ Paid (bKash / Card)</option>
                                     <option value="free" {% if appointment.payment_status=='free' %}selected{% endif %}>★ Free / Subsidized Community</option>
-                                    <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %}>⏱ Unpaid / Pending Settlement</option>
+                                    <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %}>⏱ Unpaid / Awaiting Settlement</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Submit and Cancel Actions -->
-                        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                            <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1; height: 46px; font-size: 14.5px; font-weight: 600; gap: 8px;">
+                        <div style="display: flex; gap: 12px; align-items: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid #f1f5f9;">
+                            <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1; height: 48px; font-size: 15px; font-weight: 600; gap: 8px; box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">save</span>
                                 <span>Save Consultation Changes</span>
                             </button>
-                            <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="height: 46px; padding: 0 20px; font-size: 14px;">
+                            <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="height: 48px; padding: 0 20px; font-size: 14px;">
                                 Cancel
                             </a>
                         </div>
-                    </form>
+                    </div>
+
                 </div>
 
-                <!-- RIGHT COLUMN: Real-Time Consultation Ticket Preview -->
-                <div style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- RIGHT COLUMN: Dynamic Session Pass Preview -->
+                <div style="display: flex; flex-direction: column; gap: 20px; position: sticky; top: 24px;">
                     
-                    <!-- Dynamic Clinical Ticket Card -->
-                    <div class="gh-card" style="padding: 0; box-shadow: var(--gh-shadow-md); border-radius: var(--gh-radius-lg); overflow: hidden; border: 1px solid #e0e7ff; background: #ffffff;">
+                    <div class="gh-card" style="padding: 0; box-shadow: var(--gh-shadow-md); border-radius: 14px; overflow: hidden; border: 1px solid #e0e7ff; background: #ffffff;">
                         <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -274,29 +377,29 @@
 
                         <div style="padding: 22px 20px; display: flex; flex-direction: column; gap: 16px;">
                             
-                            <!-- Patient Section -->
+                            <!-- Patient -->
                             <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <div id="previewUserAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; font-family: monospace; flex-shrink: 0;">
-                                    PT
+                                <div id="previewUserAvatar" style="width: 42px; height: 42px; border-radius: 50%; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; font-family: monospace; flex-shrink: 0;">
+                                    {{ ((current_u.user.full_name or appointment.user_name or 'PT')[:2])|upper }}
                                 </div>
                                 <div>
                                     <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">PATIENT</div>
-                                    <div id="previewUserName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ appointment.user_name or 'Patient Record' }}</div>
-                                    <div id="previewUserEmail" style="font-size: 12.5px; color: #64748b;">{{ appointment.user_email or 'Verified Record' }}</div>
+                                    <div id="previewUserName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ current_u.user.full_name if current_u.user else (appointment.user_name or 'Patient Record') }}</div>
+                                    <div id="previewUserEmail" style="font-size: 12.5px; color: #64748b;">{{ current_u.user.email if current_u.user else (appointment.user_email or 'Verified Record') }}</div>
                                 </div>
                             </div>
 
                             <div style="height: 1px; background: #f1f5f9; width: 100%;"></div>
 
-                            <!-- Specialist Section -->
+                            <!-- Specialist -->
                             <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ede9fe; color: #6d28d9; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">stethoscope</span>
+                                <div style="width: 42px; height: 42px; border-radius: 50%; background: #ede9fe; color: #6d28d9; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">stethoscope</span>
                                 </div>
                                 <div>
                                     <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">CLINICIAN</div>
-                                    <div id="previewDocName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ appointment.doctor_name or 'Medical Specialist' }}</div>
-                                    <div id="previewDocSpecialty" style="font-size: 12.5px; color: #6d28d9; font-weight: 600;">Specialist · Medical Center</div>
+                                    <div id="previewDocName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ current_d.doc.name if current_d.doc else (appointment.doctor_name or 'Medical Specialist') }}</div>
+                                    <div id="previewDocSpecialty" style="font-size: 12.5px; color: #6d28d9; font-weight: 600;">{{ current_d.doc.specialty if current_d.doc else 'Specialty' }} · {{ current_d.doc.hospital if current_d.doc else 'Hospital' }}</div>
                                 </div>
                             </div>
 
@@ -306,15 +409,14 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 12px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                 <div>
                                     <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">SCHEDULE</div>
-                                    <div id="previewDate" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace; margin-top: 2px;">{{ appointment.scheduled_time }}</div>
+                                    <div id="previewDate" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace; margin-top: 2px;">{{ appointment.scheduled_time|datetimeformat or appointment.scheduled_time }}</div>
                                 </div>
                                 <div>
                                     <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">FEE & STATUS</div>
-                                    <div id="previewFee" style="font-size: 13px; font-weight: 700; color: #059669; font-family: monospace; margin-top: 2px;">৳500 · {{ appointment.payment_status|capitalize }}</div>
+                                    <div id="previewFee" style="font-size: 13px; font-weight: 700; color: #059669; font-family: monospace; margin-top: 2px;">৳{{ current_d.doc.consultation_fee if current_d.doc else 500 }} · {{ appointment.payment_status|capitalize }}</div>
                                 </div>
                             </div>
 
-                            <!-- Security Assurance -->
                             <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #64748b; font-family: monospace; padding-top: 4px;">
                                 <span class="material-symbols-outlined" style="font-size: 16px; color: #059669;">verified_user</span>
                                 <span>ISO-27799 Guard · Telemetry Active</span>
@@ -324,55 +426,153 @@
 
                 </div>
 
-            </div>
+            </form>
 
         </main>
     </div>
 </div>
+
+<style>
+.gh-slot-chip {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.gh-slot-chip:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+.gh-slot-chip.is-active {
+    background: #0284c7;
+    border-color: #0284c7;
+    color: #ffffff;
+}
+
+.doctor-card-item.is-selected {
+    border-color: #0284c7 !important;
+    background: #f0f9ff !important;
+    box-shadow: 0 0 0 1px #0284c7;
+}
+.doctor-card-item.is-selected .doc-check-icon {
+    display: inline-block !important;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function updateEditTicketPreview() {
-    var userSelect = document.getElementById('apptUserId');
-    var previewName = document.getElementById('previewUserName');
-    var previewEmail = document.getElementById('previewUserEmail');
-    var previewAvatar = document.getElementById('previewUserAvatar');
+var currentDoctorFee = 500;
 
-    if (userSelect && userSelect.selectedIndex >= 0) {
-        var opt = userSelect.options[userSelect.selectedIndex];
-        var name = opt.getAttribute('data-name') || 'Patient';
-        var email = opt.getAttribute('data-email') || '';
-        if (previewName) previewName.textContent = name;
-        if (previewEmail) previewEmail.textContent = email || 'Registered Patient';
-        if (previewAvatar) previewAvatar.textContent = (name.substring(0, 2) || 'PT').toUpperCase();
+function filterPatientList() {
+    var query = (document.getElementById('patientSearchInput').value || '').toLowerCase().trim();
+    var tiles = document.querySelectorAll('.patient-tile');
+
+    tiles.forEach(function(tile) {
+        var name = (tile.getAttribute('data-name') || '').toLowerCase();
+        var email = (tile.getAttribute('data-email') || '').toLowerCase();
+        var div = (tile.getAttribute('data-division') || '').toLowerCase();
+
+        if (!query || name.includes(query) || email.includes(query) || div.includes(query)) {
+            tile.style.display = 'flex';
+        } else {
+            tile.style.display = 'none';
+        }
+    });
+}
+
+function selectPatient(userId, name, email, division) {
+    document.getElementById('selectedUserId').value = userId;
+
+    document.getElementById('patientSearchArea').style.display = 'none';
+    var card = document.getElementById('patientSelectedCard');
+    card.style.display = 'flex';
+
+    document.getElementById('selectedPatientAvatar').textContent = (name.substring(0, 2) || 'PT').toUpperCase();
+    document.getElementById('selectedPatientName').textContent = name;
+    document.getElementById('selectedPatientEmail').textContent = email || 'Verified Patient';
+    document.getElementById('selectedPatientLocation').textContent = division ? (division + ' Division') : 'Registered Profile';
+
+    document.getElementById('previewUserAvatar').textContent = (name.substring(0, 2) || 'PT').toUpperCase();
+    document.getElementById('previewUserName').textContent = name;
+    document.getElementById('previewUserEmail').textContent = email || 'Verified Patient Profile';
+}
+
+function clearSelectedPatient() {
+    document.getElementById('selectedUserId').value = '';
+    document.getElementById('patientSelectedCard').style.display = 'none';
+    document.getElementById('patientSearchArea').style.display = 'block';
+    document.getElementById('patientSearchInput').focus();
+
+    document.getElementById('previewUserAvatar').textContent = 'PT';
+    document.getElementById('previewUserName').textContent = 'Awaiting Patient Selection';
+    document.getElementById('previewUserEmail').textContent = 'Please choose a patient';
+}
+
+function selectDoctor(doctorId, docName, docSpecialty, fee, hospital, district) {
+    document.getElementById('selectedDoctorId').value = doctorId;
+    currentDoctorFee = fee || 500;
+
+    document.querySelectorAll('.doctor-card-item').forEach(function(card) {
+        card.classList.remove('is-selected');
+        var icon = card.querySelector('.doc-check-icon');
+        if (icon) icon.style.display = 'none';
+        card.style.borderColor = '#e2e8f0';
+        card.style.background = '#ffffff';
+    });
+    var selectedItem = document.getElementById('doctorCard_' + doctorId);
+    if (selectedItem) {
+        selectedItem.classList.add('is-selected');
+        var icon = selectedItem.querySelector('.doc-check-icon');
+        if (icon) icon.style.display = 'inline-block';
+        selectedItem.style.borderColor = '#0284c7';
+        selectedItem.style.background = '#f0f9ff';
     }
 
-    var docSelect = document.getElementById('apptDoctorId');
-    var previewDocName = document.getElementById('previewDocName');
-    var previewDocSpecialty = document.getElementById('previewDocSpecialty');
-    var feeVal = 500;
+    document.getElementById('previewDocName').textContent = docName;
+    document.getElementById('previewDocSpecialty').textContent = docSpecialty + ' · ' + hospital;
+    updateTicketPreview();
+}
 
-    if (docSelect && docSelect.selectedIndex >= 0) {
-        var dOpt = docSelect.options[docSelect.selectedIndex];
-        var dName = dOpt.getAttribute('data-name') || 'Specialist';
-        var dSpec = dOpt.getAttribute('data-specialty') || 'General Medicine';
-        var dHosp = dOpt.getAttribute('data-hospital') || 'Medical Center';
-        feeVal = dOpt.getAttribute('data-fee') || '500';
-
-        if (previewDocName) previewDocName.textContent = dName;
-        if (previewDocSpecialty) previewDocSpecialty.textContent = dSpec + ' · ' + dHosp;
+function setTimeSlot(timeStr) {
+    var timeInput = document.getElementById('scheduleTimeInput');
+    if (timeInput) {
+        timeInput.value = timeStr;
     }
 
-    var timeInput = document.getElementById('apptScheduledTime');
+    document.querySelectorAll('.gh-slot-chip').forEach(function(btn) {
+        btn.classList.remove('is-active');
+        if (btn.textContent.includes(timeStr) || (timeStr === '10:00' && btn.textContent.includes('10:00 AM')) || (timeStr === '14:30' && btn.textContent.includes('02:30 PM')) || (timeStr === '16:00' && btn.textContent.includes('04:00 PM'))) {
+            btn.classList.add('is-active');
+        }
+    });
+
+    syncFinalDateTime();
+}
+
+function syncFinalDateTime() {
+    var dateVal = document.getElementById('scheduleDateInput').value;
+    var timeVal = document.getElementById('scheduleTimeInput').value;
+    var finalInput = document.getElementById('finalScheduledTime');
     var previewDate = document.getElementById('previewDate');
-    if (timeInput && timeInput.value) {
-        var dt = new Date(timeInput.value);
-        if (previewDate && !isNaN(dt.getTime())) {
+
+    if (dateVal && timeVal) {
+        var isoStr = dateVal + 'T' + timeVal;
+        finalInput.value = isoStr;
+
+        var dt = new Date(isoStr);
+        if (!isNaN(dt.getTime())) {
             previewDate.textContent = dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
     }
+}
 
+function updateTicketPreview() {
     var statusSelect = document.getElementById('apptStatus');
     var paySelect = document.getElementById('apptPaymentStatus');
     var statusBadge = document.getElementById('previewStatusBadge');
@@ -407,24 +607,24 @@ function updateEditTicketPreview() {
 
     if (previewFee) {
         var payLabel = curPay === 'paid' ? 'Paid' : (curPay === 'free' ? 'Community Subsidy' : 'Unpaid');
-        previewFee.textContent = '৳' + feeVal + ' · ' + payLabel;
+        previewFee.textContent = '৳' + currentDoctorFee + ' · ' + payLabel;
     }
 }
 
+// Pre-fill existing scheduled time on load
 document.addEventListener('DOMContentLoaded', function() {
-    var userSelect = document.getElementById('apptUserId');
-    var docSelect = document.getElementById('apptDoctorId');
-    var timeInput = document.getElementById('apptScheduledTime');
-    var statusSelect = document.getElementById('apptStatus');
-    var paySelect = document.getElementById('apptPaymentStatus');
-
-    if (userSelect) userSelect.addEventListener('change', updateEditTicketPreview);
-    if (docSelect) docSelect.addEventListener('change', updateEditTicketPreview);
-    if (timeInput) timeInput.addEventListener('input', updateEditTicketPreview);
-    if (statusSelect) statusSelect.addEventListener('change', updateEditTicketPreview);
-    if (paySelect) paySelect.addEventListener('change', updateEditTicketPreview);
-
-    updateEditTicketPreview();
+    var rawTime = "{{ appointment.scheduled_time or '' }}";
+    if (rawTime) {
+        try {
+            var cleanTime = rawTime.split('+')[0].split('Z')[0];
+            var parts = cleanTime.split('T');
+            if (parts.length === 2) {
+                document.getElementById('scheduleDateInput').value = parts[0];
+                document.getElementById('scheduleTimeInput').value = parts[1].substring(0, 5);
+            }
+        } catch(e) {}
+    }
+    updateTicketPreview();
 });
 </script>
 {% endblock %}

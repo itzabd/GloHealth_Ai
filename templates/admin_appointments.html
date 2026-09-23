@@ -211,33 +211,66 @@
                 </div>
             </div>
 
-            <!-- Toolbar: Search & Dynamic Filters -->
-            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 260px; position: relative;">
-                    <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 10px; font-size: 20px; color: #94a3b8;">search</span>
-                    <input type="text" id="adminApptSearch" class="gh-input" placeholder="Search appointment by patient name, email, or clinician..." style="padding-left: 40px; height: 40px; font-size: 13.5px;">
-                </div>
-                <!-- Status Filter -->
-                <select id="adminApptStatusFilter" class="gh-input" style="width: 170px; height: 40px; font-size: 13px; font-weight: 500;">
-                    <option value="">All Statuses</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-                <!-- Payment Filter -->
-                <select id="adminApptPaymentFilter" class="gh-input" style="width: 180px; height: 40px; font-size: 13px; font-weight: 500;">
-                    <option value="">All Payments</option>
-                    <option value="paid">Paid</option>
-                    <option value="free">Free / Community</option>
-                    <option value="unpaid">Unpaid</option>
-                </select>
-                <button type="button" id="adminApptResetFilter" class="gh-btn gh-btn--outline" style="height: 40px; font-size: 12px; padding: 0 12px; color: #64748b;" title="Reset all filters">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
-                    Reset
+            <!-- Quick-Filter Segment Tabs -->
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+                <button type="button" class="gh-appt-tab is-active" id="tabAll" onclick="applyQuickTab('', '')">
+                    All <span class="gh-tab-badge" id="badgeAll">{{ total_appts }}</span>
                 </button>
-                <div id="adminApptCount" style="font-size: 12.5px; color: var(--gh-text-muted); font-family: monospace; white-space: nowrap; margin-left: auto;">
-                    Showing {{ total_appts }} of {{ total_appts }} appointments
+                <button type="button" class="gh-appt-tab" id="tabConfirmed" onclick="applyQuickTab('confirmed', '')">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #059669; display: inline-block;"></span>
+                    Confirmed <span class="gh-tab-badge">{{ confirmed_appts.count }}</span>
+                </button>
+                <button type="button" class="gh-appt-tab" id="tabPending" onclick="applyQuickTab('pending', '')">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #d97706; display: inline-block;"></span>
+                    Pending <span class="gh-tab-badge">{{ pending_appts.count }}</span>
+                </button>
+                <button type="button" class="gh-appt-tab" id="tabPaid" onclick="applyQuickTab('', 'paid')">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #0284c7; display: inline-block;"></span>
+                    Paid <span class="gh-tab-badge">{{ paid_appts.count }}</span>
+                </button>
+                <button type="button" class="gh-appt-tab" id="tabFree" onclick="applyQuickTab('', 'free')">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #8b5cf6; display: inline-block;"></span>
+                    Free / Subsidy <span class="gh-tab-badge">{{ free_appts.count }}</span>
+                </button>
+            </div>
+
+            <!-- Toolbar: Search & Dynamic Filters (Elevated Cohesive Container) -->
+            <div style="background: #ffffff; border: 1px solid var(--gh-border); border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+                <!-- Full-Width Search Input Box -->
+                <div style="flex: 1; min-width: 280px; position: relative;">
+                    <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 11px; font-size: 20px; color: #94a3b8; pointer-events: none;">search</span>
+                    <input type="text" id="adminApptSearch" placeholder="Search by patient name, email, clinician, or appointment ID..." style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 16px 0 44px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 13.5px; outline: none; transition: border-color 0.2s, background 0.2s;">
+                </div>
+                
+                <!-- Controls Group -->
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <!-- Status Filter -->
+                    <select id="adminApptStatusFilter" style="height: 42px; padding: 0 14px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; outline: none; cursor: pointer;">
+                        <option value="">Status: All</option>
+                        <option value="confirmed">✓ Confirmed</option>
+                        <option value="pending">⏱ Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+
+                    <!-- Payment Filter -->
+                    <select id="adminApptPaymentFilter" style="height: 42px; padding: 0 14px; font-size: 13px; font-weight: 500; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; outline: none; cursor: pointer;">
+                        <option value="">Payment: All</option>
+                        <option value="paid">Paid</option>
+                        <option value="free">Free / Community</option>
+                        <option value="unpaid">Unpaid</option>
+                    </select>
+
+                    <!-- Reset Filter Button -->
+                    <button type="button" id="adminApptResetFilter" style="height: 42px; padding: 0 14px; font-size: 12.5px; font-weight: 600; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: background 0.15s;" title="Reset all filters" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+                        Reset
+                    </button>
+
+                    <!-- Appointments Count Indicator -->
+                    <div id="adminApptCount" style="font-size: 12.5px; color: #64748b; font-family: monospace; white-space: nowrap; margin-left: 4px; padding-left: 10px; border-left: 1px solid #e2e8f0;">
+                        Showing {{ total_appts }} of {{ total_appts }}
+                    </div>
                 </div>
             </div>
 
@@ -287,8 +320,8 @@
                                 </td>
                                 <td style="padding: 14px 16px; font-family: monospace; color: #475569;">
                                     <div style="display: flex; align-items: center; gap: 6px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">schedule</span>
-                                        <span>{{ appt.scheduled_time or 'TBD' }}</span>
+                                        <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">calendar_today</span>
+                                        <span style="font-weight: 500;">{{ appt.scheduled_time|datetimeformat or 'TBD' }}</span>
                                     </div>
                                 </td>
                                 <td style="padding: 14px 16px;">
@@ -421,6 +454,44 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
+
+.gh-appt-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.gh-appt-tab:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+.gh-appt-tab.is-active {
+    background: #0284c7;
+    border-color: #0284c7;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+}
+.gh-appt-tab .gh-tab-badge {
+    font-size: 11px;
+    font-family: monospace;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #475569;
+}
+.gh-appt-tab.is-active .gh-tab-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
 </style>
 {% endblock %}
 
@@ -461,6 +532,38 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+function applyQuickTab(statusVal, paymentVal) {
+    var statusFilter = document.getElementById('adminApptStatusFilter');
+    var paymentFilter = document.getElementById('adminApptPaymentFilter');
+
+    if (statusFilter) statusFilter.value = statusVal;
+    if (paymentFilter) paymentFilter.value = paymentVal;
+
+    // Update active tab visual
+    document.querySelectorAll('.gh-appt-tab').forEach(function(tab) {
+        tab.classList.remove('is-active');
+    });
+
+    if (!statusVal && !paymentVal) {
+        var t = document.getElementById('tabAll');
+        if (t) t.classList.add('is-active');
+    } else if (statusVal === 'confirmed') {
+        var t = document.getElementById('tabConfirmed');
+        if (t) t.classList.add('is-active');
+    } else if (statusVal === 'pending') {
+        var t = document.getElementById('tabPending');
+        if (t) t.classList.add('is-active');
+    } else if (paymentVal === 'paid') {
+        var t = document.getElementById('tabPaid');
+        if (t) t.classList.add('is-active');
+    } else if (paymentVal === 'free') {
+        var t = document.getElementById('tabFree');
+        if (t) t.classList.add('is-active');
+    }
+
+    filterAppointments();
+}
+
 function resetApptFilters() {
     var searchInput = document.getElementById('adminApptSearch');
     var statusFilter = document.getElementById('adminApptStatusFilter');
@@ -468,6 +571,13 @@ function resetApptFilters() {
     if (searchInput) searchInput.value = '';
     if (statusFilter) statusFilter.value = '';
     if (paymentFilter) paymentFilter.value = '';
+
+    document.querySelectorAll('.gh-appt-tab').forEach(function(tab) {
+        tab.classList.remove('is-active');
+    });
+    var t = document.getElementById('tabAll');
+    if (t) t.classList.add('is-active');
+
     filterAppointments();
 }
 
@@ -508,7 +618,7 @@ function filterAppointments() {
     }
 
     if (countEl) {
-        countEl.textContent = 'Showing ' + visibleCount + ' of ' + rows.length + ' appointments';
+        countEl.textContent = 'Showing ' + visibleCount + ' of ' + rows.length;
     }
 }
 
@@ -519,8 +629,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var resetBtn = document.getElementById('adminApptResetFilter');
 
     if (searchInput) searchInput.addEventListener('input', filterAppointments);
-    if (statusFilter) statusFilter.addEventListener('change', filterAppointments);
-    if (paymentFilter) paymentFilter.addEventListener('change', filterAppointments);
+    if (statusFilter) statusFilter.addEventListener('change', function() {
+        document.querySelectorAll('.gh-appt-tab').forEach(function(tab) { tab.classList.remove('is-active'); });
+        filterAppointments();
+    });
+    if (paymentFilter) paymentFilter.addEventListener('change', function() {
+        document.querySelectorAll('.gh-appt-tab').forEach(function(tab) { tab.classList.remove('is-active'); });
+        filterAppointments();
+    });
     if (resetBtn) resetBtn.addEventListener('click', resetApptFilters);
 });
 </script>
