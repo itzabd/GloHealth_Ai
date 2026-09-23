@@ -378,6 +378,7 @@ def load_user(user_id):
     except Exception as e:
         print(f"Error loading user: {str(e)}")
         return None
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
