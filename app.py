@@ -521,13 +521,23 @@ def admin_appointments():
         appointments_resp = supabase.from_('appointments').select('*').execute()
         appointments = appointments_resp.data if hasattr(appointments_resp, 'data') else []
 
-        doctors_resp = supabase.from_('doctors').select('id, name').execute()
-        doctors = {d['id']: d['name'] for d in doctors_resp.data} if hasattr(doctors_resp, 'data') else {}
+        doctors_resp = supabase.from_('doctors').select('*').execute()
+        doctors_list = doctors_resp.data if hasattr(doctors_resp, 'data') else []
+        doctors_map = {d['id']: d['name'] for d in doctors_list}
+
+        users_resp = supabase.from_('user_profiles').select('*').execute()
+        users_list = users_resp.data if hasattr(users_resp, 'data') else []
+        users_map = {u['id']: u for u in users_list}
 
         for a in appointments:
-            a['doctor_name'] = doctors.get(a['doctor_id'], 'N/A')
+            a['doctor_name'] = doctors_map.get(a.get('doctor_id'), a.get('doctor_name') or 'N/A')
+            u_info = users_map.get(a.get('user_id'), {})
+            if not a.get('user_name') and u_info:
+                a['user_name'] = u_info.get('full_name') or u_info.get('name') or 'Patient'
+            if not a.get('user_email') and u_info:
+                a['user_email'] = u_info.get('email') or 'N/A'
 
-        return render_template('admin_appointments.html', appointments=appointments)
+        return render_template('admin_appointments.html', appointments=appointments, doctors=doctors_list, users=users_list, hide_nav=True)
     except Exception as e:
         print(f"Admin Appointments error: {e}")
         flash(t_flash("flash.err_appts"), "danger")

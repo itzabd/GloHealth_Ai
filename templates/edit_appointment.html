@@ -1,51 +1,66 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Appointment{% endblock %}
+{% block title %}Edit Consultation · Admin Console · GloHealth AI{% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card p-4">
-        <h4 class="mb-4" data-i18n="c.edit">Edit Appointment</h4>
-        <form method="POST">
+<div class="gh-container gh-container--narrow" style="padding-top: 40px; padding-bottom: 60px;">
+  <div class="gh-card" style="box-shadow: var(--gh-shadow-md); border-radius: var(--gh-radius-xl); padding: 32px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
+      <div>
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: var(--gh-primary);" data-i18n="c.edit">Edit Consultation Details</h2>
+        <p style="margin: 4px 0 0; font-size: 13px; color: var(--gh-text-muted);">Modify schedule, clinician assignment, and payment telemetry.</p>
+      </div>
+      <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline gh-btn--sm" data-i18n="c.cancel">Cancel</a>
+    </div>
 
-          <label data-i18n="c.user">User</label>
-          <select name="user_id" class="form-control mb-2" required>
-            {% for u in users %}
-              <option value="{{ u.id }}" {% if u.id == appointment.user_id %}selected{% endif %}>{{ u.full_name }} ({{ u.email }})</option>
-            {% endfor %}
-          </select>
+    <form method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Patient Record *</label>
+        <select name="user_id" class="gh-input" required>
+          {% for u in users %}
+            <option value="{{ u.id }}" {% if u.id == appointment.user_id %}selected{% endif %}>{{ u.full_name or 'Patient' }} ({{ u.email }})</option>
+          {% endfor %}
+        </select>
+      </div>
 
-          <label data-i18n="ap.doc">Doctor</label>
-          <select name="doctor_id" class="form-control mb-2" required>
-            {% for d in doctors %}
-              <option value="{{ d.id }}" {% if d.id == appointment.doctor_id %}selected{% endif %}>{{ d.name }} - {{ d.specialty }}</option>
-            {% endfor %}
-          </select>
+      <div>
+        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Assigned Clinician *</label>
+        <select name="doctor_id" class="gh-input" required>
+          {% for d in doctors %}
+            <option value="{{ d.id }}" {% if d.id == appointment.doctor_id %}selected{% endif %}>{{ d.name }} — {{ d.specialty }} (Fee: ৳{{ d.consultation_fee }})</option>
+          {% endfor %}
+        </select>
+      </div>
 
-          <label data-i18n="c.scheduled_time">Scheduled Time</label>
-          <input type="datetime-local" name="scheduled_time" class="form-control mb-2" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required>
+      <div>
+        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Scheduled Date & Time *</label>
+        <input type="datetime-local" name="scheduled_time" class="gh-input" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required>
+      </div>
 
-          <label data-i18n="c.status">Status</label>
-          <select name="status" class="form-control mb-2">
-            <option value="pending" {% if appointment.status=='pending' %}selected{% endif %} data-i18n="ap.pend">Pending</option>
-            <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %} data-i18n="ap.conf">Confirmed</option>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Consultation Status</label>
+          <select name="status" class="gh-input">
+            <option value="pending" {% if appointment.status=='pending' %}selected{% endif %} data-i18n="ap.pend">⏱ Pending Review</option>
+            <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %} data-i18n="ap.conf">✓ Confirmed</option>
             <option value="completed" {% if appointment.status=='completed' %}selected{% endif %} data-i18n="ap.comp">Completed</option>
             <option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %} data-i18n="ap.status_cancelled">Cancelled</option>
           </select>
-
-          <label data-i18n="ap.payment_status">Payment Status</label>
-          <select name="payment_status" class="form-control mb-2">
+        </div>
+        <div>
+          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Payment Status</label>
+          <select name="payment_status" class="gh-input">
             <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %} data-i18n="ap.unpaid">Unpaid</option>
-            <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %} data-i18n="ap.paid">Paid</option>
+            <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %} data-i18n="ap.paid">✓ Paid</option>
           </select>
-
-          <button type="submit" class="btn btn-accent" data-i18n="c.save_changes">Save Changes</button>
-          <a href="{{ url_for('admin_appointments') }}" class="btn btn-secondary" data-i18n="c.cancel">Cancel</a>
-        </form>
+        </div>
       </div>
-    </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 12px;">
+        <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1;" data-i18n="c.save_changes">Save Consultation Changes</button>
+        <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" data-i18n="c.cancel">Cancel</a>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
