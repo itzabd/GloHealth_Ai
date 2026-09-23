@@ -1217,7 +1217,7 @@ img {
   right: 0;
   bottom: 0;
   background-color: rgba(15, 23, 42, 0.45);
-  z-index: 998;
+  z-index: 1001 !important;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
@@ -1229,16 +1229,17 @@ img {
 /* Mobile Dropdown Drawer (Matches Stitch Mobile Spec) */
 .gh-nav__drawer {
   display: none;
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 56px;
   left: 0;
   right: 0;
   width: 100%;
-  background-color: #ffffff;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
   border-bottom: 1px solid var(--gh-border);
   box-shadow: 0 16px 32px -4px rgba(15, 23, 42, 0.16), 0 4px 12px -2px rgba(15, 23, 42, 0.08);
   padding: 16px 20px 20px 20px;
-  z-index: 999;
+  z-index: 1002 !important;
   flex-direction: column;
   gap: 12px;
   max-height: calc(100vh - 56px);
