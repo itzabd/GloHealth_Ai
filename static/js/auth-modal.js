@@ -285,6 +285,21 @@
             });
         });
 
+        // Form submit feedback & anti-duplicate submit (UI/UX Pro Max)
+        const form = modalContainer.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.classList.add('gh-btn--loading');
+                    submitBtn.setAttribute('aria-busy', 'true');
+                    setTimeout(function() {
+                        submitBtn.disabled = true;
+                    }, 50);
+                }
+            });
+        }
+
         // Auto-focus first input
         const firstInput = modalContainer.querySelector('input');
         if (firstInput) {
@@ -324,10 +339,33 @@
             }
         });
 
-        // Close on Escape key
+        // Close on Escape key & Focus Trap
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            if (!modal.classList.contains('is-open')) return;
+
+            if (e.key === 'Escape') {
                 closeModal();
+                return;
+            }
+
+            // Keyboard Focus Trap (WCAG 2.1 AAA)
+            if (e.key === 'Tab') {
+                const focusable = modalContainer.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length === 0) return;
+                const firstEl = focusable[0];
+                const lastEl = focusable[focusable.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstEl) {
+                        e.preventDefault();
+                        lastEl.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastEl) {
+                        e.preventDefault();
+                        firstEl.focus();
+                    }
+                }
             }
         });
 

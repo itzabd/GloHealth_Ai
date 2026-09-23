@@ -25,23 +25,23 @@
             <div style="flex: 1; min-width: 220px;">
                 <div class="gh-chip" style="width: 100%; cursor: text; padding: 4px 12px;">
                     <span class="material-symbols-outlined u-muted">search</span>
-                    <input type="search" id="symptomSearch" data-i18n-ph="ch.search" placeholder="Search symptoms (e.g. fever, cough, pain)..."
+                    <input type="search" id="symptomSearch" data-i18n-ph="ch.search" placeholder="Search symptoms (e.g. fever, cough, pain)..." aria-label="Search symptoms by name"
                            style="border: none; background: transparent; outline: none; width: 100%; font-size: 13px; color: var(--gh-text);">
                 </div>
             </div>
 
             <!-- Category Chips -->
             <div id="categoryChips" class="gh-row" style="flex-wrap: wrap; gap: 6px;">
-                <button type="button" class="gh-chip is-active" data-category="all" data-i18n="ch.all">All</button>
+                <button type="button" class="gh-chip is-active" data-category="all" data-i18n="ch.all" aria-pressed="true">All</button>
                 {% for cat, items in symptom_groups.items() %}
                     {% if items %}
-                    <button type="button" class="gh-chip" data-category="{{ cat }}">{{ cat }}</button>
+                    <button type="button" class="gh-chip" data-category="{{ cat }}" aria-pressed="false">{{ cat }}</button>
                     {% endif %}
                 {% endfor %}
             </div>
 
             <!-- Clear Action -->
-            <button type="button" id="clearAll" class="gh-btn gh-btn--ghost gh-btn--sm">
+            <button type="button" id="clearAll" class="gh-btn gh-btn--ghost gh-btn--sm" aria-label="Clear all selected symptoms">
                 <span class="material-symbols-outlined" style="font-size: 16px;">delete_sweep</span>
                 <span data-i18n="ch.clear_all">Clear all</span>
             </button>
@@ -69,7 +69,7 @@
                             <div class="gh-symptom__slider" onclick="event.stopPropagation();">
                                 <div class="gh-symptom__slider-row">
                                     <span style="font-size: 11px; color: var(--gh-text-muted);" data-i18n="ch.severity">Severity</span>
-                                    <input type="range" min="0" max="10" value="5" class="pain-slider">
+                                    <input type="range" min="0" max="10" value="5" class="pain-slider" aria-label="Severity level for {{ s.label }}" aria-valuemin="0" aria-valuemax="10">
                                     <span class="gh-symptom__slider-value">5</span>
                                 </div>
                             </div>

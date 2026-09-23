@@ -21,9 +21,9 @@
   --gh-border-soft:    #f1f5f9;
   --gh-text:           #0f172a;
   --gh-text-muted:     #64748b;
-  --gh-text-faint:     #94a3b8;
-  --gh-font-heading:   'Space Grotesk', system-ui, sans-serif;
-  --gh-font-body:      'Inter', system-ui, sans-serif;
+  --gh-text-faint:     #64748b;
+  --gh-font-heading:   'Figtree', 'Space Grotesk', system-ui, sans-serif;
+  --gh-font-body:      'Noto Sans', 'Inter', system-ui, sans-serif;
   --gh-font-bn:        'Hind Siliguri', 'Inter', sans-serif;
   --gh-radius-sm:      6px;
   --gh-radius:         12px;
@@ -1639,5 +1639,149 @@ img {
   .gh-auth-modal__form-col {
     padding: 32px 24px;
     justify-content: flex-start;
+  }
+}
+
+/* ==========================================================================
+   UI/UX PRO MAX DESIGN INTELLIGENCE & ACCESSIBILITY RULES
+   ========================================================================== */
+
+/* 1. Accessible Skip Link */
+.gh-skip-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  background: var(--gh-primary);
+  color: #ffffff !important;
+  padding: 10px 18px;
+  border-radius: var(--gh-radius-sm);
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 99999;
+  text-decoration: none !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+  transition: top 0.2s ease-in-out;
+}
+.gh-skip-link:focus,
+.gh-skip-link:focus-visible {
+  top: 16px;
+  outline: 3px solid #22d3ee;
+  outline-offset: 2px;
+}
+
+/* 2. Universal Focus Visible (WCAG 2.1 AAA Compliant) */
+:focus-visible {
+  outline: 2px solid var(--gh-primary) !important;
+  outline-offset: 2px !important;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--gh-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* 3. Guaranteed 44x44px Minimum Touch Targets (Mobile & Desktop) */
+.gh-nav__hamburger {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.gh-nav__icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.gh-toast__close {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.gh-auth-modal__close {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 4. Explicit Cursor Pointer on Interactive Elements */
+button,
+a,
+[role="button"],
+[data-auth-open],
+.gh-chip,
+.gh-symptom,
+.gh-btn,
+select,
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+  cursor: pointer;
+}
+
+/* 5. Smooth Transition Baseline (150-300ms) */
+.gh-btn,
+.gh-nav__link,
+.gh-card,
+.gh-chip,
+.gh-symptom {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 6. Form Button Loading State with Spinner */
+.gh-btn--loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.82;
+  color: transparent !important;
+}
+
+.gh-btn--loading::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: calc(50% - 9px);
+  left: calc(50% - 9px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: ghSpin 0.7s linear infinite;
+}
+
+@keyframes ghSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* 7. Reduced Motion Respect (Accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .gh-nav__drawer.is-open {
+    animation: none !important;
+  }
+  .gh-toast {
+    animation: none !important;
   }
 }

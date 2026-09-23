@@ -31,7 +31,7 @@
             <!-- Search Input with Leading Search Icon -->
             <div style="flex: 2; min-width: 240px; position: relative;">
                 <span class="material-symbols-outlined u-muted" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 20px; pointer-events: none;">search</span>
-                <input type="text" id="doctorSearch" data-i18n-placeholder="dr.search" placeholder="Search by name, hospital, or specialty…" 
+                <input type="text" id="doctorSearch" data-i18n-placeholder="dr.search" placeholder="Search by name, hospital, or specialty…" aria-label="Search doctors by name, hospital, or specialty"
                        style="width: 100%; height: 42px; padding: 0 14px 0 40px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 14px; font-family: var(--gh-font-body); color: var(--gh-text-main); outline: none; transition: border-color 0.15s, box-shadow 0.15s;" 
                        onfocus="this.style.borderColor='var(--gh-primary)'; this.style.boxShadow='0 0 0 3px rgba(3,105,161,0.1)';" 
                        onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';" />
@@ -39,7 +39,7 @@
 
             <!-- Specialty Dropdown -->
             <div style="flex: 1; min-width: 160px;">
-                <select id="specialtyFilter" 
+                <select id="specialtyFilter" aria-label="Filter doctors by medical specialty"
                         style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 13px; font-family: var(--gh-font-body); color: var(--gh-text-main); cursor: pointer; outline: none;">
                     <option value="" data-i18n="dr.spec">All Specialties</option>
                     <option value="Cardiology">Cardiology</option>
@@ -53,7 +53,7 @@
 
             <!-- Division Dropdown (All 8 Divisions) -->
             <div style="flex: 1; min-width: 150px;">
-                <select id="divisionFilter" 
+                <select id="divisionFilter" aria-label="Filter doctors by administrative division"
                         style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: var(--gh-radius-sm); background: #ffffff; font-size: 13px; font-family: var(--gh-font-body); color: var(--gh-text-main); cursor: pointer; outline: none;">
                     <option value="" data-i18n="dr.div">All Divisions</option>
                     <option value="Dhaka">Dhaka</option>
