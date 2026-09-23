@@ -24,7 +24,7 @@
                 </div>
                 <span class="gh-nav__brand-name" style="font-size: 18px; font-weight: 700; color: var(--gh-primary); letter-spacing: -0.02em;">GloHealth</span>
                 <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
-                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
+                <span class="gh-badge gh-badge--accent gh-admin-console-badge" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
             </a>
             <div class="gh-admin-meta-divider" style="height: 16px; width: 1px; background: var(--gh-border);"></div>
             <div class="gh-row gh-admin-meta-cluster" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
@@ -34,8 +34,11 @@
         </div>
 
         <!-- Right: Admin Controls & User Info -->
-        <div class="gh-row" style="gap: 12px; align-items: center;">
-            <span class="gh-chip" style="font-size: 11px; padding: 3px 8px; font-family: monospace;">EN | বাং</span>
+        <div class="gh-row" style="gap: 8px; align-items: center;">
+            <!-- Active Language Toggle Pill -->
+            <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
+                <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
+            </button>
 
             <button type="button" class="gh-nav__icon-btn gh-admin-mobile-hide" aria-label="Notifications" title="Notifications" style="position: relative;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
@@ -48,23 +51,27 @@
 
             <div class="gh-admin-meta-divider" style="height: 16px; width: 1px; background: var(--gh-border);"></div>
 
-            <!-- Admin Profile Badge -->
-            <div class="gh-row" style="gap: 8px; align-items: center;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: monospace;">
-                    AD
+            <!-- Admin Profile Badge (Real User Session) -->
+            <div class="gh-row" style="gap: 8px; align-items: center; flex-shrink: 0;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: monospace; flex-shrink: 0;">
+                    {{ ((current_user.name[:2] if current_user.name else (current_user.email[:2] if current_user.email else 'AD')))|upper }}
                 </div>
                 <div class="gh-admin-meta-userinfo" style="display: flex; flex-direction: column;">
-                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">Dr. S. Ahmed</span>
-                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">SA ID: GLH-9042 · CLINICAL DIR</span>
+                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">
+                        {{ current_user.name or (current_user.email.split('@')[0] if current_user.email else 'System Admin') }}
+                    </span>
+                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">
+                        ID: {{ (current_user.id[:8] if current_user.id else 'ADMIN-01')|upper }} · {{ 'SUPERADMIN' if current_user.is_admin else 'STAFF' }}
+                    </span>
                 </div>
             </div>
 
             <!-- Exit to Patient Portal Link -->
-            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 4px; padding: 4px 10px; font-size: 12px;">
-                <span class="material-symbols-outlined" style="font-size: 15px;">exit_to_app</span>
-                <span data-i18n="ad.patient_portal">Patient Portal</span>
+            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm gh-admin-exit-btn" title="Patient Portal" style="margin-left: 2px; padding: 4px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
+                <span class="gh-admin-exit-text" data-i18n="ad.patient_portal">Patient Portal</span>
             </a>
-            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
+            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out" style="flex-shrink: 0;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
             </a>
         </div>
@@ -157,16 +164,16 @@
         <main class="gh-admin-cockpit-main">
 
             <!-- Header Section -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <div>
-                    <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
-                        <h1 style="font-size: 26px; font-weight: 700; color: #0f172a; margin: 0;">Clinical Consultation & Appointments</h1>
-                        <span class="gh-badge gh-badge--accent" style="font-size: 11px; font-family: monospace;">ISO-27799 ENCRYPTED</span>
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; width: 100%; max-width: 100%; box-sizing: border-box;">
+                <div style="flex: 1; min-width: 240px;">
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;">
+                        <h1 style="font-size: clamp(20px, 4vw, 26px); font-weight: 700; color: #0f172a; margin: 0; line-height: 1.25;">Clinical Consultation & Appointments</h1>
+                        <span class="gh-badge gh-badge--accent" style="font-size: 10px; font-family: monospace; padding: 2px 6px;">ISO-27799 ENCRYPTED</span>
                     </div>
                     <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0;">Coordinate, schedule, and track patient teleconsultations with verified medical specialists.</p>
                 </div>
-                <div class="gh-row" style="gap: 12px;">
-                    <a href="{{ url_for('add_appointment_page') }}" class="gh-btn gh-btn--primary" style="gap: 8px;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
+                    <a href="{{ url_for('add_appointment_page') }}" class="gh-btn gh-btn--primary" style="gap: 8px; height: 38px; padding: 0 16px; border-radius: 6px; font-size: 13px; font-weight: 600; white-space: nowrap;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">add_circle</span>
                         <span data-i18n="c.add">Book New Appointment</span>
                     </a>
@@ -216,33 +223,33 @@
                 </div>
             </div>
 
-            <!-- Quick-Filter Segment Tabs -->
-            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
-                <button type="button" class="gh-appt-tab is-active" id="tabAll" onclick="applyQuickTab('', '')">
+            <!-- Quick-Filter Segment Tabs (Horizontally Scrollable on Mobile) -->
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%; padding-bottom: 4px; box-sizing: border-box;">
+                <button type="button" class="gh-appt-tab is-active" id="tabAll" onclick="applyQuickTab('', '')" style="white-space: nowrap; flex-shrink: 0;">
                     All <span class="gh-tab-badge" id="badgeAll">{{ total_appts }}</span>
                 </button>
-                <button type="button" class="gh-appt-tab" id="tabConfirmed" onclick="applyQuickTab('confirmed', '')">
+                <button type="button" class="gh-appt-tab" id="tabConfirmed" onclick="applyQuickTab('confirmed', '')" style="white-space: nowrap; flex-shrink: 0;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #059669; display: inline-block;"></span>
                     Confirmed <span class="gh-tab-badge">{{ confirmed_appts.count }}</span>
                 </button>
-                <button type="button" class="gh-appt-tab" id="tabPending" onclick="applyQuickTab('pending', '')">
+                <button type="button" class="gh-appt-tab" id="tabPending" onclick="applyQuickTab('pending', '')" style="white-space: nowrap; flex-shrink: 0;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #d97706; display: inline-block;"></span>
                     Pending <span class="gh-tab-badge">{{ pending_appts.count }}</span>
                 </button>
-                <button type="button" class="gh-appt-tab" id="tabPaid" onclick="applyQuickTab('', 'paid')">
+                <button type="button" class="gh-appt-tab" id="tabPaid" onclick="applyQuickTab('', 'paid')" style="white-space: nowrap; flex-shrink: 0;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #0284c7; display: inline-block;"></span>
                     Paid <span class="gh-tab-badge">{{ paid_appts.count }}</span>
                 </button>
-                <button type="button" class="gh-appt-tab" id="tabFree" onclick="applyQuickTab('', 'free')">
+                <button type="button" class="gh-appt-tab" id="tabFree" onclick="applyQuickTab('', 'free')" style="white-space: nowrap; flex-shrink: 0;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #8b5cf6; display: inline-block;"></span>
                     Free / Subsidy <span class="gh-tab-badge">{{ free_appts.count }}</span>
                 </button>
             </div>
 
             <!-- Toolbar: Search & Dynamic Filters (Elevated Cohesive Container) -->
-            <div style="background: #ffffff; border: 1px solid var(--gh-border); border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;">
+            <div style="background: #ffffff; border: 1px solid var(--gh-border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; width: 100%; box-sizing: border-box;">
                 <!-- Full-Width Search Input Box -->
-                <div style="flex: 1; min-width: 280px; position: relative;">
+                <div style="flex: 1; min-width: 220px; width: 100%; position: relative;">
                     <span class="material-symbols-outlined" style="position: absolute; left: 14px; top: 11px; font-size: 20px; color: #94a3b8; pointer-events: none;">search</span>
                     <input type="text" id="adminApptSearch" placeholder="Search by patient name, email, clinician, or appointment ID..." style="width: 100%; box-sizing: border-box; height: 42px; padding: 0 16px 0 44px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-size: 13.5px; outline: none; transition: border-color 0.2s, background 0.2s;">
                 </div>

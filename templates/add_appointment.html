@@ -20,47 +20,54 @@
                 </div>
                 <span class="gh-nav__brand-name" style="font-size: 18px; font-weight: 700; color: var(--gh-primary); letter-spacing: -0.02em;">GloHealth</span>
                 <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
-                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
+                <span class="gh-badge gh-badge--accent gh-admin-console-badge" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
             </a>
             <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
-            <div class="gh-row" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
+            <div class="gh-row gh-admin-meta-cluster" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block;"></span>
                 <span data-i18n="ad.cluster">HQ CLUSTER : PROD · ACTIVE</span>
             </div>
         </div>
 
         <!-- Right: Admin Controls & User Info -->
-        <div class="gh-row" style="gap: 16px; align-items: center;">
-            <span class="gh-chip" style="font-size: 11px; padding: 3px 8px; font-family: monospace;">EN | বাং</span>
+        <div class="gh-row" style="gap: 8px; align-items: center;">
+            <!-- Active Language Toggle Pill -->
+            <button type="button" class="gh-nav__lang-pill" id="langToggle" onclick="window.GH_TOGGLE_LANG &amp;&amp; window.GH_TOGGLE_LANG(event)" aria-label="Toggle language">
+                <span class="gh-lang-en" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('en');">EN</span> | <span class="gh-lang-bn" onclick="event.stopPropagation(); window.GH_APPLY_LANG &amp;&amp; window.GH_APPLY_LANG('bn');">বাং</span>
+            </button>
 
-            <button type="button" class="gh-nav__icon-btn" aria-label="Notifications" title="Notifications" style="position: relative;">
+            <button type="button" class="gh-nav__icon-btn gh-admin-mobile-hide" aria-label="Notifications" title="Notifications" style="position: relative;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
                 <span style="position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #e11d48; border-radius: 50%;"></span>
             </button>
 
-            <button type="button" class="gh-nav__icon-btn" aria-label="Help" title="Diagnostics Help">
+            <button type="button" class="gh-nav__icon-btn gh-admin-mobile-hide" aria-label="Help" title="Diagnostics Help">
                 <span class="material-symbols-outlined" style="font-size: 20px;">help_outline</span>
             </button>
 
-            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+            <div style="height: 16px; width: 1px; background: var(--gh-border);" class="gh-admin-meta-divider"></div>
 
-            <!-- Admin Profile Badge -->
-            <div class="gh-row" style="gap: 10px; align-items: center;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: monospace;">
-                    AD
+            <!-- Admin Profile Badge (Real User Session) -->
+            <div class="gh-row" style="gap: 8px; align-items: center; flex-shrink: 0;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: monospace; flex-shrink: 0;">
+                    {{ ((current_user.name[:2] if current_user.name else (current_user.email[:2] if current_user.email else 'AD')))|upper }}
                 </div>
-                <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">Dr. S. Ahmed</span>
-                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">SA ID: GLH-9042 · CLINICAL DIR</span>
+                <div class="gh-admin-meta-userinfo" style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">
+                        {{ current_user.name or (current_user.email.split('@')[0] if current_user.email else 'System Admin') }}
+                    </span>
+                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">
+                        ID: {{ (current_user.id[:8] if current_user.id else 'ADMIN-01')|upper }} · {{ 'SUPERADMIN' if current_user.is_admin else 'STAFF' }}
+                    </span>
                 </div>
             </div>
 
             <!-- Exit to Patient Portal Link -->
-            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 8px;">
+            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm gh-admin-exit-btn" title="Patient Portal" style="margin-left: 2px; padding: 4px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0;">
                 <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
-                <span data-i18n="ad.patient_portal">Patient Portal</span>
+                <span class="gh-admin-exit-text" data-i18n="ad.patient_portal">Patient Portal</span>
             </a>
-            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
+            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out" style="flex-shrink: 0;">
                 <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
             </a>
         </div>
