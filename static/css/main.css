@@ -759,13 +759,14 @@ img {
 .gh-modal-backdrop {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.45);
+  background-color: rgba(15, 23, 42, 0.6);
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 10000;
   padding: 16px;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .gh-modal-backdrop.is-open {
@@ -875,13 +876,13 @@ img {
 
 @media (max-width: 640px) {
   .gh-modal-backdrop {
-    align-items: flex-end;
-    padding: 0;
+    align-items: center;
+    padding: 16px;
+    z-index: 10000;
   }
   .gh-modal {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    max-height: 85vh;
+    border-radius: var(--gh-radius-lg);
+    max-height: 90vh;
   }
 }
 
@@ -1632,6 +1633,8 @@ img {
   .gh-modal--auth {
     grid-template-columns: 1fr !important;
     max-width: 480px;
+    background-color: #ffffff !important;
+    z-index: 10001 !important;
   }
   .gh-auth-modal__brand {
     display: none !important;
@@ -1639,6 +1642,7 @@ img {
   .gh-auth-modal__form-col {
     padding: 32px 24px;
     justify-content: flex-start;
+    background-color: #ffffff !important;
   }
 }
 
@@ -1685,13 +1689,20 @@ textarea:focus-visible {
 }
 
 /* 3. Guaranteed 44x44px Minimum Touch Targets (Mobile & Desktop) */
-.gh-nav__hamburger {
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+@media (max-width: 860px) {
+  .gh-nav__hamburger {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+}
+@media (min-width: 861px) {
+  .gh-nav__hamburger {
+    display: none !important;
+  }
 }
 
 .gh-nav__icon-btn {

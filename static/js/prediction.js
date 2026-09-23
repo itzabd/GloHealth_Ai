@@ -22,11 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastPredictions = null;
     let lastLocation = {};
 
-    // i18n helper: get translated string, fallback to key
-    function t(key) {
-        var lang = (window.GH_LANG || 'en');
+    // i18n helper: get translated string, fallback to fallback value or key
+    function t(key, fallback) {
+        var lang = (window.GH_LANG || localStorage.getItem('glohealth_lang') || 'en');
         var dict = (window.GH_I18N && window.GH_I18N[lang]) || {};
-        return dict[key] !== undefined ? dict[key] : key;
+        if (dict[key] !== undefined) return dict[key];
+        var enDict = (window.GH_I18N && window.GH_I18N['en']) || {};
+        if (enDict[key] !== undefined) return enDict[key];
+        return fallback !== undefined ? fallback : key;
     }
 
     // Request geolocation in background if permitted
@@ -280,11 +283,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </ul>
             </div>
 
-            <div class="gh-row gh-row--between u-mt-4" style="padding-top: 12px; border-top: 1px solid var(--gh-border-soft);">
-                <button type="button" class="gh-btn gh-btn--ghost" id="modalCloseBtn">${t('common.close')}</button>
-                <a href="/doctors" class="gh-btn gh-btn--primary">
+            <div class="gh-row gh-row--between u-mt-4" style="padding-top: 12px; border-top: 1px solid var(--gh-border-soft); align-items: center;">
+                <button type="button" class="gh-btn gh-btn--ghost" id="modalCloseBtn">${t('common.close', 'Close')}</button>
+                <a href="/doctors" class="gh-btn gh-btn--primary" style="display: inline-flex; align-items: center; gap: 8px;">
                     <span class="material-symbols-outlined">person_add</span>
-                    ${t('common.book_specialist')}
+                    ${t('common.book_specialist', 'Book Specialist')}
                 </a>
             </div>
 

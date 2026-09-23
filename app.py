@@ -389,10 +389,25 @@ def admin_required(f):
 @login_required
 @admin_required
 def admin_dashboard():
-    # Example: show system stats, user management, etc.
-    users = supabase.from_('user_profiles').select('*').execute().data
-    appointments = supabase.from_('appointments').select('*').execute().data
-    return render_template('admin_dashboard.html', users=users, appointments=appointments, hide_nav=True)
+    try:
+        users_resp = supabase.from_('user_profiles').select('*').execute()
+        users = users_resp.data if hasattr(users_resp, 'data') else []
+    except Exception:
+        users = []
+
+    try:
+        appts_resp = supabase.from_('appointments').select('*').execute()
+        appointments = appts_resp.data if hasattr(appts_resp, 'data') else []
+    except Exception:
+        appointments = []
+
+    try:
+        docs_resp = supabase.from_('doctors').select('*').execute()
+        doctors = docs_resp.data if hasattr(docs_resp, 'data') else []
+    except Exception:
+        doctors = []
+
+    return render_template('admin_dashboard.html', users=users, appointments=appointments, doctors=doctors, hide_nav=True)
 
 
 @app.route('/admin/users')
@@ -401,15 +416,7 @@ def admin_users():
     if not getattr(current_user, 'is_admin', False):
         flash(t_flash("flash.unauthorized"), "danger")
         return redirect(url_for('dashboard'))
-
-    try:
-        users_resp = supabase.from_("user_profiles").select("*").execute()
-        users = users_resp.data if hasattr(users_resp, "data") else []
-        return render_template("admin_users.html", users=users)
-    except Exception as e:
-        print(f"Admin Users error: {e}")
-        flash(t_flash("flash.err_users"), "danger")
-        return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_dashboard") + "#users")
 
 # View all doctors
 @app.route("/admin/doctors")
@@ -418,14 +425,7 @@ def admin_doctors():
     if not getattr(current_user, "is_admin", False):
         flash(t_flash("flash.unauthorized"), "danger")
         return redirect(url_for("dashboard"))
-
-    try:
-        resp = supabase.from_("doctors").select("*").execute()
-        doctors = resp.data if hasattr(resp, "data") else []
-        return render_template("admin_doctors.html", doctors=doctors)
-    except Exception as e:
-        flash(t_flash("flash.err_doctors", err=str(e)), "danger")
-        return redirect(url_for("admin_dashboard"))
+    return redirect(url_for("admin_dashboard") + "#doctors")
 
 
 # Add doctor page

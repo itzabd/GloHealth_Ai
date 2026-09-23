@@ -311,6 +311,26 @@
         modal = modal || document.getElementById('authModal');
         modalContainer = modalContainer || document.getElementById('authModalContainer');
         if (!modal || !modalContainer) return;
+
+        // Dismiss mobile nav drawer and its backdrop so modal is never obscured
+        var navDrawer = document.getElementById('navDrawer');
+        var navBackdrop = document.getElementById('navBackdrop');
+        var navToggle = document.getElementById('navToggle');
+        var navToggleIcon = document.getElementById('navToggleIcon');
+        if (navDrawer) {
+            navDrawer.classList.remove('is-open');
+            navDrawer.setAttribute('aria-hidden', 'true');
+        }
+        if (navBackdrop) {
+            navBackdrop.classList.remove('is-open');
+        }
+        if (navToggle) {
+            navToggle.setAttribute('aria-expanded', 'false');
+        }
+        if (navToggleIcon) {
+            navToggleIcon.textContent = 'menu';
+        }
+
         renderView(view || 'signup');
         modal.classList.add('is-open');
         document.body.style.overflow = 'hidden';

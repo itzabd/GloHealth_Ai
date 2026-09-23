@@ -1,42 +1,46 @@
 {% extends "base.html" %}
 
-{% block title %}
-<span class="lang-bn" lang="bn">ব্যবহারকারী সম্পাদনা</span>
-<span class="lang-en" lang="en" data-i18n="c.edit">Edit User</span>
-{% endblock %}
+{% block title %}Edit User · GloHealth AI{% endblock %}
 
 {% block content %}
-<div class="dashboard-wrapper">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4">
-                <h4 class="mb-4">
-                    <span class="lang-bn" lang="bn">ব্যবহারকারী সম্পাদনা</span>
-                    <span class="lang-en" lang="en" data-i18n="c.edit">Edit User</span>
-                </h4>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label class="form-label" data-i18n="c.name">Full Name</label>
-                        <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" data-i18n="c.email">Email</label>
-                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" data-i18n="c.city">City</label>
-                        <input type="text" name="city" class="form-control" value="{{ user.city }}">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label" data-i18n="c.division">Division</label>
-                        <input type="text" name="division" class="form-control" value="{{ user.division }}">
-                    </div>
-                    <button type="submit" class="btn btn-accent" data-i18n="c.save_changes">Save Changes</button>
-                    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary" data-i18n="c.cancel">Cancel</a>
-                </form>
-            </div>
-        </div>
+<div class="gh-container gh-container--narrow" style="padding-top: 40px; padding-bottom: 60px;">
+  <div class="gh-card" style="box-shadow: var(--gh-shadow-md); border-radius: var(--gh-radius-xl); padding: 32px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
+      <div>
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: var(--gh-primary);" data-i18n="c.edit">Edit Patient Profile</h2>
+        <p style="margin: 4px 0 0; font-size: 13px; color: var(--gh-text-muted);">Manage account permissions and profile details for {{ user.email }}.</p>
+      </div>
+      <a href="{{ url_for('admin_users') }}" class="gh-btn gh-btn--outline gh-btn--sm" data-i18n="c.cancel">Cancel</a>
     </div>
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Full Name *</label>
+        <input type="text" name="full_name" class="gh-input" value="{{ user.full_name or '' }}" required>
+      </div>
+
+      <div>
+        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Email Address *</label>
+        <input type="email" name="email" class="gh-input" value="{{ user.email or '' }}" required>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">City / District</label>
+          <input type="text" name="city" class="gh-input" value="{{ user.city or '' }}">
+        </div>
+        <div>
+          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Division</label>
+          <input type="text" name="division" class="gh-input" value="{{ user.division or '' }}">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 12px;">
+        <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1;" data-i18n="c.save_changes">Save Changes</button>
+        <a href="{{ url_for('admin_users') }}" class="gh-btn gh-btn--outline" data-i18n="c.cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
 
