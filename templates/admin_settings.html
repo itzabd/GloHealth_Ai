@@ -5,12 +5,16 @@
 
 {% block content %}
 <!-- Full-Height Admin Cockpit Shell -->
-<div style="min-height: 100vh; display: flex; flex-direction: column; background: #faf8ff; color: #0f172a; font-family: var(--gh-font-body);">
+<div class="gh-admin-cockpit-shell">
 
     <!-- 1. Dedicated Admin Telemetry Top Bar -->
-    <header style="width: 100%; height: 56px; background: #ffffff; border-bottom: 1px solid var(--gh-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 30; flex-shrink: 0;">
-        <!-- Left: Brand & Operational Status Indicator -->
-        <div class="gh-row" style="gap: 20px; align-items: center;">
+    <header class="gh-admin-cockpit-header">
+        <!-- Left: Hamburger Toggle (Mobile) + Brand & Operational Status Indicator -->
+        <div class="gh-row" style="gap: 12px; align-items: center;">
+            <button type="button" id="adminMenuToggle" class="gh-admin-mobile-toggle" aria-label="Toggle admin navigation menu">
+                <span class="material-symbols-outlined" style="font-size: 22px;">menu</span>
+            </button>
+
             <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
                 <div class="gh-nav__brand-icon">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -22,33 +26,33 @@
                 <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
                 <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
             </a>
-            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
-            <div class="gh-row" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
+            <div class="gh-admin-meta-divider" style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+            <div class="gh-row gh-admin-meta-cluster" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block;"></span>
                 <span data-i18n="ad.cluster">HQ CLUSTER : PROD · ACTIVE</span>
             </div>
         </div>
 
         <!-- Right: Admin Controls & User Info -->
-        <div class="gh-row" style="gap: 16px; align-items: center;">
+        <div class="gh-row" style="gap: 12px; align-items: center;">
             <span class="gh-chip" style="font-size: 11px; padding: 3px 8px; font-family: monospace;">EN | বাং</span>
 
-            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+            <div class="gh-admin-meta-divider" style="height: 16px; width: 1px; background: var(--gh-border);"></div>
 
             <!-- Admin Profile Badge -->
-            <div class="gh-row" style="gap: 10px; align-items: center;">
+            <div class="gh-row" style="gap: 8px; align-items: center;">
                 <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: monospace;">
                     AD
                 </div>
-                <div style="display: flex; flex-direction: column;">
+                <div class="gh-admin-meta-userinfo" style="display: flex; flex-direction: column;">
                     <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">Dr. S. Ahmed</span>
                     <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">SA ID: GLH-9042 · CLINICAL DIR</span>
                 </div>
             </div>
 
             <!-- Exit to Patient Portal Link -->
-            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 8px;">
-                <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
+            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 4px; padding: 4px 10px; font-size: 12px;">
+                <span class="material-symbols-outlined" style="font-size: 15px;">exit_to_app</span>
                 <span data-i18n="ad.patient_portal">Patient Portal</span>
             </a>
             <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
@@ -58,10 +62,11 @@
     </header>
 
     <!-- 2. Shell Layout: Sidebar + Main Workspace -->
-    <div style="flex: 1; display: flex; overflow: hidden;">
+    <div class="gh-admin-cockpit-body">
+        <div id="adminBackdrop" class="gh-admin-backdrop"></div>
         
-        <!-- SIDEBAR (240px) -->
-        <aside style="width: 240px; background: #ffffff; border-right: 1px solid var(--gh-border); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; user-select: none; z-index: 20;">
+        <!-- SIDEBAR -->
+        <aside id="adminSidebar" class="gh-admin-cockpit-sidebar">
             <div style="display: flex; flex-direction: column;">
                 <div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
                     <div class="gh-row" style="gap: 8px; align-items: center;">
@@ -92,7 +97,7 @@
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">calendar_today</span>
                         <span data-i18n="ad.appts">Appointments</span>
                     </a>
-                    <a href="{{ url_for('geo_insights') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                    <a href="{{ url_for('geo_insights', mode='admin') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
                         <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">insights</span>
                         <span data-i18n="ad.insights">Insights</span>
                     </a>
@@ -133,7 +138,7 @@
         </aside>
 
         <!-- MAIN WORKSPACE -->
-        <main style="flex: 1; background: #faf8ff; padding: 32px; overflow-y: auto;">
+        <main class="gh-admin-cockpit-main">
             <div style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
 
                 <!-- Flash Messages -->
@@ -177,7 +182,7 @@
                     </div>
 
                     <!-- Grid of 4 Settings Cards -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <div class="gh-analytics-grid">
 
                         <!-- Card 1: Clinical Telehealth Protocols -->
                         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 20px;">

@@ -1600,13 +1600,18 @@ def geo_insights():
         'active_outbreaks': 3
     }
 
+    mode = request.args.get('mode', '').lower()
+    is_admin = getattr(current_user, 'is_admin', False)
+    is_admin_mode = is_admin and (mode == 'admin')
+
     return render_template(
         'geo_insights.html',
         current_user=current_user,
         kpis=kpis,
         division_data=division_data,
         top_diseases=top_diseases,
-        hide_nav=getattr(current_user, 'is_admin', False)
+        is_admin_mode=is_admin_mode,
+        hide_nav=is_admin_mode
     )
 
 # THEN PUT THE TEMPLATE FILTER OUTSIDE THE FUNCTION
