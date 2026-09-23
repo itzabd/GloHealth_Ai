@@ -1,66 +1,430 @@
+{% set hide_nav = true %}
 {% extends "base.html" %}
 
-{% block title %}Edit Consultation · Admin Console · GloHealth AI{% endblock %}
+{% block title %}Edit Clinical Consultation #{{ appointment.id }} · Admin Console · GloHealth AI{% endblock %}
 
 {% block content %}
-<div class="gh-container gh-container--narrow" style="padding-top: 40px; padding-bottom: 60px;">
-  <div class="gh-card" style="box-shadow: var(--gh-shadow-md); border-radius: var(--gh-radius-xl); padding: 32px;">
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
-      <div>
-        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: var(--gh-primary);" data-i18n="c.edit">Edit Consultation Details</h2>
-        <p style="margin: 4px 0 0; font-size: 13px; color: var(--gh-text-muted);">Modify schedule, clinician assignment, and payment telemetry.</p>
-      </div>
-      <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline gh-btn--sm" data-i18n="c.cancel">Cancel</a>
+<!-- Full-Height Admin Cockpit Shell (Matches Clinical Telemetry Spec) -->
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: #faf8ff; color: #0f172a; font-family: var(--gh-font-body);">
+
+    <!-- 1. Dedicated Admin Telemetry Top Bar -->
+    <header style="width: 100%; height: 56px; background: #ffffff; border-bottom: 1px solid var(--gh-border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 30; flex-shrink: 0;">
+        <!-- Left: Brand & Operational Status Indicator -->
+        <div class="gh-row" style="gap: 20px; align-items: center;">
+            <a href="{{ url_for('admin_dashboard') }}" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                <div class="gh-nav__brand-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+                <span class="gh-nav__brand-name" style="font-size: 18px; font-weight: 700; color: var(--gh-primary); letter-spacing: -0.02em;">GloHealth</span>
+                <span class="gh-nav__brand-badge" style="font-size: 11px;">AI</span>
+                <span class="gh-badge gh-badge--accent" style="font-size: 10px; margin-left: 6px; padding: 2px 6px;" data-i18n="ad.title">ADMIN CONSOLE</span>
+            </a>
+            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+            <div class="gh-row" style="gap: 8px; align-items: center; font-size: 12px; font-family: monospace; color: var(--gh-text-muted);">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #0d9488; display: inline-block;"></span>
+                <span data-i18n="ad.cluster">HQ CLUSTER : PROD · ACTIVE</span>
+            </div>
+        </div>
+
+        <!-- Right: Admin Controls & User Info -->
+        <div class="gh-row" style="gap: 16px; align-items: center;">
+            <span class="gh-chip" style="font-size: 11px; padding: 3px 8px; font-family: monospace;">EN | বাং</span>
+
+            <button type="button" class="gh-nav__icon-btn" aria-label="Notifications" title="Notifications" style="position: relative;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+                <span style="position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #e11d48; border-radius: 50%;"></span>
+            </button>
+
+            <button type="button" class="gh-nav__icon-btn" aria-label="Help" title="Diagnostics Help">
+                <span class="material-symbols-outlined" style="font-size: 20px;">help_outline</span>
+            </button>
+
+            <div style="height: 16px; width: 1px; background: var(--gh-border);"></div>
+
+            <!-- Admin Profile Badge -->
+            <div class="gh-row" style="gap: 10px; align-items: center;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; font-family: monospace;">
+                    AD
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 12px; font-weight: 700; color: #0f172a; line-height: 1.2;">Dr. S. Ahmed</span>
+                    <span style="font-size: 10px; color: var(--gh-text-muted); font-family: monospace;">SA ID: GLH-9042 · CLINICAL DIR</span>
+                </div>
+            </div>
+
+            <!-- Exit to Patient Portal Link -->
+            <a href="{{ url_for('dashboard') }}" class="gh-btn gh-btn--outline gh-btn--sm" style="margin-left: 8px;">
+                <span class="material-symbols-outlined" style="font-size: 16px;">exit_to_app</span>
+                <span data-i18n="ad.patient_portal">Patient Portal</span>
+            </a>
+            <a href="{{ url_for('logout') }}" class="gh-nav__icon-btn" title="Sign out">
+                <span class="material-symbols-outlined" style="font-size: 20px;">logout</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- 2. Shell Layout: Sidebar + Main Workspace -->
+    <div style="flex: 1; display: flex; overflow: hidden;">
+        
+        <!-- SIDEBAR (240px) -->
+        <aside style="width: 240px; background: #ffffff; border-right: 1px solid var(--gh-border); display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; user-select: none; z-index: 20;">
+            <div style="display: flex; flex-direction: column;">
+                <!-- Sub-Header Workspace Switcher -->
+                <div style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                    <div class="gh-row" style="gap: 8px; align-items: center;">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span style="font-size: 11px; font-family: monospace; font-weight: 600; color: #64748b; letter-spacing: 0.05em;">HQ CLUSTER : PROD</span>
+                    </div>
+                    <span style="font-size: 10px; font-family: monospace; background: #f1f5f9; color: #475569; padding: 2px 6px; border: 1px solid #e2e8f0; border-radius: 4px;">v2.4</span>
+                </div>
+
+                <!-- Section Label -->
+                <div style="padding: 16px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
+                    <span data-i18n="ad.mgmt">MANAGEMENT</span>
+                </div>
+
+                <!-- Nav items list -->
+                <nav id="adminNav" style="display: flex; flex-direction: column; gap: 4px; padding: 0 8px;">
+                    <a href="{{ url_for('admin_dashboard') }}#overview" class="gh-admin-nav-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">dashboard</span>
+                        <span data-i18n="nav.dashboard">Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}#doctors" class="gh-admin-nav-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">medical_services</span>
+                        <span data-i18n="ad.doctors">Doctors</span>
+                    </a>
+                    <a href="{{ url_for('admin_dashboard') }}#users" class="gh-admin-nav-item" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">group</span>
+                        <span data-i18n="ad.users">Users</span>
+                    </a>
+                    <a href="{{ url_for('admin_appointments') }}" class="gh-admin-nav-item is-active" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 600; border-radius: 6px; background-color: #f0f9ff; color: #0369a1; border-left: 4px solid #0369a1; text-decoration: none; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="color: #0369a1; font-size: 20px;">calendar_today</span>
+                        <span data-i18n="ad.appts">Appointments</span>
+                    </a>
+                    <a href="{{ url_for('geo_insights') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">insights</span>
+                        <span data-i18n="ad.insights">Insights</span>
+                    </a>
+                    <a href="{{ url_for('admin_settings') }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; font-size: 14px; font-weight: 500; border-radius: 6px; color: #475569; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <span class="material-symbols-outlined" style="color: #64748b; font-size: 20px;">settings</span>
+                        <span data-i18n="ad.settings">System Settings</span>
+                    </a>
+                </nav>
+
+                <!-- Telemetry Logs -->
+                <div style="padding: 24px 16px 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #94a3b8; font-family: monospace; text-transform: uppercase;">
+                    TELEMETRY LOGS
+                </div>
+                <div style="padding: 0 12px; display: flex; flex-direction: column; gap: 4px; font-size: 12px;">
+                    <div style="padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; color: #64748b; font-family: monospace; border-radius: 4px; background: #f8fafc;">
+                        <span>ISO-27799 Guard</span>
+                        <span style="font-size: 10px; color: #059669; font-weight: 700;">PASS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding: 16px; border-top: 1px solid var(--gh-border); background: #fafafa;">
+                <div style="font-size: 11px; color: var(--gh-text-muted); font-family: monospace; line-height: 1.4;">
+                    <div>APPOINTMENT #{{ appointment.id }}</div>
+                    <div>AUDIT TRACE: LOCKED</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main style="flex: 1; overflow-y: auto; padding: 28px 36px 60px 36px;">
+
+            <!-- Breadcrumbs -->
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #64748b; margin-bottom: 12px; font-family: monospace;">
+                <a href="{{ url_for('admin_dashboard') }}" style="color: #64748b; text-decoration: none;">Admin Console</a>
+                <span>/</span>
+                <a href="{{ url_for('admin_appointments') }}" style="color: #64748b; text-decoration: none;">Appointments</a>
+                <span>/</span>
+                <span style="color: #0284c7; font-weight: 600;">Edit Session #{{ appointment.id }}</span>
+            </div>
+
+            <!-- Header Section -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
+                <div>
+                    <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
+                        <h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0;">Edit Clinical Consultation Details</h1>
+                        <span class="gh-badge gh-badge--accent" style="font-size: 11px; font-family: monospace;">RECORD ID: #{{ appointment.id }}</span>
+                    </div>
+                    <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0;">Update specialist allocation, consultation schedule, and payment reconciliation telemetry.</p>
+                </div>
+                <div class="gh-row" style="gap: 12px;">
+                    <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                        <span>Back to Appointments</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form & Live Details Grid -->
+            <div style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 28px; align-items: start;">
+
+                <!-- LEFT COLUMN: Edit Form -->
+                <div class="gh-card" style="box-shadow: var(--gh-shadow-sm); border-radius: var(--gh-radius-lg); padding: 28px; background: #ffffff;">
+                    <form method="POST" id="appointmentEditForm" style="display: flex; flex-direction: column; gap: 20px;">
+                        
+                        <!-- 1. Patient Record Selection -->
+                        <div>
+                            <label for="apptUserId" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                Patient Profile <span style="color: #e11d48;">*</span>
+                            </label>
+                            <select id="apptUserId" name="user_id" class="gh-input" required style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                {% for u in users %}
+                                <option value="{{ u.id }}" 
+                                        {% if u.id == appointment.user_id %}selected{% endif %}
+                                        data-name="{{ u.full_name or 'Patient' }}" 
+                                        data-email="{{ u.email or '' }}" 
+                                        data-division="{{ u.division or '' }}">
+                                    {{ u.full_name or 'Patient' }} &nbsp;·&nbsp; {{ u.email }} {% if u.division %}({{ u.division }}){% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- 2. Clinician Selection -->
+                        <div>
+                            <label for="apptDoctorId" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                Assigned Medical Specialist <span style="color: #e11d48;">*</span>
+                            </label>
+                            <select id="apptDoctorId" name="doctor_id" class="gh-input" required style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                {% for d in doctors %}
+                                <option value="{{ d.id }}" 
+                                        {% if d.id == appointment.doctor_id %}selected{% endif %}
+                                        data-name="{{ d.name }}" 
+                                        data-specialty="{{ d.specialty or 'General Medicine' }}" 
+                                        data-fee="{{ d.consultation_fee or 500 }}" 
+                                        data-hospital="{{ d.hospital or 'Medical Center' }}">
+                                    {{ d.name }} &nbsp;·&nbsp; {{ d.specialty }} &nbsp;(Fee: ৳{{ d.consultation_fee or 500 }}) {% if d.hospital %}[{{ d.hospital }}]{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- 3. Scheduled Date & Time -->
+                        <div>
+                            <label for="apptScheduledTime" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                Scheduled Date & Time <span style="color: #e11d48;">*</span>
+                            </label>
+                            <input type="datetime-local" id="apptScheduledTime" name="scheduled_time" class="gh-input" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required style="height: 44px; font-size: 13.5px; font-family: monospace;">
+                        </div>
+
+                        <!-- 4. Consultation Status & Payment Status -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div>
+                                <label for="apptStatus" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                    Consultation Status
+                                </label>
+                                <select id="apptStatus" name="status" class="gh-input" style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                    <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %}>✓ Confirmed</option>
+                                    <option value="pending" {% if appointment.status=='pending' %}selected{% endif %}>⏱ Pending Review</option>
+                                    <option value="completed" {% if appointment.status=='completed' %}selected{% endif %}>Completed</option>
+                                    <option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %}>Cancelled</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="apptPaymentStatus" style="display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #334155; margin-bottom: 6px;">
+                                    Payment Telemetry
+                                </label>
+                                <select id="apptPaymentStatus" name="payment_status" class="gh-input" style="height: 44px; font-size: 13.5px; font-weight: 500;">
+                                    <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %}>✓ Paid (bKash / Card)</option>
+                                    <option value="free" {% if appointment.payment_status=='free' %}selected{% endif %}>★ Free / Subsidized Community</option>
+                                    <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %}>⏱ Unpaid / Pending Settlement</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Submit and Cancel Actions -->
+                        <div style="display: flex; gap: 12px; align-items: center; margin-top: 12px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                            <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1; height: 46px; font-size: 14.5px; font-weight: 600; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">save</span>
+                                <span>Save Consultation Changes</span>
+                            </button>
+                            <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="height: 46px; padding: 0 20px; font-size: 14px;">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- RIGHT COLUMN: Real-Time Consultation Ticket Preview -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Dynamic Clinical Ticket Card -->
+                    <div class="gh-card" style="padding: 0; box-shadow: var(--gh-shadow-md); border-radius: var(--gh-radius-lg); overflow: hidden; border: 1px solid #e0e7ff; background: #ffffff;">
+                        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                                    <span style="font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.1em; color: #94a3b8; text-transform: uppercase;">SESSION PASS #{{ appointment.id }}</span>
+                                </div>
+                                <div style="font-size: 16px; font-weight: 700; margin-top: 2px;">GloHealth AI Telehealth</div>
+                            </div>
+                            <span class="gh-badge" id="previewStatusBadge" style="background: #ecfdf5; color: #059669; font-weight: 700; font-size: 11px; border: 1px solid #a7f3d0; padding: 4px 10px; border-radius: 12px;">
+                                {{ appointment.status|capitalize }}
+                            </span>
+                        </div>
+
+                        <div style="padding: 22px 20px; display: flex; flex-direction: column; gap: 16px;">
+                            
+                            <!-- Patient Section -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div id="previewUserAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; font-family: monospace; flex-shrink: 0;">
+                                    PT
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">PATIENT</div>
+                                    <div id="previewUserName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ appointment.user_name or 'Patient Record' }}</div>
+                                    <div id="previewUserEmail" style="font-size: 12.5px; color: #64748b;">{{ appointment.user_email or 'Verified Record' }}</div>
+                                </div>
+                            </div>
+
+                            <div style="height: 1px; background: #f1f5f9; width: 100%;"></div>
+
+                            <!-- Specialist Section -->
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #ede9fe; color: #6d28d9; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">stethoscope</span>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.05em;">CLINICIAN</div>
+                                    <div id="previewDocName" style="font-size: 15px; font-weight: 700; color: #0f172a;">{{ appointment.doctor_name or 'Medical Specialist' }}</div>
+                                    <div id="previewDocSpecialty" style="font-size: 12.5px; color: #6d28d9; font-weight: 600;">Specialist · Medical Center</div>
+                                </div>
+                            </div>
+
+                            <div style="height: 1px; background: #f1f5f9; width: 100%;"></div>
+
+                            <!-- Schedule & Financial Telemetry -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #f8fafc; padding: 12px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                                <div>
+                                    <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">SCHEDULE</div>
+                                    <div id="previewDate" style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace; margin-top: 2px;">{{ appointment.scheduled_time }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">FEE & STATUS</div>
+                                    <div id="previewFee" style="font-size: 13px; font-weight: 700; color: #059669; font-family: monospace; margin-top: 2px;">৳500 · {{ appointment.payment_status|capitalize }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Security Assurance -->
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #64748b; font-family: monospace; padding-top: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 16px; color: #059669;">verified_user</span>
+                                <span>ISO-27799 Guard · Telemetry Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
     </div>
-
-    <form method="POST" style="display: flex; flex-direction: column; gap: 16px;">
-      <div>
-        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Patient Record *</label>
-        <select name="user_id" class="gh-input" required>
-          {% for u in users %}
-            <option value="{{ u.id }}" {% if u.id == appointment.user_id %}selected{% endif %}>{{ u.full_name or 'Patient' }} ({{ u.email }})</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div>
-        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Assigned Clinician *</label>
-        <select name="doctor_id" class="gh-input" required>
-          {% for d in doctors %}
-            <option value="{{ d.id }}" {% if d.id == appointment.doctor_id %}selected{% endif %}>{{ d.name }} — {{ d.specialty }} (Fee: ৳{{ d.consultation_fee }})</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div>
-        <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Scheduled Date & Time *</label>
-        <input type="datetime-local" name="scheduled_time" class="gh-input" value="{{ appointment.scheduled_time|replace(' ', 'T') }}" required>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div>
-          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Consultation Status</label>
-          <select name="status" class="gh-input">
-            <option value="pending" {% if appointment.status=='pending' %}selected{% endif %} data-i18n="ap.pend">⏱ Pending Review</option>
-            <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %} data-i18n="ap.conf">✓ Confirmed</option>
-            <option value="completed" {% if appointment.status=='completed' %}selected{% endif %} data-i18n="ap.comp">Completed</option>
-            <option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %} data-i18n="ap.status_cancelled">Cancelled</option>
-          </select>
-        </div>
-        <div>
-          <label class="gh-form-label" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gh-text-muted); margin-bottom: 6px;">Payment Status</label>
-          <select name="payment_status" class="gh-input">
-            <option value="unpaid" {% if appointment.payment_status=='unpaid' %}selected{% endif %} data-i18n="ap.unpaid">Unpaid</option>
-            <option value="paid" {% if appointment.payment_status=='paid' %}selected{% endif %} data-i18n="ap.paid">✓ Paid</option>
-          </select>
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 12px; margin-top: 12px;">
-        <button type="submit" class="gh-btn gh-btn--primary" style="flex: 1;" data-i18n="c.save_changes">Save Consultation Changes</button>
-        <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" data-i18n="c.cancel">Cancel</a>
-      </div>
-    </form>
-  </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function updateEditTicketPreview() {
+    var userSelect = document.getElementById('apptUserId');
+    var previewName = document.getElementById('previewUserName');
+    var previewEmail = document.getElementById('previewUserEmail');
+    var previewAvatar = document.getElementById('previewUserAvatar');
+
+    if (userSelect && userSelect.selectedIndex >= 0) {
+        var opt = userSelect.options[userSelect.selectedIndex];
+        var name = opt.getAttribute('data-name') || 'Patient';
+        var email = opt.getAttribute('data-email') || '';
+        if (previewName) previewName.textContent = name;
+        if (previewEmail) previewEmail.textContent = email || 'Registered Patient';
+        if (previewAvatar) previewAvatar.textContent = (name.substring(0, 2) || 'PT').toUpperCase();
+    }
+
+    var docSelect = document.getElementById('apptDoctorId');
+    var previewDocName = document.getElementById('previewDocName');
+    var previewDocSpecialty = document.getElementById('previewDocSpecialty');
+    var feeVal = 500;
+
+    if (docSelect && docSelect.selectedIndex >= 0) {
+        var dOpt = docSelect.options[docSelect.selectedIndex];
+        var dName = dOpt.getAttribute('data-name') || 'Specialist';
+        var dSpec = dOpt.getAttribute('data-specialty') || 'General Medicine';
+        var dHosp = dOpt.getAttribute('data-hospital') || 'Medical Center';
+        feeVal = dOpt.getAttribute('data-fee') || '500';
+
+        if (previewDocName) previewDocName.textContent = dName;
+        if (previewDocSpecialty) previewDocSpecialty.textContent = dSpec + ' · ' + dHosp;
+    }
+
+    var timeInput = document.getElementById('apptScheduledTime');
+    var previewDate = document.getElementById('previewDate');
+    if (timeInput && timeInput.value) {
+        var dt = new Date(timeInput.value);
+        if (previewDate && !isNaN(dt.getTime())) {
+            previewDate.textContent = dt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · ' + dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+
+    var statusSelect = document.getElementById('apptStatus');
+    var paySelect = document.getElementById('apptPaymentStatus');
+    var statusBadge = document.getElementById('previewStatusBadge');
+    var previewFee = document.getElementById('previewFee');
+
+    var curStatus = statusSelect ? statusSelect.value : 'confirmed';
+    var curPay = paySelect ? paySelect.value : 'paid';
+
+    if (statusBadge) {
+        if (curStatus === 'confirmed') {
+            statusBadge.textContent = 'Confirmed';
+            statusBadge.style.background = '#ecfdf5';
+            statusBadge.style.color = '#059669';
+            statusBadge.style.borderColor = '#a7f3d0';
+        } else if (curStatus === 'pending') {
+            statusBadge.textContent = 'Pending Review';
+            statusBadge.style.background = '#fffbeb';
+            statusBadge.style.color = '#d97706';
+            statusBadge.style.borderColor = '#fde68a';
+        } else if (curStatus === 'completed') {
+            statusBadge.textContent = 'Completed';
+            statusBadge.style.background = '#f0f9ff';
+            statusBadge.style.color = '#0284c7';
+            statusBadge.style.borderColor = '#bae6fd';
+        } else {
+            statusBadge.textContent = 'Cancelled';
+            statusBadge.style.background = '#fef2f2';
+            statusBadge.style.color = '#e11d48';
+            statusBadge.style.borderColor = '#fecdd3';
+        }
+    }
+
+    if (previewFee) {
+        var payLabel = curPay === 'paid' ? 'Paid' : (curPay === 'free' ? 'Community Subsidy' : 'Unpaid');
+        previewFee.textContent = '৳' + feeVal + ' · ' + payLabel;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var userSelect = document.getElementById('apptUserId');
+    var docSelect = document.getElementById('apptDoctorId');
+    var timeInput = document.getElementById('apptScheduledTime');
+    var statusSelect = document.getElementById('apptStatus');
+    var paySelect = document.getElementById('apptPaymentStatus');
+
+    if (userSelect) userSelect.addEventListener('change', updateEditTicketPreview);
+    if (docSelect) docSelect.addEventListener('change', updateEditTicketPreview);
+    if (timeInput) timeInput.addEventListener('input', updateEditTicketPreview);
+    if (statusSelect) statusSelect.addEventListener('change', updateEditTicketPreview);
+    if (paySelect) paySelect.addEventListener('change', updateEditTicketPreview);
+
+    updateEditTicketPreview();
+});
+</script>
 {% endblock %}

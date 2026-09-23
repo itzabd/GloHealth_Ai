@@ -173,10 +173,12 @@
             {% set confirmed_appts = namespace(count=0) %}
             {% set pending_appts = namespace(count=0) %}
             {% set paid_appts = namespace(count=0) %}
+            {% set free_appts = namespace(count=0) %}
             {% for a in appointments %}
                 {% if a.status == 'confirmed' %}{% set confirmed_appts.count = confirmed_appts.count + 1 %}{% endif %}
                 {% if a.status == 'pending' %}{% set pending_appts.count = pending_appts.count + 1 %}{% endif %}
                 {% if a.payment_status == 'paid' %}{% set paid_appts.count = paid_appts.count + 1 %}{% endif %}
+                {% if a.payment_status == 'free' %}{% set free_appts.count = free_appts.count + 1 %}{% endif %}
             {% endfor %}
 
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
@@ -203,15 +205,15 @@
 
                 <!-- Paid Rate -->
                 <div class="gh-card" style="padding: 20px; box-shadow: var(--gh-shadow-sm); border-radius: var(--gh-radius-md);">
-                    <div style="font-size: 11px; font-weight: 700; color: var(--gh-text-muted); font-family: monospace; letter-spacing: 0.05em; margin-bottom: 8px;">PAID TRANSACTIONS</div>
-                    <div style="font-size: 28px; font-weight: 700; color: #0f172a; line-height: 1;">{{ paid_appts.count }} <span style="font-size: 14px; font-weight: 500; color: var(--gh-text-muted);">/ {{ total_appts }}</span></div>
-                    <div style="font-size: 11.5px; color: #059669; margin-top: 8px; font-weight: 500;">bKash & Card Verified</div>
+                    <div style="font-size: 11px; font-weight: 700; color: var(--gh-text-muted); font-family: monospace; letter-spacing: 0.05em; margin-bottom: 8px;">PAID / SUBSIDIZED</div>
+                    <div style="font-size: 28px; font-weight: 700; color: #0f172a; line-height: 1;">{{ paid_appts.count }} <span style="font-size: 14px; font-weight: 500; color: var(--gh-text-muted);">+ {{ free_appts.count }} free</span></div>
+                    <div style="font-size: 11.5px; color: #059669; margin-top: 8px; font-weight: 500;">Verified Transactions & Subsidies</div>
                 </div>
             </div>
 
             <!-- Toolbar: Search & Dynamic Filters -->
-            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
-                <div style="flex: 1; position: relative;">
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 260px; position: relative;">
                     <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 10px; font-size: 20px; color: #94a3b8;">search</span>
                     <input type="text" id="adminApptSearch" class="gh-input" placeholder="Search appointment by patient name, email, or clinician..." style="padding-left: 40px; height: 40px; font-size: 13.5px;">
                 </div>
@@ -224,12 +226,17 @@
                     <option value="cancelled">Cancelled</option>
                 </select>
                 <!-- Payment Filter -->
-                <select id="adminApptPaymentFilter" class="gh-input" style="width: 170px; height: 40px; font-size: 13px; font-weight: 500;">
+                <select id="adminApptPaymentFilter" class="gh-input" style="width: 180px; height: 40px; font-size: 13px; font-weight: 500;">
                     <option value="">All Payments</option>
                     <option value="paid">Paid</option>
+                    <option value="free">Free / Community</option>
                     <option value="unpaid">Unpaid</option>
                 </select>
-                <div id="adminApptCount" style="font-size: 12.5px; color: var(--gh-text-muted); font-family: monospace; white-space: nowrap; margin-left: 8px;">
+                <button type="button" id="adminApptResetFilter" class="gh-btn gh-btn--outline" style="height: 40px; font-size: 12px; padding: 0 12px; color: #64748b;" title="Reset all filters">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">refresh</span>
+                    Reset
+                </button>
+                <div id="adminApptCount" style="font-size: 12.5px; color: var(--gh-text-muted); font-family: monospace; white-space: nowrap; margin-left: auto;">
                     Showing {{ total_appts }} of {{ total_appts }} appointments
                 </div>
             </div>
@@ -313,6 +320,11 @@
                                             <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span>
                                             Paid
                                         </span>
+                                    {% elif appt.payment_status == 'free' %}
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: #0284c7; background: #f0f9ff; padding: 2px 8px; border-radius: 4px; border: 1px solid #bae6fd;">
+                                            <span class="material-symbols-outlined" style="font-size: 14px;">card_giftcard</span>
+                                            Free / Subsidy
+                                        </span>
                                     {% else %}
                                         <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: #d97706; background: #fffbeb; padding: 2px 8px; border-radius: 4px; border: 1px solid #fde68a;">
                                             <span class="material-symbols-outlined" style="font-size: 14px;">hourglass_top</span>
@@ -326,16 +338,23 @@
                                             <span class="material-symbols-outlined" style="font-size: 14px;">edit</span>
                                             <span data-i18n="c.edit">Edit</span>
                                         </a>
-                                        <form action="{{ url_for('delete_appointment_page', appointment_id=appt.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to cancel and remove this appointment session?');">
-                                            <button type="submit" class="gh-btn gh-btn--outline gh-btn--sm" title="Delete record" style="padding: 4px 8px; height: 28px; font-size: 12px; color: #e11d48; border-color: #fecdd3;">
-                                                <span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
-                                                <span data-i18n="c.delete">Delete</span>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="gh-btn gh-btn--outline gh-btn--sm" title="Cancel & delete record" style="padding: 4px 8px; height: 28px; font-size: 12px; color: #e11d48; border-color: #fecdd3;" onclick="openDeleteApptModal('{{ appt.id }}', '{{ (appt.user_name or 'Patient Record')|replace("'", "\\'") }}', '{{ (appt.doctor_name or 'Clinician')|replace("'", "\\'") }}', '{{ appt.scheduled_time or 'Scheduled Session' }}')">
+                                            <span class="material-symbols-outlined" style="font-size: 14px;">delete</span>
+                                            <span data-i18n="c.delete">Delete</span>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                             {% endfor %}
+                            <!-- Filter No Matches Row -->
+                            <tr id="noFilterMatchRow" style="display: none;">
+                                <td colspan="7" style="padding: 48px 16px; text-align: center; color: #64748b;">
+                                    <span class="material-symbols-outlined" style="font-size: 40px; color: #94a3b8; display: block; margin-bottom: 8px;">filter_alt_off</span>
+                                    <div style="font-size: 14.5px; font-weight: 600; color: #334155;">No matching appointments found</div>
+                                    <p style="font-size: 13px; color: #64748b; margin: 4px 0 12px;">Try adjusting your search terms or clearing your status and payment filters.</p>
+                                    <button type="button" class="gh-btn gh-btn--outline gh-btn--sm" onclick="resetApptFilters()">Clear Filters</button>
+                                </td>
+                            </tr>
                         {% else %}
                             <tr id="emptyAppointmentsRow">
                                 <td colspan="7" style="padding: 48px; text-align: center; color: var(--gh-text-muted);">
@@ -353,50 +372,156 @@
         </main>
     </div>
 </div>
+
+<!-- Custom In-App Delete Confirmation Modal (Replaces Native Browser confirm) -->
+<div id="deleteApptModal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 16px;" role="dialog" aria-modal="true" aria-labelledby="delModalTitle">
+    <div style="background: #ffffff; width: 100%; max-width: 440px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #fee2e2; overflow: hidden; animation: ghModalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+        <!-- Modal Top Accent Header -->
+        <div style="padding: 24px 24px 16px; display: flex; align-items: flex-start; gap: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #fef2f2; color: #e11d48; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid #fecdd3;">
+                <span class="material-symbols-outlined" style="font-size: 26px;">warning</span>
+            </div>
+            <div style="flex: 1;">
+                <h3 id="delModalTitle" style="margin: 0; font-size: 18px; font-weight: 700; color: #0f172a;">Cancel Appointment</h3>
+                <p style="margin: 6px 0 0; font-size: 13.5px; color: #64748b; line-height: 1.45;">Are you sure you want to cancel and remove this clinical session? This will purge the appointment record from the telemetry registry.</p>
+            </div>
+        </div>
+
+        <!-- Appointment Context Details Card -->
+        <div style="margin: 0 24px 20px; padding: 12px 16px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: #64748b;">Patient:</span>
+                <span id="delModalPatient" style="font-weight: 600; color: #0f172a;">—</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: #64748b;">Clinician:</span>
+                <span id="delModalDoctor" style="font-weight: 600; color: #0284c7;">—</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #64748b;">Scheduled:</span>
+                <span id="delModalTime" style="font-family: monospace; color: #475569; font-size: 12px;">—</span>
+            </div>
+        </div>
+
+        <!-- Modal Actions Footer -->
+        <div style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="gh-btn gh-btn--outline" onclick="closeDeleteApptModal()" style="font-size: 13.5px;">Keep Appointment</button>
+            <form id="deleteApptForm" method="POST" action="" style="margin: 0;">
+                <button type="submit" class="gh-btn" style="background: #e11d48; color: #ffffff; border: none; font-size: 13.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(225, 29, 72, 0.25); cursor: pointer; padding: 8px 16px; border-radius: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                    Confirm Cancellation
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes ghModalPop {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+var deleteModal = document.getElementById('deleteApptModal');
+var deleteForm = document.getElementById('deleteApptForm');
+var delPatientEl = document.getElementById('delModalPatient');
+var delDoctorEl = document.getElementById('delModalDoctor');
+var delTimeEl = document.getElementById('delModalTime');
+
+function openDeleteApptModal(apptId, patientName, docName, scheduledTime) {
+    if (!deleteModal || !deleteForm) return;
+    deleteForm.action = "/admin/appointments/delete/" + encodeURIComponent(apptId);
+    if (delPatientEl) delPatientEl.textContent = patientName || 'Patient Record';
+    if (delDoctorEl) delDoctorEl.textContent = docName || 'Assigned Clinician';
+    if (delTimeEl) delTimeEl.textContent = scheduledTime || 'Scheduled Session';
+    deleteModal.style.display = 'flex';
+}
+
+function closeDeleteApptModal() {
+    if (deleteModal) {
+        deleteModal.style.display = 'none';
+    }
+}
+
+// Close on backdrop click or ESC key
+if (deleteModal) {
+    deleteModal.addEventListener('click', function(e) {
+        if (e.target === deleteModal) {
+            closeDeleteApptModal();
+        }
+    });
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && deleteModal && deleteModal.style.display === 'flex') {
+        closeDeleteApptModal();
+    }
+});
+
+function resetApptFilters() {
+    var searchInput = document.getElementById('adminApptSearch');
+    var statusFilter = document.getElementById('adminApptStatusFilter');
+    var paymentFilter = document.getElementById('adminApptPaymentFilter');
+    if (searchInput) searchInput.value = '';
+    if (statusFilter) statusFilter.value = '';
+    if (paymentFilter) paymentFilter.value = '';
+    filterAppointments();
+}
+
+function filterAppointments() {
     var searchInput = document.getElementById('adminApptSearch');
     var statusFilter = document.getElementById('adminApptStatusFilter');
     var paymentFilter = document.getElementById('adminApptPaymentFilter');
     var countEl = document.getElementById('adminApptCount');
+    var noMatchRow = document.getElementById('noFilterMatchRow');
     var rows = document.querySelectorAll('.admin-appt-row');
 
-    function filterAppointments() {
-        var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-        var status = (statusFilter ? statusFilter.value : '').toLowerCase().trim();
-        var payment = (paymentFilter ? paymentFilter.value : '').toLowerCase().trim();
-        var visibleCount = 0;
+    var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+    var status = (statusFilter ? statusFilter.value : '').toLowerCase().trim();
+    var payment = (paymentFilter ? paymentFilter.value : '').toLowerCase().trim();
+    var visibleCount = 0;
 
-        rows.forEach(function(row) {
-            var patient = row.getAttribute('data-patient') || '';
-            var email = row.getAttribute('data-email') || '';
-            var doc = row.getAttribute('data-doc') || '';
-            var rowStatus = row.getAttribute('data-status') || '';
-            var rowPayment = row.getAttribute('data-payment') || '';
+    rows.forEach(function(row) {
+        var patient = (row.getAttribute('data-patient') || '').toLowerCase().trim();
+        var email = (row.getAttribute('data-email') || '').toLowerCase().trim();
+        var doc = (row.getAttribute('data-doc') || '').toLowerCase().trim();
+        var rowStatus = (row.getAttribute('data-status') || '').toLowerCase().trim();
+        var rowPayment = (row.getAttribute('data-payment') || '').toLowerCase().trim();
 
-            var matchesQuery = !query || patient.includes(query) || email.includes(query) || doc.includes(query);
-            var matchesStatus = !status || rowStatus === status;
-            var matchesPayment = !payment || rowPayment === payment;
+        var matchesQuery = !query || patient.includes(query) || email.includes(query) || doc.includes(query);
+        var matchesStatus = !status || rowStatus === status;
+        var matchesPayment = !payment || rowPayment === payment;
 
-            if (matchesQuery && matchesStatus && matchesPayment) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        if (countEl) {
-            countEl.textContent = 'Showing ' + visibleCount + ' of ' + rows.length + ' appointments';
+        if (matchesQuery && matchesStatus && matchesPayment) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
         }
+    });
+
+    if (noMatchRow) {
+        noMatchRow.style.display = (visibleCount === 0 && rows.length > 0) ? '' : 'none';
     }
+
+    if (countEl) {
+        countEl.textContent = 'Showing ' + visibleCount + ' of ' + rows.length + ' appointments';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('adminApptSearch');
+    var statusFilter = document.getElementById('adminApptStatusFilter');
+    var paymentFilter = document.getElementById('adminApptPaymentFilter');
+    var resetBtn = document.getElementById('adminApptResetFilter');
 
     if (searchInput) searchInput.addEventListener('input', filterAppointments);
     if (statusFilter) statusFilter.addEventListener('change', filterAppointments);
     if (paymentFilter) paymentFilter.addEventListener('change', filterAppointments);
+    if (resetBtn) resetBtn.addEventListener('click', resetApptFilters);
 });
 </script>
 {% endblock %}

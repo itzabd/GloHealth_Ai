@@ -563,12 +563,14 @@ def add_appointment_page():
         try:
             data = request.form
             # Find selected user to get name/email
-            selected_user = next((u for u in users if u["id"] == data["user_id"]), None)
+            selected_user = next((u for u in users if str(u["id"]) == str(data["user_id"])), None)
+            selected_doctor = next((d for d in doctors if str(d["id"]) == str(data["doctor_id"])), None)
             supabase.from_("appointments").insert({
                 "user_id": data["user_id"],
                 "user_name": selected_user["full_name"] if selected_user else "N/A",
                 "user_email": selected_user["email"] if selected_user else "N/A",
                 "doctor_id": data["doctor_id"],
+                "doctor_name": selected_doctor["name"] if selected_doctor else "N/A",
                 "scheduled_time": data["scheduled_time"],
                 "status": data.get("status", "pending"),
                 "payment_status": data.get("payment_status", "unpaid")
@@ -606,12 +608,14 @@ def edit_appointment_page(appointment_id):
     if request.method == "POST":
         try:
             data = request.form
-            selected_user = next((u for u in users if u["id"] == data["user_id"]), None)
+            selected_user = next((u for u in users if str(u["id"]) == str(data["user_id"])), None)
+            selected_doctor = next((d for d in doctors if str(d["id"]) == str(data["doctor_id"])), None)
             supabase.from_("appointments").update({
                 "user_id": data["user_id"],
                 "user_name": selected_user["full_name"] if selected_user else "N/A",
                 "user_email": selected_user["email"] if selected_user else "N/A",
                 "doctor_id": data["doctor_id"],
+                "doctor_name": selected_doctor["name"] if selected_doctor else "N/A",
                 "scheduled_time": data["scheduled_time"],
                 "status": data.get("status", "pending"),
                 "payment_status": data.get("payment_status", "unpaid")
