@@ -1,431 +1,275 @@
-# GloHealth AI - AI-Powered Health Symptom Reporting System
+<div align="center">
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen.svg)](https://www.python.org/)
-[![Flask](https://img.shields.io/badge/flask-3.1.1-blue.svg)](https://flask.palletsprojects.com/)
+  <img src="static/Logo.png" alt="GloHealth AI Logo" width="160" style="border-radius: 20px; margin-bottom: 12px;" />
 
-## Table of Contents
+  # GloHealth AI
+  ### Intelligent Healthcare Symptom Diagnosis & Epidemiological Surveillance Platform
 
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Machine Learning Models](#machine-learning-models)
-- [API Documentation](#api-documentation)
-- [Database Schema](#database-schema)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+  [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-glohealth--ai.onrender.com-00C781?style=for-the-badge&logo=render&logoColor=white)](https://glohealth-ai.onrender.com)
+  [![GitHub stars](https://img.shields.io/github/stars/itzabd/GloHealth_Ai?style=for-the-badge&color=gold)](https://github.com/itzabd/GloHealth_Ai/stargazers)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
----
+  <p align="center">
+    <a href="https://glohealth-ai.onrender.com"><strong>Explore Live Demo »</strong></a>
+    <br />
+    <br />
+    <a href="#-system-architecture">Architecture</a> •
+    <a href="#-features-at-a-glance">Key Features</a> •
+    <a href="#-screenshot-gallery">Visual Tour</a> •
+    <a href="#-quickstart--installation">Quickstart</a> •
+    <a href="#-machine-learning-engine">ML Pipeline</a> •
+    <a href="#-api-reference">API Reference</a>
+  </p>
 
-## Overview
+  <p>
+    <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/Flask-3.1.1-000000?style=flat-square&logo=flask&logoColor=white" alt="Flask" />
+    <img src="https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white" alt="Supabase" />
+    <img src="https://img.shields.io/badge/scikit--learn-F7931E?style=flat-square&logo=scikit-learn&logoColor=white" alt="scikit-learn" />
+    <img src="https://img.shields.io/badge/XGBoost-EB3A24?style=flat-square&logo=xgboost&logoColor=white" alt="XGBoost" />
+    <img src="https://img.shields.io/badge/Render-Deployment-46E3B7?style=flat-square&logo=render&logoColor=white" alt="Render" />
+    <img src="https://img.shields.io/badge/i18n-English%20%7C%20Bengali-8A2BE2?style=flat-square" alt="i18n" />
+  </p>
 
-**GloHealth AI** is a comprehensive, full-stack healthcare application that leverages machine learning to predict diseases based on patient-reported symptoms. The system is designed to:
-
-- **Empower individuals** with quick, AI-driven health insights for early disease detection
-- **Support public health authorities** with geospatial and temporal disease trend analysis
-- **Connect patients with healthcare providers** through an integrated appointment booking system
-- **Provide transparency** via explainable AI using feature importance visualizations
-
-The application combines predictive accuracy with geographical intelligence to identify emerging health patterns at the regional level, enabling data-driven resource allocation and public health response strategies.
+</div>
 
 ---
 
-## Key Features
-
-### 👤 User-Facing Features
-
-| Feature | Description |
-|---------|-------------|
-| **Symptom Prediction** | Input symptoms to receive instant disease predictions with confidence scores |
-| **Feature Transparency** | View visual explanations of which symptoms influence predictions |
-| **Geospatial Analysis** | Explore seasonal and regional disease trends with interactive maps |
-| **Appointment Booking** | Search, filter, and book appointments with specialized doctors |
-| **Subscription Plans** | Choose from Basic, Premium, and Ultimate plans with tiered benefits |
-| **Prediction History** | Track past predictions and consultation records |
-
-### 👨‍💼 Admin Dashboard Features
-
-| Feature | Description |
-|---------|-------------|
-| **User Management** | View, edit, and manage user profiles and permissions |
-| **Doctor Management** | Add, edit, and manage doctor profiles with specialties and availability |
-| **Appointment Control** | Schedule, modify, and cancel appointments with real-time updates |
-| **System Analytics** | Monitor usage metrics and disease prevalence trends |
-| **Settings Configuration** | Manage system-wide settings and support parameters |
-
-### 🤖 AI & Analytics Features
-
-| Feature | Description |
-|---------|-------------|
-| **Multi-Model Evaluation** | Random Forest, XGBoost, SVM, Logistic Regression, Gradient Boosting |
-| **Class Imbalance Handling** | SMOTE + Undersampling for robust predictions on imbalanced datasets |
-| **Location-Based Boosting** | Adjust predictions using regional disease prevalence data |
-| **Seasonal Adjustments** | Account for temporal patterns in disease occurrence |
-| **Feature Importance Analysis** | Identify most influential symptoms for each disease |
+> 🌐 **Try the Live Application:** **[https://glohealth-ai.onrender.com](https://glohealth-ai.onrender.com)**  
+> Experience real-time symptom diagnosis, regional health insights, doctor scheduling, and the administrative surveillance console.
 
 ---
 
-## Architecture
+## 📌 Executive Summary
 
-### System Design
+**GloHealth AI** is an enterprise-ready, full-stack healthcare web application that combines machine learning with regional geospatial intelligence to provide rapid symptom-based disease prediction, healthcare resource scheduling, and epidemiological trend tracking.
+
+### Core Objectives:
+1. **Patient Empowerment:** Instant, ML-driven health triage with transparent confidence scores and symptom importance breakdowns.
+2. **Public Health Intelligence:** Geospatial and temporal disease surveillance across divisions to aid early epidemic detection.
+3. **Telehealth Ecosystem:** Integrated scheduling connecting patients with verified medical specialists.
+4. **Inclusive Healthcare:** Bilingual support (**English & Bengali**) with a fully responsive mobile-first UI.
+
+---
+
+## 📸 Screenshot Gallery
+
+### 🌐 User Experience (Desktop & Mobile)
+| Desktop Landing Experience | Responsive Mobile Experience |
+|:---:|:---:|
+| <img src="docs/screenshots/desktop_landing.png" alt="Desktop Landing" width="480" /> | <img src="docs/screenshots/mobile_landing.png" alt="Mobile Landing" width="240" /> |
+
+---
+
+### 🩺 AI Symptom Assessment & Clinical Results
+| Interactive Symptom Selector | Diagnostic Risk & Confidence Score |
+|:---:|:---:|
+| <img src="docs/screenshots/clinical_assessment_modal.png" alt="Clinical Assessment" width="400" /> | <img src="docs/screenshots/prediction_assessment.png" alt="Prediction Results" width="400" /> |
+
+---
+
+### 🏥 Healthcare Management & Administrative Surveillance
+| Epidemiological Surveillance Overview | Doctor Roster & Specialty Management |
+|:---:|:---:|
+| <img src="docs/screenshots/admin_overview_tab.png" alt="Admin Overview" width="400" /> | <img src="docs/screenshots/admin_doctors_tab.png" alt="Admin Doctors" width="400" /> |
+
+| Appointment Scheduling & Dispatch | Bilingual Accessibility (Bengali / বাংলা) |
+|:---:|:---:|
+| <img src="docs/screenshots/admin_appointments_new.png" alt="Admin Appointments" width="400" /> | <img src="docs/screenshots/clinical_assessment_modal_bn.png" alt="Bengali Assessment Modal" width="400" /> |
+
+---
+
+### 📊 Machine Learning Metrics & Explainability
+| Model Confusion Matrix | Top Symptom Feature Importance |
+|:---:|:---:|
+| <img src="docs/screenshots/confusion_matrix.png" alt="Confusion Matrix" width="400" /> | <img src="docs/screenshots/feature_importance.png" alt="Feature Importance" width="400" /> |
+
+---
+
+## ✨ Features at a Glance
+
+### 👤 Patient & Public Portal
+- **AI Symptom Diagnosis:** Select symptoms across categorized clinical groups to receive ranked disease predictions with confidence intervals.
+- **Location-Aware Boosting:** Predictions intelligently factor in regional disease prevalence data from Bangladesh divisions.
+- **Doctor Discovery & Booking:** Filter healthcare specialists by division, district, hospital, and consultation fee.
+- **Subscription Tiers:** Flexible membership plans (**Basic, Premium, Ultimate**) with complimentary consultation credits.
+- **Bilingual Interface:** Seamless toggling between English and Bengali across all forms, modals, and assessment dashboards.
+
+### 🛡️ Administrative & Epidemiological Console
+- **Disease Surveillance Heatmap:** Real-time spatial tracking of reported symptom clusters and regional prevalence trends.
+- **Doctor Credentialing:** Add, verify, and update healthcare provider profiles and schedules.
+- **Appointment Dispatch:** Monitor patient bookings, update consultation statuses, and reconcile payment records.
+- **User Governance:** Role-based access control (Patient, Doctor, Administrator).
+- **System Settings:** Centralized configuration for consultation pricing, emergency hotlines, and platform metadata.
+
+---
+
+## 🏛️ System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Frontend Layer                           │
-│        (HTML/CSS/Bootstrap - Responsive UI)                 │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│              Flask Web Application                          │
-│  Routes: /prediction, /predict, /doctors, /appointments    │
-│  Authentication: Flask-Login + Supabase Auth               │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│          Business Logic & ML Pipeline                       │
-│  ├─ Disease Prediction Engine                              │
-│  ├─ Location-based Boosting                               │
-│  ├─ Geospatial Analysis                                   │
-│  └─ Feature Importance Extraction                          │
-└──────────────────────┬──────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────┐
-│         Data Layer - Supabase (PostgreSQL)                 │
-│  ├─ User Profiles & Authentication                        │
-│  ├─ Predictions & Results                                 │
-│  ├─ Doctors & Appointments                                │
-│  ├─ Location Insights                                     │
-│  ├─ User Subscriptions                                    │
-│  └─ System Settings                                       │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             Client Interfaces                               │
+│        Desktop Web Browser  │  Mobile Web  │  Bilingual Locale (EN/BN)      │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ HTTPS / REST
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│                    Flask 3.1.1 Application Engine                           │
+│  ├─ Session Management (Flask-Login)                                        │
+│  ├─ RESTful Routing (/prediction, /predict, /doctors, /admin)               │
+│  └─ Security & Rate Limiting                                                │
+└──────────────────┬───────────────────────────────────┬──────────────────────┘
+                   │                                   │
+┌──────────────────▼──────────────────┐ ┌──────────────▼──────────────────────┐
+│     Machine Learning Pipeline       │ │       Supabase Data Layer           │
+│  ├─ Multi-Model Voting Ensemble     │ │  ├─ PostgreSQL Tables               │
+│  ├─ Regional Prevalence Boosting    │ │  ├─ Supabase Auth & JWT             │
+│  ├─ Feature Importance Explainer    │ │  ├─ Row Level Security (RLS)        │
+│  └─ Temporal Trend Analysis         │ │  └─ Real-time Query Engine          │
+└─────────────────────────────────────┘ └─────────────────────────────────────┘
 ```
 
 ---
 
-## Tech Stack
+## 🛠️ Technology Stack
 
-### Backend & ML
-- **Framework:** Python 3.8+, Flask 3.1.1
-- **Machine Learning:** scikit-learn, XGBoost, imbalanced-learn
-- **Data Processing:** Pandas, NumPy, SciPy
-- **Visualization:** Matplotlib, Seaborn, Folium
-
-### Frontend
-- **Markup:** HTML5
-- **Styling:** CSS3, Bootstrap
-- **Client-Side:** JavaScript (form submission, geolocation)
-
-### Database & Authentication
-- **Database:** Supabase (PostgreSQL)
-- **Authentication:** Supabase Auth (Email/Password)
-- **Session Management:** Flask-Login
-
-### Deployment & DevOps
-- **Server:** Gunicorn
-- **Hosting:** Render / Local Server
-- **Python Runtime:** 3.11.x (specified in `runtime.txt`)
-
-### Dependencies
-See [requirements.txt](requirements.txt) for complete list (67 packages)
+| Layer | Technologies |
+|---|---|
+| **Backend Framework** | Python 3.11+, Flask 3.1.1, Gunicorn |
+| **Machine Learning** | scikit-learn, XGBoost, imbalanced-learn (SMOTE), SciPy |
+| **Data Processing** | Pandas, NumPy, Joblib |
+| **Visualization** | Matplotlib, Seaborn, Folium |
+| **Database & Auth** | Supabase (Managed PostgreSQL) with Supabase-py SDK |
+| **Frontend** | Semantic HTML5, Vanilla CSS3, Responsive Glassmorphism, JavaScript ES6+ |
+| **Testing & QA** | TestSprite E2E Test Suite, Playwright |
+| **Deployment** | Render (PaaS) with zero-downtime containerized deploys |
 
 ---
 
-## Installation
+## 🚀 Quickstart & Installation
 
 ### Prerequisites
-- Python 3.8 or higher
-- Git
-- Pip (Python package manager)
-- PostgreSQL database (via Supabase)
+- **Python 3.11+** installed ([python.org](https://www.python.org/downloads/))
+- **Git** installed ([git-scm.com](https://git-scm.com/))
+- A free **Supabase** account ([supabase.com](https://supabase.com/))
 
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/itzabd/GloHealth_Ai.git
 cd GloHealth_Ai
 ```
 
-### Step 2: Create Virtual Environment
+### 2. Configure Virtual Environment
 ```bash
 # On Windows
-python -m venv venv
-venv\Scripts\activate
+python -m venv .venv
+.venv\Scripts\activate
 
 # On macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### Step 3: Install Dependencies
+### 3. Install Dependencies
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Step 4: Environment Configuration
-Create a `.env` file in the project root:
+### 4. Configure Environment Variables
+Copy the template configuration file:
+```bash
+cp .env.example .env
+```
+Edit `.env` with your project credentials:
 ```env
-# Flask Configuration
-FLASK_SECRET_KEY=your_secret_key_here
-FLASK_ENV=development
-FLASK_APP=app.py
-
-# Supabase Configuration
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_anon_key
-
-# Database
-DATABASE_URL=your_database_url
-
-# Optional: Email Configuration
-MAIL_SERVER=your_smtp_server
-MAIL_PORT=587
-MAIL_USERNAME=your_email
-MAIL_PASSWORD=your_password
+FLASK_SECRET_KEY=your_secure_random_key
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your_supabase_anon_public_key
+PORT=5000
 ```
 
-### Step 5: Initialize Database
+### 5. Initialize Database Schema
+Run the automated schema provisioning script:
 ```bash
-# Run Supabase migrations
 python supabase_setup.py
-
-# Verify installation
-python test_install.py
 ```
 
-### Step 6: Train ML Models (Optional)
+### 6. Run the Application
 ```bash
-# Place training data in data/ directory
-python train_model.py
-```
-
-### Step 7: Run Application
-```bash
-# Development Server
+# Development mode
 python app.py
 
-# Production Server (with Gunicorn)
-gunicorn app:app --workers 4 --bind 0.0.0.0:8000
+# Production mode with Gunicorn
+gunicorn app:app --workers 4 --bind 0.0.0.0:5000
 ```
-
-Access the application at: `http://localhost:5000`
-
----
-
-## Configuration
-
-### Database Setup
-
-**Required Supabase Tables:**
-
-```sql
--- User Profiles
-CREATE TABLE user_profiles (
-  id UUID PRIMARY KEY,
-  full_name VARCHAR,
-  email VARCHAR,
-  city VARCHAR,
-  division VARCHAR,
-  postal_code VARCHAR,
-  is_admin BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Predictions
-CREATE TABLE predictions (
-  id BIGSERIAL PRIMARY KEY,
-  user_id UUID REFERENCES user_profiles(id),
-  symptoms JSONB,
-  top_prediction VARCHAR,
-  confidence FLOAT,
-  full_results JSONB,
-  division VARCHAR,
-  latitude FLOAT,
-  longitude FLOAT,
-  zip_code VARCHAR,
-  timestamp TIMESTAMP DEFAULT NOW()
-);
-
--- Location Insights
-CREATE TABLE location_insights (
-  id BIGSERIAL PRIMARY KEY,
-  division VARCHAR,
-  disease VARCHAR,
-  confidence_score FLOAT,
-  prevalence_score FLOAT DEFAULT 0.001,
-  case_count INTEGER DEFAULT 1,
-  latitude FLOAT,
-  longitude FLOAT,
-  zip_code VARCHAR,
-  last_updated TIMESTAMP DEFAULT NOW()
-);
-
--- Doctors
-CREATE TABLE doctors (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR,
-  specialty VARCHAR,
-  division VARCHAR,
-  district VARCHAR,
-  hospital VARCHAR,
-  consultation_fee DECIMAL,
-  availability TEXT,
-  contact VARCHAR,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Appointments
-CREATE TABLE appointments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES user_profiles(id),
-  doctor_id UUID REFERENCES doctors(id),
-  scheduled_time TIMESTAMP,
-  status VARCHAR DEFAULT 'pending',
-  payment_status VARCHAR DEFAULT 'unpaid',
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- User Subscriptions
-CREATE TABLE user_subscriptions (
-  id BIGSERIAL PRIMARY KEY,
-  user_id UUID REFERENCES user_profiles(id),
-  plan_name VARCHAR,
-  start_date TIMESTAMP,
-  end_date TIMESTAMP,
-  active BOOLEAN DEFAULT TRUE,
-  checkup_points INTEGER,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- System Settings
-CREATE TABLE system_settings (
-  id BIGSERIAL PRIMARY KEY,
-  site_name VARCHAR,
-  support_email VARCHAR,
-  checkup_fee DECIMAL,
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-### Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `FLASK_SECRET_KEY` | Flask session encryption key | ✅ |
-| `SUPABASE_URL` | Supabase project URL | ✅ |
-| `SUPABASE_KEY` | Supabase anonymous API key | ✅ |
-| `FLASK_ENV` | development/production | ❌ |
+Open your browser and navigate to: **`http://localhost:5000`**
 
 ---
 
-## Usage
+## 🧠 Machine Learning Engine
 
-### 1. User Registration & Login
-1. Navigate to `/signup`
-2. Provide email, password, and division information
-3. Account is created in Supabase Auth
-4. Profile data stored in `user_profiles` table
+The GloHealth AI diagnosis pipeline evaluates **6 competitive algorithms** on multidimensional clinical symptom datasets:
 
-### 2. Disease Prediction
-1. Go to `/prediction`
-2. Select symptoms from categorized lists
-3. Provide location (division + coordinates)
-4. Submit for AI prediction
-5. View top 3 predictions with confidence scores
+| Algorithm | Strengths | Role in Ensemble |
+|---|---|---|
+| **Random Forest** | High variance resilience, feature ranking | Primary ensemble voting member |
+| **XGBoost** | High gradient performance, missing value handling | High-confidence probability booster |
+| **Extra Trees** | Fast randomized feature split sampling | Overfitting mitigation |
+| **Support Vector Machine (SVM)** | Robust boundary optimization in high dimensions | High-margin decision support |
+| **Gradient Boosting** | Sequential error correction | Sensitivity optimization |
+| **Logistic Regression** | Linear probability calibration | Baseline comparison & interpretability |
 
-### 3. Booking Appointments
-1. Browse available doctors at `/doctors`
-2. Filter by division and specialty
-3. Click "Book Appointment" on doctor profile
-4. Select subscription plan if needed
-5. Choose appointment date/time
-6. Confirm payment or use free checkup points
-
-### 4. Admin Functions
-1. Login with admin account
-2. Access `/admin/dashboard`
-3. Manage users, doctors, appointments, and settings
+### Addressing Class Imbalance
+- **SMOTE (Synthetic Minority Over-sampling Technique)** applied to underrepresented symptom categories to prevent bias toward common ailments.
+- **Location-Based Boosting:** Incorporates regional case frequency dynamically via Bayesian weighting to adjust prior probabilities for endemic conditions.
 
 ---
 
-## Project Structure
+## 📡 API Reference
 
-```
-GloHealth_Ai/
-├── app.py                          # Main Flask application
-├── train_model.py                  # ML model training
-├── data_prep.py                    # Data preprocessing
-├── geo_analysis.py                 # Geospatial analysis
-├── supabase_setup.py               # Database init
-├── requirements.txt                # Dependencies
-├── runtime.txt                     # Python version
-├── static/                         # CSS, JS, images
-├── templates/                      # HTML templates
-├── data/                           # Training datasets
-├── results/                        # Model outputs
-└── .env                            # Environment variables
-```
+### Health Diagnosis Prediction
+`POST /predict`
 
----
+Computes the highest probability diseases given a set of symptoms and geolocation coordinates.
 
-## Machine Learning Models
-
-### Training Pipeline
-
-The system evaluates **6 different machine learning algorithms**:
-
-| Model | Best For |
-|-------|----------|
-| Random Forest | High accuracy, feature importance |
-| XGBoost | Fast training, gradient boosting |
-| SVM | Non-linear patterns |
-| Logistic Regression | Interpretability |
-| Gradient Boosting | Sequential learning |
-| Extra Trees | Faster training |
-
-### Model Selection
-Best model selected based on **test F1-score (weighted)**
-
-### Output Artifacts
-- `production_model.joblib` - Best model for deployment
-- `label_encoder.joblib` - Disease class encoder
-- `feature_columns.joblib` - Feature list
-- Confusion matrices and feature importance plots
-- Training report with metrics
-
----
-
-## API Documentation
-
-### Prediction Endpoint
+#### Request Headers
 ```http
-POST /predict
 Content-Type: application/json
-Authorization: Required
+```
 
+#### Request Body
+```json
 {
-  "symptoms": ["fever", "cough"],
-  "division": "Dhaka",
-  "lat": 23.8103,
-  "long": 90.4125
+  "symptoms": ["chills", "high_fever", "sweating", "headache", "nausea"],
+  "division": "Chittagong",
+  "lat": 22.3569,
+  "long": 91.7832
 }
 ```
 
-### Response
+#### Successful Response (`200 OK`)
 ```json
 {
   "success": true,
+  "top_prediction": "Malaria",
+  "confidence": 0.892,
+  "confidence_percentage": "89.2%",
+  "regional_influence_applied": true,
   "predictions": [
     {
-      "disease": "Flu",
-      "confidence": 0.78,
-      "probability": "78.0%",
-      "regional_influence": 0.15
+      "disease": "Malaria",
+      "probability": "89.2%",
+      "confidence": 0.892
+    },
+    {
+      "disease": "Dengue",
+      "probability": "7.4%",
+      "confidence": 0.074
+    },
+    {
+      "disease": "Typhoid",
+      "probability": "3.4%",
+      "confidence": 0.034
     }
   ]
 }
@@ -433,81 +277,171 @@ Authorization: Required
 
 ---
 
-## Database Schema
+## 🗄️ Database Architecture (Supabase PostgreSQL)
 
-### Core Tables
+```sql
+-- User Profiles & Roles
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY,
+  full_name VARCHAR(150),
+  email VARCHAR(255) UNIQUE,
+  city VARCHAR(100),
+  division VARCHAR(100),
+  postal_code VARCHAR(20),
+  is_admin BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-- **user_profiles** - User account information
-- **predictions** - Disease prediction records
-- **location_insights** - Regional disease trends
-- **doctors** - Healthcare provider profiles
-- **appointments** - Scheduled consultations
-- **user_subscriptions** - Plan subscriptions
-- **system_settings** - System configuration
+-- AI Predictions Log
+CREATE TABLE predictions (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  symptoms JSONB,
+  top_prediction VARCHAR(150),
+  confidence FLOAT,
+  full_results JSONB,
+  division VARCHAR(100),
+  latitude FLOAT,
+  longitude FLOAT,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
----
+-- Regional Epidemiological Surveillance
+CREATE TABLE location_insights (
+  id BIGSERIAL PRIMARY KEY,
+  division VARCHAR(100),
+  disease VARCHAR(150),
+  confidence_score FLOAT,
+  prevalence_score FLOAT DEFAULT 0.001,
+  case_count INTEGER DEFAULT 1,
+  latitude FLOAT,
+  longitude FLOAT,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-## Deployment
+-- Healthcare Providers
+CREATE TABLE doctors (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(150),
+  specialty VARCHAR(100),
+  division VARCHAR(100),
+  district VARCHAR(100),
+  hospital VARCHAR(200),
+  consultation_fee DECIMAL(10, 2),
+  availability TEXT,
+  contact VARCHAR(50),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-### Local Development
-```bash
-python app.py
-# Server runs on http://localhost:5000
+-- Appointments & Consultations
+CREATE TABLE appointments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+  doctor_id UUID REFERENCES doctors(id) ON DELETE CASCADE,
+  scheduled_time TIMESTAMP WITH TIME ZONE,
+  status VARCHAR(50) DEFAULT 'pending',
+  payment_status VARCHAR(50) DEFAULT 'unpaid',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 ```
 
-### Production (Render)
-1. Push to GitHub
-2. Connect to Render
-3. Set environment variables
-4. Deploy with Gunicorn
-
-### Production Checklist
-- ✅ Strong `FLASK_SECRET_KEY`
-- ✅ HTTPS enabled
-- ✅ Database backups configured
-- ✅ Error logging enabled
-- ✅ Security headers set
-- ✅ Rate limiting configured
-
 ---
 
-## Contributing
+## 🧪 Automated Testing Suite
 
-Follow PEP 8 style conventions, include docstrings, and submit PRs with clear descriptions.
+The platform includes end-to-end integration and user journey tests created with **TestSprite** and **Playwright**:
 
----
-
-## Troubleshooting
-
-### Supabase Connection Error
 ```bash
-pip install --upgrade urllib3 certifi
+# Run automated test cases
+pytest testsprite_tests/
 ```
 
-### Model Not Found
-```bash
-python train_model.py
+| Test Case | Scenario Description |
+|---|---|
+| `TC001` | Doctor appointment booking workflow |
+| `TC002` | User registration and dashboard onboarding |
+| `TC003` | Authentication and session validation |
+| `TC004` | Multi-symptom selection and AI prediction generation |
+| `TC005` | Administrative console surveillance review |
+| `TC008` | Healthcare provider onboarding & roster update |
+| `TC010` | Doctor specialty filtering and geographic search |
+| `TC013` | Regional disease trend visualization |
+
+---
+
+## 📂 Project Structure
+
+```
+GloHealth_Ai/
+├── .github/                       # GitHub Actions workflows & issue templates
+│   ├── ISSUE_TEMPLATE/            # Bug report & feature request forms
+│   ├── pull_request_template.md   # Pull request guidelines
+│   └── workflows/ci.yml           # Automated lint & syntax CI pipeline
+├── config/                        # Dynamic configuration files
+│   └── system_settings.json       # Platform-wide runtime settings
+├── data/                          # Training & evaluation datasets
+│   ├── symbipredict_2022.csv      # Clinical symptom matrix
+│   ├── train.csv                  # Partitioned training dataset
+│   └── test.csv                   # Partitioned test dataset
+├── docs/                          # Project documentation & visual assets
+│   └── screenshots/               # Clean screenshot showcase
+├── results/                       # Trained ML artifacts & evaluation plots
+│   ├── production_model.joblib    # Serialized production classifier
+│   ├── label_encoder.joblib       # Disease categorical encoder
+│   └── feature_columns.joblib     # Input symptom vector definitions
+├── static/                        # Static UI assets
+│   ├── css/main.css               # Core design system & responsive styling
+│   ├── js/                        # Client-side validation & dynamic interactions
+│   └── Logo.png                   # Official GloHealth AI brand logo
+├── templates/                     # Jinja2 HTML templates
+│   ├── admin_*.html               # Administrative surveillance consoles
+│   ├── auth/                      # Authentication views (Login / Signup)
+│   ├── base.html                  # Global layout & navigation shell
+│   └── landing.html               # Main landing & feature showcase
+├── testsprite_tests/              # Automated E2E Playwright test suite
+├── .env.example                   # Environment configuration template
+├── .gitignore                     # Git ignore rules for clean repo hygiene
+├── app.py                         # Flask web application & API routing
+├── data_prep.py                   # Data cleaning & preprocessing script
+├── disease_predictor.joblib       # Standalone predictor model artifact
+├── geo_analysis.py                # Geospatial and regional risk weighting
+├── Procfile                       # Process manager for cloud hosting
+├── render.yaml                    # Infrastructure-as-code for Render
+├── requirements.txt               # Production Python dependencies
+├── runtime.txt                    # Python version specification
+├── supabase_setup.py              # Supabase database initialization
+├── train_model.py                 # Multi-algorithm ML training pipeline
+├── CONTRIBUTING.md                # Open-source contribution guide
+├── LICENSE                        # MIT Open-Source License
+└── SECURITY.md                    # Responsible disclosure & security policy
 ```
 
-### Port Already in Use
-```bash
-lsof -ti:5000 | xargs kill -9
-```
+---
+
+## 🤝 Contributing
+
+Contributions make the open-source community a place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+Please review our **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[SECURITY.md](SECURITY.md)** before submitting pull requests.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'feat: Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
-## License
+## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details
-
----
-
-## Support
-
-- **Author:** Abdullah Hossien (itzabd)
-- **GitHub:** [@itzabd](https://github.com/itzabd)
-- **Issues:** [GitHub Issues](https://github.com/itzabd/GloHealth_Ai/issues)
+Distributed under the **MIT License**. See **[LICENSE](LICENSE)** for more information.
 
 ---
 
-**Version:** 1.0.0 | **Status:** Active Development | **Updated:** April 24, 2026
+## 👨‍💻 Author & Acknowledgements
+
+**Abdullah Hossien (itzabd)**  
+- GitHub: [@itzabd](https://github.com/itzabd)  
+- Live Deployment: [glohealth-ai.onrender.com](https://glohealth-ai.onrender.com)  
+
+*Special thanks to all open-source contributors and healthcare researchers who make accessible AI diagnostics possible.*
