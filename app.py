@@ -1643,7 +1643,6 @@ def get_disease_color_filter(disease):
 @app.route('/doctors')
 @login_required
 def doctors():
-    global supabase
     division = request.args.get('division')
     specialty = request.args.get('specialty')
 
@@ -1680,7 +1679,6 @@ def doctors():
 @app.route('/book_appointment/<doctor_id>', methods=['GET', 'POST'])
 @login_required
 def book_appointment(doctor_id):
-    global supabase
     doctor = None
 
     # Fetch doctor with retry & reconnect
@@ -1777,7 +1775,6 @@ def book_appointment(doctor_id):
 @app.route('/appointments')
 @login_required
 def appointments():
-    global supabase
     appointments_list = []
     for attempt in range(3):
         try:
