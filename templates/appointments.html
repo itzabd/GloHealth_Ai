@@ -56,12 +56,25 @@
                                 {{ appt.doctors.hospital if appt.doctors and appt.doctors.hospital else 'Clinical Hub, Dhaka' }}
                             </td>
                             <td data-label="Status">
-                                <span class="gh-badge gh-badge--success" data-i18n="ap.conf">Confirmed</span>
+                                {% if appt.status|lower == 'confirmed' %}
+                                    <span class="gh-badge gh-badge--success" data-i18n="ap.conf">Confirmed</span>
+                                {% elif appt.status|lower == 'cancelled' %}
+                                    <span class="gh-badge gh-badge--danger" style="background: #fee2e2; color: #dc2626;">Cancelled</span>
+                                {% else %}
+                                    <span class="gh-badge gh-badge--warn" data-i18n="ap.pend">Pending</span>
+                                {% endif %}
                             </td>
                             <td data-label="Actions" style="text-align: right;">
-                                <div class="gh-row" style="gap: 6px; justify-content: flex-end;">
-                                    <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="ap.resched">Reschedule</button>
-                                    <button type="button" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="ap.join">Join Call</button>
+                                <div class="gh-row" style="gap: 6px; justify-content: flex-end; align-items: center;">
+                                    {% if appt.status|lower != 'cancelled' %}
+                                        <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="ap.resched" onclick="openRescheduleModal('{{ appt.id }}', '{{ appt.scheduled_time }}')">Reschedule</button>
+                                        <form method="POST" action="{{ url_for('cancel_appointment', appointment_id=appt.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                            <button type="submit" class="gh-btn gh-btn--ghost gh-btn--sm" data-i18n="ap.cancel" style="color: #e11d48;">Cancel</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if appt.status|lower == 'confirmed' %}
+                                        <button type="button" class="gh-btn gh-btn--primary gh-btn--sm" data-i18n="ap.join">Join Call</button>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -149,9 +162,73 @@
             </div>
         </div>
     </div>
+    <!-- Reschedule Modal -->
+    <div id="rescheduleModal" class="gh-modal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+        <div class="gh-card" style="background: #ffffff; max-width: 440px; width: 92%; padding: 24px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);">
+            <div class="gh-row justify-content-between align-items-center" style="margin-bottom: 16px;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: var(--gh-text-main);">Reschedule Appointment</h3>
+                <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm" onclick="closeRescheduleModal()" aria-label="Close dialog" style="font-size: 18px;">&times;</button>
+            </div>
+            <form id="rescheduleForm" method="POST" action="">
+                <div style="margin-bottom: 14px;">
+                    <label for="rescheduleDate" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--gh-text-main);">Select Date</label>
+                    <input type="date" name="date" id="rescheduleDate" required style="width: 100%; height: 40px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label for="rescheduleTime" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--gh-text-main);">Select Time Slot</label>
+                    <select name="time" id="rescheduleTime" required style="width: 100%; height: 40px; padding: 0 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px;">
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:30">03:30 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                    </select>
+                </div>
+                <div class="gh-row" style="gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="gh-btn gh-btn--ghost gh-btn--sm" onclick="closeRescheduleModal()">Cancel</button>
+                    <button type="submit" class="gh-btn gh-btn--primary gh-btn--sm">Confirm Reschedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/appointments.js') }}"></script>
+<script>
+function openRescheduleModal(apptId, currentDatetime) {
+    var modal = document.getElementById('rescheduleModal');
+    var form = document.getElementById('rescheduleForm');
+    var dateInput = document.getElementById('rescheduleDate');
+    var timeSelect = document.getElementById('rescheduleTime');
+
+    if (modal && form) {
+        form.action = '/reschedule_appointment/' + apptId;
+        if (currentDatetime && currentDatetime.length >= 10) {
+            dateInput.value = currentDatetime.substring(0, 10);
+            if (currentDatetime.length >= 16) {
+                var timePart = currentDatetime.substring(11, 16);
+                for (var i = 0; i < timeSelect.options.length; i++) {
+                    if (timeSelect.options[i].value === timePart) {
+                        timeSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        } else {
+            var tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            dateInput.value = tomorrow.toISOString().substring(0, 10);
+        }
+        modal.style.display = 'flex';
+    }
+}
+
+function closeRescheduleModal() {
+    var modal = document.getElementById('rescheduleModal');
+    if (modal) modal.style.display = 'none';
+}
+</script>
 {% endblock %}

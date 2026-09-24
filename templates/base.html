@@ -125,6 +125,25 @@
         -webkit-overflow-scrolling: touch;
         min-width: 0;
       }
+      .gh-admin-page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .gh-admin-page-header-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .gh-admin-page-header-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-shrink: 0;
+      }
       .gh-admin-mobile-toggle {
         display: none;
         background: #f8fafc;
@@ -248,6 +267,46 @@
         .gh-analytics-grid {
           grid-template-columns: 1fr !important;
           gap: 16px !important;
+        }
+        .gh-admin-page-header {
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 14px !important;
+          margin-bottom: 18px !important;
+        }
+        .gh-admin-page-header-actions {
+          width: 100% !important;
+        }
+        .gh-admin-page-header-actions .gh-btn {
+          width: 100% !important;
+          justify-content: center !important;
+          height: 42px !important;
+        }
+        .gh-admin-toolbar-controls {
+          width: 100% !important;
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: 8px !important;
+        }
+        .gh-admin-toolbar-controls select {
+          flex: 1 1 calc(50% - 4px) !important;
+          min-width: 120px !important;
+        }
+        .gh-admin-toolbar-controls button {
+          flex: 1 1 100% !important;
+          justify-content: center !important;
+        }
+        .gh-admin-appt-count {
+          width: 100% !important;
+          margin-left: 0 !important;
+          padding-left: 0 !important;
+          border-left: none !important;
+          text-align: center !important;
+          margin-top: 4px !important;
+        }
+        .gh-admin-2col-form {
+          grid-template-columns: 1fr !important;
+          gap: 20px !important;
         }
       }
       @media (max-width: 520px) {

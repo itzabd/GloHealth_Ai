@@ -152,16 +152,16 @@
             </div>
 
             <!-- Header Section -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
-                <div>
-                    <div class="gh-row" style="gap: 10px; align-items: center; margin-bottom: 4px;">
-                        <h1 style="font-size: 24px; font-weight: 700; color: #0f172a; margin: 0;">Schedule Clinical Consultation</h1>
-                        <span class="gh-badge gh-badge--accent" style="font-size: 11px; font-family: monospace;">ISO-27799 ENCRYPTED</span>
+            <div class="gh-admin-page-header" style="padding-bottom: 16px; border-bottom: 1px solid var(--gh-border);">
+                <div class="gh-admin-page-header-info">
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 4px; flex-wrap: wrap;">
+                        <h1 style="font-size: clamp(20px, 4vw, 24px); font-weight: 700; color: #0f172a; margin: 0; line-height: 1.25;">Schedule Clinical Consultation</h1>
+                        <span class="gh-badge gh-badge--accent" style="font-size: 11px; font-family: monospace; white-space: nowrap;">ISO-27799 ENCRYPTED</span>
                     </div>
-                    <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0;">Search patient, choose specialist clinician, and assign a consultation slot in real time.</p>
+                    <p style="font-size: 13.5px; color: var(--gh-text-muted); margin: 0; line-height: 1.45;">Search patient, choose specialist clinician, and assign a consultation slot in real time.</p>
                 </div>
-                <div class="gh-row" style="gap: 12px;">
-                    <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="gap: 6px;">
+                <div class="gh-admin-page-header-actions">
+                    <a href="{{ url_for('admin_appointments') }}" class="gh-btn gh-btn--outline" style="gap: 6px; white-space: nowrap;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
                         <span>Back to Appointments</span>
                     </a>
@@ -169,7 +169,7 @@
             </div>
 
             <!-- 2-Column Responsive Workspace -->
-            <form method="POST" id="appointmentAddForm" style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 28px; align-items: start;">
+            <form method="POST" id="appointmentAddForm" class="gh-admin-2col-form" style="display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); gap: 28px; align-items: start;">
                 
                 <!-- Hidden Form Fields Submitted on POST -->
                 <input type="hidden" name="user_id" id="selectedUserId" value="" required>

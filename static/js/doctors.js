@@ -11,10 +11,36 @@ document.addEventListener('DOMContentLoaded', function() {
     var emptyState = document.getElementById('doctorsEmptyState');
     var grid = document.getElementById('doctorsGrid');
 
+    function normalizeTerm(str) {
+        return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function matchSpecialty(docSpec, filterSpec) {
+        if (!filterSpec) return true;
+        var d = normalizeTerm(docSpec);
+        var f = normalizeTerm(filterSpec);
+        if (!d || !f) return false;
+        if (d === f || d.includes(f) || f.includes(d)) return true;
+        var stemLen = Math.min(6, d.length, f.length);
+        if (stemLen >= 4 && d.slice(0, stemLen) === f.slice(0, stemLen)) return true;
+        return false;
+    }
+
+    function matchDivision(docDiv, filterDiv) {
+        if (!filterDiv) return true;
+        var d = normalizeTerm(docDiv);
+        var f = normalizeTerm(filterDiv);
+        if (!d || !f) return false;
+        if (d === f) return true;
+        if ((d === 'chittagong' && f === 'chattogram') || (d === 'chattogram' && f === 'chittagong')) return true;
+        if ((d === 'barisal' && f === 'barishal') || (d === 'barishal' && f === 'barisal')) return true;
+        return d.includes(f) || f.includes(d);
+    }
+
     function applyFilters() {
         var query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-        var selectedSpecialty = (specialtySelect ? specialtySelect.value : '').toLowerCase();
-        var selectedDivision = (divisionSelect ? divisionSelect.value : '').toLowerCase();
+        var selectedSpecialty = (specialtySelect ? specialtySelect.value : '');
+        var selectedDivision = (divisionSelect ? divisionSelect.value : '');
 
         var visibleCount = 0;
 
@@ -25,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
             var division = (card.getAttribute('data-division') || '').toLowerCase();
 
             var matchesQuery = !query || name.includes(query) || hospital.includes(query) || specialty.includes(query);
-            var matchesSpecialty = !selectedSpecialty || specialty === selectedSpecialty;
-            var matchesDivision = !selectedDivision || division === selectedDivision;
+            var matchesSpecialtyVal = matchSpecialty(specialty, selectedSpecialty);
+            var matchesDivisionVal = matchDivision(division, selectedDivision);
 
-            if (matchesQuery && matchesSpecialty && matchesDivision) {
+            if (matchesQuery && matchesSpecialtyVal && matchesDivisionVal) {
                 card.style.display = '';
                 visibleCount++;
             } else {

@@ -1,0 +1,979 @@
+[
+  {
+    "id": "TC001",
+    "title": "Book a future doctor appointment",
+    "description": "This test verifies that an authenticated user can open a doctor profile, book a future appointment with a reason, and see the booking confirmed.",
+    "category": "Doctor Directory and Appointment Booking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /doctors"
+      },
+      {
+        "type": "action",
+        "description": "Open a doctor profile from the listing"
+      },
+      {
+        "type": "action",
+        "description": "Proceed to the booking page"
+      },
+      {
+        "type": "action",
+        "description": "Choose a valid future date"
+      },
+      {
+        "type": "action",
+        "description": "Select an available time slot"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the reason for the visit field with a brief reason"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the booking"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a booking confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the appointment appears in the appointments list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Create an account and reach the dashboard",
+    "description": "This test verifies that a new user can register with valid details and land on the dashboard after account creation.",
+    "category": "User Authentication and Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /signup"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the name field with a valid full name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with a new valid email address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the division field with a valid division"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the district field with a valid district"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the postal code field with a valid postal code"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new account session is active"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Sign in with valid credentials",
+    "description": "This test verifies that an existing user can sign in successfully and reach the dashboard.",
+    "category": "User Authentication and Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is signed in"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Select symptoms and receive a prediction result",
+    "description": "This test verifies that an authenticated user can submit selected symptoms and location details and receive an AI prediction result with guidance.",
+    "category": "Clinical Symptom Assessment and AI Prediction",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /prediction"
+      },
+      {
+        "type": "action",
+        "description": "Select one or more symptoms"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the division field with a valid division"
+      },
+      {
+        "type": "action",
+        "description": "Submit the assessment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the prediction results page is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a disease prediction and advice are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Open the admin dashboard and review platform activity",
+    "description": "This test verifies that an administrator can access the protected dashboard and view platform metrics and recent activity before navigating to management sections.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the admin dashboard link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify platform metrics are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify recent activity is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Review prediction results and guidance",
+    "description": "This test verifies that an authenticated user can open the results page and review the predicted condition, confidence, and medical guidance.",
+    "category": "Prediction Results and Insights",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /results"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the predicted condition and confidence score are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify medical guidance is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Update a user profile in admin management",
+    "description": "This test verifies that an administrator can edit a user and see the updated profile reflected in the user list.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the user management section"
+      },
+      {
+        "type": "action",
+        "description": "Select a user to edit"
+      },
+      {
+        "type": "action",
+        "description": "Update profile details"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated user appears in the user list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Add a new doctor in admin management",
+    "description": "This test verifies that an administrator can create a doctor record and see it appear in the registry.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the doctor management section"
+      },
+      {
+        "type": "action",
+        "description": "Add a new doctor"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required doctor details"
+      },
+      {
+        "type": "action",
+        "description": "Save the doctor record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new doctor appears in the registry"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Update an appointment in admin management",
+    "description": "This test verifies that an administrator can change an appointment and see the updated values reflected in the appointments list.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the appointment management section"
+      },
+      {
+        "type": "action",
+        "description": "Open an appointment for editing"
+      },
+      {
+        "type": "action",
+        "description": "Change the appointment status or schedule"
+      },
+      {
+        "type": "action",
+        "description": "Save the update"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the appointments list reflects the new values"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Find doctors by search and filters",
+    "description": "This test verifies that an authenticated user can search for doctors and narrow the listing by specialty and division.",
+    "category": "Doctor Directory and Appointment Booking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /doctors"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the doctor search field with a doctor name or hospital"
+      },
+      {
+        "type": "action",
+        "description": "Select a specialty filter"
+      },
+      {
+        "type": "action",
+        "description": "Select a division filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matching doctor cards are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "End the current session",
+    "description": "This test verifies that a signed-in user can log out and return to the homepage.",
+    "category": "User Authentication and Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the logout control"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the homepage is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user session has ended"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Activate a subscription plan",
+    "description": "This test verifies that a subscriber can choose a plan and see the active subscription and updated benefits afterward.",
+    "category": "Subscription Plans and Care Benefits",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /plans"
+      },
+      {
+        "type": "action",
+        "description": "Click the option to subscribe to a plan"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the subscription"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the active plan is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated checkup points or benefits are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Explore disease trends by filter",
+    "description": "This test verifies that an authenticated user can open the geospatial insights dashboard, select a disease, and review divisional trend metrics.",
+    "category": "Geospatial Health Insights",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /geo_insights"
+      },
+      {
+        "type": "action",
+        "description": "Select a disease filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify divisional risk levels are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify outbreak metrics are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Update and persist admin site settings",
+    "description": "This test verifies that an administrator can change site settings and see the updated configuration persist after saving.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the site settings section"
+      },
+      {
+        "type": "action",
+        "description": "Update the site name, support email, or base consultation fee"
+      },
+      {
+        "type": "action",
+        "description": "Save the settings"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated configuration is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the settings persist after saving"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "Review and cancel a pending appointment",
+    "description": "This test verifies that an authenticated user can view booked appointments and cancel a pending or future appointment.",
+    "category": "Doctor Directory and Appointment Booking",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /appointments"
+      },
+      {
+        "type": "action",
+        "description": "Cancel a pending or future appointment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the appointment status is updated to cancelled"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cancelled appointment remains visible in the list"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Cancel an active subscription",
+    "description": "This test verifies that a subscriber can open an active plan and cancel it so renewal stops while benefits remain available for the current period.",
+    "category": "Subscription Plans and Care Benefits",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /plans"
+      },
+      {
+        "type": "action",
+        "description": "Open the active subscription"
+      },
+      {
+        "type": "action",
+        "description": "Cancel the subscription"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the subscription is marked as not renewing"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify retained benefits are still displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Export the audit log from admin",
+    "description": "This test verifies that an administrator can trigger the audit export from the protected admin portal.",
+    "category": "Administrative Governance",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the audit export section"
+      },
+      {
+        "type": "action",
+        "description": "Request the audit log export"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the audit export is available"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export action completes successfully"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Inspect prediction explanation details",
+    "description": "This test verifies that an authenticated user can review the explanation for the prediction and see the most influential symptoms.",
+    "category": "Prediction Results and Insights",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /results"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the prediction explanation is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the influential symptoms are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC019",
+    "title": "Switch the interface to English",
+    "description": "This test verifies that changing the language to English updates the application language across the interface.",
+    "category": "Bilingual Localization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /set_language/en"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface is displayed in English"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify clinical content is displayed in English"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Switch the interface to Bengali",
+    "description": "This test verifies that changing the language to Bengali updates the application language across the interface.",
+    "category": "Bilingual Localization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /set_language/bn"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the interface is displayed in Bengali"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify clinical content is displayed in Bengali"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Compare health trends across divisions",
+    "description": "This test verifies that an authenticated user can compare disease trends across divisions and months on the geospatial dashboard.",
+    "category": "Geospatial Health Insights",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /geo_insights"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the map is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify trend comparison metrics are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Review explanation for a prediction",
+    "description": "This test verifies that an authenticated user can view the explanation of which symptoms influenced the prediction results.",
+    "category": "Clinical Symptom Assessment and AI Prediction",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /prediction"
+      },
+      {
+        "type": "action",
+        "description": "Select one or more symptoms"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the division field with a valid division"
+      },
+      {
+        "type": "action",
+        "description": "Submit the assessment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify feature explanation details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify selected symptoms are reflected in the explanation"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Prevent submission without symptoms",
+    "description": "This test verifies that the prediction form blocks submission until at least one symptom is selected.",
+    "category": "Clinical Symptom Assessment and AI Prediction",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to /prediction"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the division field with a valid division"
+      },
+      {
+        "type": "action",
+        "description": "Submit the assessment"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a symptom validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the prediction results page is not displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "View plan details and benefits",
+    "description": "This test verifies that a user can compare available plans and open a plan detail view to review consultation allowances and benefits.",
+    "category": "Subscription Plans and Care Benefits",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /plans"
+      },
+      {
+        "type": "action",
+        "description": "Open a plan detail view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify plan comparison information is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify consultation allowances and benefits are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC025",
+    "title": "Reject invalid sign-in credentials",
+    "description": "This test verifies that invalid credentials are blocked and a sign-in error is shown.",
+    "category": "User Authentication and Account Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with a fake email address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with an invalid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a sign-in error message is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dashboard is not displayed"
+      }
+    ],
+    "priority": "Medium"
+  }
+]
